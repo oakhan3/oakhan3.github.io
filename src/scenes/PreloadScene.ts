@@ -28,6 +28,9 @@ export class PreloadScene extends Phaser.Scene {
     this.load.on('progress', (value: number) => {
       progressBar.width = (barWidth - 2) * value
     })
+
+    this.load.image('overworld-tiles', 'assets/tilesets/overworld.png')
+    this.load.tilemapTiledJSON('overworld-map', 'assets/maps/overworld.json')
   }
 
   create() {
