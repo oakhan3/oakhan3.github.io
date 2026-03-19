@@ -20,6 +20,8 @@ npm run lint           # Lint source files
 npm run lint:fix       # Lint and auto-fix
 npm run format         # Format source files with Prettier
 npm run format:check   # Check formatting without writing
+npm run test           # Run tests (browser mode via Playwright)
+npm run test:watch     # Run tests in watch mode
 npm run clean          # Remove dist/
 ```
 

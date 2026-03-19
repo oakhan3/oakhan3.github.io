@@ -4,7 +4,7 @@ import { PreloadScene } from './scenes/PreloadScene'
 import { OverworldScene } from './scenes/OverworldScene'
 import { GBA_WIDTH, GBA_HEIGHT } from './config'
 
-const config: Phaser.Types.Core.GameConfig = {
+export const GAME_CONFIG: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   parent: 'game-container',
   pixelArt: true,
@@ -25,4 +25,8 @@ const config: Phaser.Types.Core.GameConfig = {
   scene: [BootScene, PreloadScene, OverworldScene],
 }
 
-new Phaser.Game(config)
+export function createGame(): Phaser.Game {
+  return new Phaser.Game(GAME_CONFIG)
+}
+
+createGame()
