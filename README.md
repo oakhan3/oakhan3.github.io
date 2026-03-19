@@ -25,8 +25,38 @@ npm run test:watch     # Run tests in watch mode
 npm run clean          # Remove dist/
 ```
 
+## Editing the Map
+
+The overworld map is built in [Tiled](https://www.mapeditor.org/) and exported as JSON.
+
+### Setup
+
+1. Install [Tiled](https://www.mapeditor.org/)
+2. Open `public/assets/maps/overworld.tmx`
+
+### Tileset
+
+The tileset is from [Tiny Realm Asset Pack](https://trislin.itch.io/pixel-lands-village) by trislin (non-commercial license). Tile size is 16x16.
+
+### Layers
+
+Create layers in this order (bottom to top):
+
+| Layer | Type | Purpose |
+|-------|------|---------|
+| Ground | Tile | Grass, paths, water -- fill the entire map |
+| Decoration | Tile | Flowers, signs, small objects |
+| Buildings | Tile | Walls, roofs -- transparency shows Ground beneath |
+| Collisions | Tile | Paint any tile on impassable areas (hidden in game) |
+| AbovePlayer | Tile | Tree canopy, roof overhangs -- renders above the player |
+| Interactables | Object | Rectangle objects where the player can interact |
+
+### Exporting
+
+File > Export As > save to `public/assets/maps/overworld.json`. Make sure the tileset is **embedded** (right-click tileset tab > Embed Tileset).
+
 ## How It Works
 
-The site renders at 240x160 (GBA native resolution) and scales up to fill the browser window with nearest-neighbor interpolation for a crisp pixel art look.
+The site renders at 480x320 and scales up to fill the browser window with nearest-neighbor interpolation for a crisp pixel art look.
 
 Scenes flow: **Boot** (press any key) -> **Preload** (asset loading) -> **Overworld** (explore and interact).
