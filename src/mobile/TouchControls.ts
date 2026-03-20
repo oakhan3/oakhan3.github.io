@@ -1,9 +1,8 @@
 import Phaser from 'phaser'
-import { GBA_WIDTH, GBA_HEIGHT } from '../config'
+import { GBA_WIDTH, GBA_HEIGHT, Direction } from '../config'
 
 const CENTER_X = GBA_WIDTH / 2
 const CENTER_Y = GBA_HEIGHT / 2
-export type Direction = 'up' | 'down' | 'left' | 'right' | 'none'
 
 export class TouchControls {
   private activeDirection: Direction = 'none'

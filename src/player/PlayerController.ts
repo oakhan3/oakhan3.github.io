@@ -1,6 +1,6 @@
 import Phaser from 'phaser'
 import { PlayerSprite } from './PlayerSprite'
-import { PLAYER_SPEED } from '../config'
+import { PLAYER_SPEED, Direction } from '../config'
 import { TouchControls } from '../mobile/TouchControls'
 
 export class PlayerController {
@@ -9,6 +9,7 @@ export class PlayerController {
   private player: PlayerSprite
   private frozen = false
   private touchControls: TouchControls
+  private currentFacing: Direction = 'down'
 
   constructor(scene: Phaser.Scene, player: PlayerSprite, touchControls: TouchControls) {
     this.player = player
@@ -47,20 +48,28 @@ export class PlayerController {
     this.player.setVelocity(velocityX, velocityY)
 
     if (velocityX < 0) {
+      this.currentFacing = 'left'
       this.player.setFlipX(true)
       this.player.anims.play('walk-right', true)
     } else if (velocityX > 0) {
+      this.currentFacing = 'right'
       this.player.setFlipX(false)
       this.player.anims.play('walk-right', true)
     } else if (velocityY < 0) {
+      this.currentFacing = 'up'
       this.player.setFlipX(false)
       this.player.anims.play('walk-up', true)
     } else if (velocityY > 0) {
+      this.currentFacing = 'down'
       this.player.setFlipX(false)
       this.player.anims.play('walk-down', true)
     } else {
       this.player.anims.stop()
     }
+  }
+
+  get facing(): Direction {
+    return this.currentFacing
   }
 
   freeze(): void {

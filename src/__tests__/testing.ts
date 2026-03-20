@@ -1,3 +1,5 @@
+import { PlayerController } from '../player/PlayerController'
+
 export function waitForScene(game: Phaser.Game, sceneKey: string): Promise<Phaser.Scene> {
   return new Promise((resolve) => {
     const check = () => {
@@ -78,6 +80,11 @@ export function simulatePointerUp(game: Phaser.Game, gameX: number, gameY: numbe
 export function simulatePointerMove(game: Phaser.Game, gameX: number, gameY: number): void {
   const { pageX, pageY } = gameToPageCoords(game, gameX, gameY)
   game.canvas.dispatchEvent(new MouseEvent('mousemove', { clientX: pageX, clientY: pageY, button: 0, bubbles: true }))
+}
+
+export function findPlayerController(scene: Phaser.Scene): PlayerController {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (scene as any).playerController
 }
 
 export function findPlayer(scene: Phaser.Scene): Phaser.Physics.Arcade.Sprite {
