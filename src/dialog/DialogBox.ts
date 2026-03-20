@@ -10,6 +10,8 @@ const TYPEWRITER_DELAY = 35
 const BORDER_COLOR = 0xe2e8f0
 const BACKGROUND_COLOR = 0x1a1b2e
 const BACKGROUND_ALPHA = 0.92
+const INDICATOR_SIZE = 5
+const INDICATOR_BLINK_DURATION = 400
 
 export class DialogBox {
   private scene: Phaser.Scene
@@ -20,6 +22,8 @@ export class DialogBox {
   private typewriterTimer: Phaser.Time.TimerEvent | null = null
   private onClose: (() => void) | null = null
   private advanceKeys: Phaser.Input.Keyboard.Key[]
+  private indicator: Phaser.GameObjects.Graphics
+  private indicatorTween: Phaser.Tweens.Tween | null = null
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene
@@ -38,7 +42,14 @@ export class DialogBox {
       lineSpacing: 6,
     })
 
-    this.container = scene.add.container(BOX_MARGIN, BOX_Y, [background, this.textObject])
+    // NOTE: Small downward triangle at bottom-right of the box, classic GBA "press to continue" cue.
+    this.indicator = scene.add.graphics()
+    this.indicator.fillStyle(BORDER_COLOR, 1)
+    this.indicator.fillTriangle(0, 0, INDICATOR_SIZE * 2, 0, INDICATOR_SIZE, INDICATOR_SIZE)
+    this.indicator.setPosition(BOX_WIDTH - BOX_PADDING - INDICATOR_SIZE * 2, BOX_HEIGHT - BOX_PADDING - INDICATOR_SIZE)
+    this.indicator.setVisible(false)
+
+    this.container = scene.add.container(BOX_MARGIN, BOX_Y, [background, this.textObject, this.indicator])
     this.container.setScrollFactor(0)
     this.container.setDepth(100)
     this.container.setVisible(false)
@@ -51,6 +62,7 @@ export class DialogBox {
     this.displayedLength = 0
     this.onClose = onClose ?? null
     this.textObject.setText('')
+    this.hideIndicator()
     this.container.setVisible(true)
 
     this.typewriterTimer = this.scene.time.addEvent({
@@ -82,6 +94,9 @@ export class DialogBox {
   private advanceCharacter(): void {
     this.displayedLength++
     this.textObject.setText(this.fullText.slice(0, this.displayedLength))
+    if (this.displayedLength >= this.fullText.length) {
+      this.showIndicator()
+    }
   }
 
   private rushText(): void {
@@ -91,9 +106,31 @@ export class DialogBox {
     }
     this.displayedLength = this.fullText.length
     this.textObject.setText(this.fullText)
+    this.showIndicator()
+  }
+
+  private showIndicator(): void {
+    this.indicator.setVisible(true)
+    this.indicatorTween = this.scene.tweens.add({
+      targets: this.indicator,
+      alpha: { from: 1, to: 0 },
+      duration: INDICATOR_BLINK_DURATION,
+      yoyo: true,
+      repeat: -1,
+    })
+  }
+
+  private hideIndicator(): void {
+    if (this.indicatorTween) {
+      this.indicatorTween.destroy()
+      this.indicatorTween = null
+    }
+    this.indicator.setVisible(false)
+    this.indicator.setAlpha(1)
   }
 
   private close(): void {
+    this.hideIndicator()
     this.container.setVisible(false)
     for (const key of this.advanceKeys) {
       key.removeAllListeners()
