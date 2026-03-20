@@ -7,6 +7,7 @@ import { GBA_WIDTH, GBA_HEIGHT } from './config'
 export const GAME_CONFIG: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   parent: 'game-container',
+  autoFocus: true,
   pixelArt: true,
   roundPixels: true,
   scale: {
@@ -21,6 +22,9 @@ export const GAME_CONFIG: Phaser.Types.Core.GameConfig = {
       gravity: { x: 0, y: 0 },
       debug: false,
     },
+  },
+  fps: {
+    smoothStep: false,
   },
   scene: [BootScene, PreloadScene, OverworldScene],
 }
