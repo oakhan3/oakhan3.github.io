@@ -1,4 +1,5 @@
 import Phaser from 'phaser'
+import { PLAYER_FRAME_WIDTH, PLAYER_FRAME_HEIGHT } from '../config'
 
 export class PreloadScene extends Phaser.Scene {
   constructor() {
@@ -31,6 +32,10 @@ export class PreloadScene extends Phaser.Scene {
 
     this.load.image('overworld-tiles', 'assets/tilesets/overworld.png')
     this.load.tilemapTiledJSON('overworld-map', 'assets/maps/overworld.json')
+    this.load.spritesheet('player', 'assets/sprites/player.png', {
+      frameWidth: PLAYER_FRAME_WIDTH,
+      frameHeight: PLAYER_FRAME_HEIGHT,
+    })
   }
 
   create() {
