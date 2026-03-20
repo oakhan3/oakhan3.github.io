@@ -1,58 +1,7 @@
 import { describe, it, expect, afterEach } from 'vitest'
 import { createGame } from '../main'
 import { PLAYER_SPEED } from '../config'
-
-function waitForScene(game: Phaser.Game, sceneKey: string): Promise<Phaser.Scene> {
-  return new Promise((resolve) => {
-    const check = () => {
-      const scene = game.scene.getScene(sceneKey)
-      if (scene && game.scene.isActive(sceneKey)) {
-        resolve(scene)
-      } else {
-        setTimeout(check, 50)
-      }
-    }
-    check()
-  })
-}
-
-function delay(milliseconds: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, milliseconds))
-}
-
-function simulateKeyPress(game: Phaser.Game): void {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const keyboard = (game.input as any).keyboard as { onKeyDown: (event: KeyboardEvent) => void }
-  keyboard.onKeyDown(new KeyboardEvent('keydown', { key: 'Enter', keyCode: 13, bubbles: true }))
-}
-
-function simulateKeyDown(game: Phaser.Game, key: string, keyCode: number): void {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const keyboard = (game.input as any).keyboard as { onKeyDown: (event: KeyboardEvent) => void }
-  keyboard.onKeyDown(new KeyboardEvent('keydown', { key, keyCode, bubbles: true }))
-}
-
-function simulateKeyUp(game: Phaser.Game, key: string, keyCode: number): void {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const keyboard = (game.input as any).keyboard as { onKeyUp: (event: KeyboardEvent) => void }
-  keyboard.onKeyUp(new KeyboardEvent('keyup', { key, keyCode, bubbles: true }))
-}
-
-async function bootToOverworld(game: Phaser.Game): Promise<Phaser.Scene> {
-  await waitForScene(game, 'BootScene')
-  await delay(100)
-  simulateKeyPress(game)
-  return waitForScene(game, 'OverworldScene')
-}
-
-function findPlayer(scene: Phaser.Scene): Phaser.Physics.Arcade.Sprite {
-  const bodies = scene.physics.world.bodies.getArray()
-  const playerBody = bodies.find((body) => {
-    const gameObject = body.gameObject as Phaser.Physics.Arcade.Sprite
-    return gameObject?.texture?.key === 'player'
-  })
-  return playerBody!.gameObject as Phaser.Physics.Arcade.Sprite
-}
+import { bootToOverworld, delay, dismissDialog, simulateKeyDown, simulateKeyUp, findPlayer } from './testing'
 
 let game: Phaser.Game | null = null
 
@@ -67,6 +16,7 @@ describe('player movement', () => {
   it('moves right when D key is pressed', async () => {
     game = createGame()
     const scene = await bootToOverworld(game)
+    await dismissDialog(game)
 
     simulateKeyDown(game, 'd', 68)
     await delay(100)
@@ -82,6 +32,7 @@ describe('player movement', () => {
   it('flips sprite when moving left', async () => {
     game = createGame()
     const scene = await bootToOverworld(game)
+    await dismissDialog(game)
 
     simulateKeyDown(game, 'a', 65)
     await delay(100)
@@ -97,6 +48,7 @@ describe('player movement', () => {
   it('stops when no keys are pressed', async () => {
     game = createGame()
     const scene = await bootToOverworld(game)
+    await dismissDialog(game)
 
     simulateKeyDown(game, 'd', 68)
     await delay(100)

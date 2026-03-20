@@ -1,32 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest'
 import { createGame } from '../main'
-
-function waitForScene(game: Phaser.Game, sceneKey: string): Promise<Phaser.Scene> {
-  return new Promise((resolve) => {
-    const check = () => {
-      const scene = game.scene.getScene(sceneKey)
-      if (scene && game.scene.isActive(sceneKey)) {
-        resolve(scene)
-      } else {
-        setTimeout(check, 50)
-      }
-    }
-    check()
-  })
-}
-
-function delay(milliseconds: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, milliseconds))
-}
-
-function simulateKeyPress(game: Phaser.Game): void {
-  // Phaser's KeyboardManager registers onKeyDown as a native event handler.
-  // Calling it directly queues the event and triggers MANAGER_PROCESS,
-  // which causes Phaser to process the keyboard input on the next step.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const keyboard = (game.input as any).keyboard as { onKeyDown: (event: KeyboardEvent) => void }
-  keyboard.onKeyDown(new KeyboardEvent('keydown', { key: 'Enter', keyCode: 13, bubbles: true }))
-}
+import { waitForScene, delay, simulateKeyDown } from './testing'
 
 let game: Phaser.Game | null = null
 
@@ -61,7 +35,7 @@ describe('scene transitions', () => {
     await waitForScene(game, 'BootScene')
 
     await delay(100)
-    simulateKeyPress(game)
+    simulateKeyDown(game, 'Enter', 13)
 
     const overworldScene = await waitForScene(game, 'OverworldScene')
     expect(overworldScene).toBeDefined()

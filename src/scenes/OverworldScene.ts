@@ -1,6 +1,7 @@
 import Phaser from 'phaser'
 import { PlayerSprite, createPlayerAnimations } from '../player/PlayerSprite'
 import { PlayerController } from '../player/PlayerController'
+import { DialogBox } from '../dialog/DialogBox'
 
 const OPTIONAL_LAYERS = ['Decoration', 'Collisions', 'AbovePlayer']
 
@@ -50,6 +51,10 @@ export class OverworldScene extends Phaser.Scene {
     this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
 
     this.playerController = new PlayerController(this, player)
+
+    const dialog = new DialogBox(this)
+    this.playerController.freeze()
+    dialog.show("Hi, I'm Omar Ali Khan! Welcome to my page.", () => this.playerController.unfreeze())
   }
 
   update() {

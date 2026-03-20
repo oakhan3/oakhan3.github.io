@@ -1,0 +1,109 @@
+import { describe, it, expect, afterEach } from 'vitest'
+import { createGame } from '../main'
+import { PLAYER_SPEED } from '../config'
+import {
+  bootToOverworld,
+  delay,
+  dismissDialog,
+  findPlayer,
+  simulateKeyDown,
+  simulateKeyPress,
+  simulateKeyUp,
+} from './testing'
+
+function findDialogContainer(scene: Phaser.Scene): Phaser.GameObjects.Container {
+  return scene.children.list.find(
+    (child) => child instanceof Phaser.GameObjects.Container && child.depth === 100,
+  ) as Phaser.GameObjects.Container
+}
+
+function findDialogText(container: Phaser.GameObjects.Container): Phaser.GameObjects.Text {
+  return container.list.find((child) => child instanceof Phaser.GameObjects.Text) as Phaser.GameObjects.Text
+}
+
+let game: Phaser.Game | null = null
+
+afterEach(() => {
+  if (game) {
+    game.destroy(true)
+    game = null
+  }
+})
+
+describe('dialog box', () => {
+  it('shows dialog on overworld start', async () => {
+    game = createGame()
+    const scene = await bootToOverworld(game)
+    await delay(100)
+
+    const container = findDialogContainer(scene)
+    expect(container.visible).toBe(true)
+  })
+
+  it('freezes player while dialog is open', async () => {
+    game = createGame()
+    const scene = await bootToOverworld(game)
+    await delay(100)
+
+    simulateKeyDown(game, 'd', 68)
+    await delay(100)
+
+    const player = findPlayer(scene)
+    const body = player.body as Phaser.Physics.Arcade.Body
+    expect(body.velocity.x).toBe(0)
+    expect(body.velocity.y).toBe(0)
+
+    simulateKeyUp(game, 'd', 68)
+  })
+
+  it('space rushes typewriter then dismisses', async () => {
+    game = createGame()
+    const scene = await bootToOverworld(game)
+    await delay(100)
+
+    const container = findDialogContainer(scene)
+    const textObject = findDialogText(container)
+
+    // NOTE: First press rushes the typewriter to completion.
+    simulateKeyPress(game, ' ', 32)
+    await delay(50)
+    expect(textObject.text).toBe("Hi, I'm Omar Ali Khan! Welcome to my page.")
+
+    // NOTE: Second press dismisses the dialog.
+    simulateKeyPress(game, ' ', 32)
+    await delay(50)
+    expect(container.visible).toBe(false)
+  })
+
+  it('enter key also advances dialog', async () => {
+    game = createGame()
+    const scene = await bootToOverworld(game)
+    await delay(100)
+
+    const container = findDialogContainer(scene)
+    const textObject = findDialogText(container)
+
+    simulateKeyPress(game, 'Enter', 13)
+    await delay(50)
+    expect(textObject.text).toBe("Hi, I'm Omar Ali Khan! Welcome to my page.")
+
+    simulateKeyPress(game, 'Enter', 13)
+    await delay(50)
+    expect(container.visible).toBe(false)
+  })
+
+  it('unfreezes player after dialog is dismissed', async () => {
+    game = createGame()
+    const scene = await bootToOverworld(game)
+    await dismissDialog(game)
+
+    simulateKeyDown(game, 'd', 68)
+    await delay(100)
+
+    const player = findPlayer(scene)
+    const body = player.body as Phaser.Physics.Arcade.Body
+    expect(body.velocity.x).toBe(PLAYER_SPEED)
+
+    simulateKeyUp(game, 'd', 68)
+  })
+})
