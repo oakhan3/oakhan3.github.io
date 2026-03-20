@@ -3,14 +3,10 @@ import { GBA_WIDTH, GBA_HEIGHT } from '../config'
 
 const CENTER_X = GBA_WIDTH / 2
 const CENTER_Y = GBA_HEIGHT / 2
-const TAP_THRESHOLD = 200
-
 export type Direction = 'up' | 'down' | 'left' | 'right' | 'none'
 
 export class TouchControls {
   private activeDirection: Direction = 'none'
-  private tapListeners: Array<() => void> = []
-  private pointerDownTime = 0
 
   constructor(scene: Phaser.Scene) {
     scene.input.on('pointerdown', this.handlePointerDown, this)
@@ -22,12 +18,7 @@ export class TouchControls {
     return this.activeDirection
   }
 
-  onTap(listener: () => void): void {
-    this.tapListeners.push(listener)
-  }
-
   private handlePointerDown(pointer: Phaser.Input.Pointer): void {
-    this.pointerDownTime = pointer.downTime
     this.updateDirection(pointer)
   }
 
@@ -36,15 +27,7 @@ export class TouchControls {
     this.updateDirection(pointer)
   }
 
-  private handlePointerUp(pointer: Phaser.Input.Pointer): void {
-    const holdDuration = pointer.upTime - this.pointerDownTime
-
-    if (holdDuration < TAP_THRESHOLD) {
-      for (const listener of this.tapListeners) {
-        listener()
-      }
-    }
-
+  private handlePointerUp(): void {
     this.activeDirection = 'none'
   }
 

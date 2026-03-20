@@ -70,14 +70,11 @@ describe('touch controls', () => {
       (child) => child instanceof Phaser.GameObjects.Container && child.depth === 100,
     ) as Phaser.GameObjects.Container
 
-    // NOTE: Quick tap (down + immediate up) should act as Enter.
+    // NOTE: First pointerdown rushes text, second pointerdown dismisses.
     simulatePointerDown(game, GBA_WIDTH / 2, GBA_HEIGHT / 2)
-    simulatePointerUp(game, GBA_WIDTH / 2, GBA_HEIGHT / 2)
     await delay(50)
 
-    // NOTE: First tap rushes text, second tap dismisses.
     simulatePointerDown(game, GBA_WIDTH / 2, GBA_HEIGHT / 2)
-    simulatePointerUp(game, GBA_WIDTH / 2, GBA_HEIGHT / 2)
     await delay(50)
 
     expect(container.visible).toBe(false)

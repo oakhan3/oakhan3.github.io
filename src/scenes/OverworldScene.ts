@@ -56,7 +56,6 @@ export class OverworldScene extends Phaser.Scene {
 
     const dialog = new DialogBox(this)
     this.playerController.freeze()
-    touchControls.onTap(() => dialog.handleAdvance())
     dialog.show("Hi, I'm Omar Ali Khan! Welcome to my page.", () => this.playerController.unfreeze())
   }
 

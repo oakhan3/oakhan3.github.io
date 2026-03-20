@@ -64,9 +64,13 @@ export class DialogBox {
       key.removeAllListeners()
       key.on('down', this.handleAdvance, this)
     }
+
+    // NOTE: Listen for pointerdown directly so dialog works on touch devices without
+    // depending on the touch controls' tap detection.
+    this.scene.input.on('pointerdown', this.handleAdvance, this)
   }
 
-  handleAdvance(): void {
+  private handleAdvance(): void {
     if (!this.container.visible) return
     if (this.displayedLength < this.fullText.length) {
       this.rushText()
@@ -94,6 +98,7 @@ export class DialogBox {
     for (const key of this.advanceKeys) {
       key.removeAllListeners()
     }
+    this.scene.input.off('pointerdown', this.handleAdvance, this)
     if (this.typewriterTimer) {
       this.typewriterTimer.destroy()
       this.typewriterTimer = null
