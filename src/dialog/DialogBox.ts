@@ -66,7 +66,8 @@ export class DialogBox {
     }
   }
 
-  private handleAdvance(): void {
+  handleAdvance(): void {
+    if (!this.container.visible) return
     if (this.displayedLength < this.fullText.length) {
       this.rushText()
     } else {

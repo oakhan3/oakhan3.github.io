@@ -49,6 +49,37 @@ export async function dismissDialog(game: Phaser.Game): Promise<void> {
   await delay(100)
 }
 
+// NOTE: Phaser transforms pageX/pageY through scaleManager.transformX/Y which applies:
+// (pageX - canvasBounds.left) * displayScale.x. We reverse this to convert game-space
+// coords into page coords that Phaser will transform back correctly.
+function gameToPageCoords(game: Phaser.Game, gameX: number, gameY: number): { pageX: number; pageY: number } {
+  const bounds = game.canvas.getBoundingClientRect()
+  const scaleX = game.scale.displayScale.x
+  const scaleY = game.scale.displayScale.y
+  return {
+    pageX: gameX / scaleX + bounds.left,
+    pageY: gameY / scaleY + bounds.top,
+  }
+}
+
+// NOTE: Dispatch on the canvas so event.target === game.canvas. Phaser's InputPlugin checks
+// pointer.downElement === game.canvas before emitting POINTER_DOWN; without this, it emits
+// POINTER_DOWN_OUTSIDE and scene listeners never fire.
+export function simulatePointerDown(game: Phaser.Game, gameX: number, gameY: number): void {
+  const { pageX, pageY } = gameToPageCoords(game, gameX, gameY)
+  game.canvas.dispatchEvent(new MouseEvent('mousedown', { clientX: pageX, clientY: pageY, button: 0, bubbles: true }))
+}
+
+export function simulatePointerUp(game: Phaser.Game, gameX: number, gameY: number): void {
+  const { pageX, pageY } = gameToPageCoords(game, gameX, gameY)
+  game.canvas.dispatchEvent(new MouseEvent('mouseup', { clientX: pageX, clientY: pageY, button: 0, bubbles: true }))
+}
+
+export function simulatePointerMove(game: Phaser.Game, gameX: number, gameY: number): void {
+  const { pageX, pageY } = gameToPageCoords(game, gameX, gameY)
+  game.canvas.dispatchEvent(new MouseEvent('mousemove', { clientX: pageX, clientY: pageY, button: 0, bubbles: true }))
+}
+
 export function findPlayer(scene: Phaser.Scene): Phaser.Physics.Arcade.Sprite {
   const bodies = scene.physics.world.bodies.getArray()
   const playerBody = bodies.find((body) => {

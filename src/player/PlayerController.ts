@@ -1,15 +1,18 @@
 import Phaser from 'phaser'
 import { PlayerSprite } from './PlayerSprite'
 import { PLAYER_SPEED } from '../config'
+import { TouchControls } from '../mobile/TouchControls'
 
 export class PlayerController {
   private cursors: Phaser.Types.Input.Keyboard.CursorKeys
   private wasd: Record<string, Phaser.Input.Keyboard.Key>
   private player: PlayerSprite
   private frozen = false
+  private touchControls: TouchControls
 
-  constructor(scene: Phaser.Scene, player: PlayerSprite) {
+  constructor(scene: Phaser.Scene, player: PlayerSprite, touchControls: TouchControls) {
     this.player = player
+    this.touchControls = touchControls
     this.cursors = scene.input.keyboard!.createCursorKeys()
     this.wasd = {
       W: scene.input.keyboard!.addKey('W'),
@@ -29,13 +32,15 @@ export class PlayerController {
     let velocityX = 0
     let velocityY = 0
 
-    if (this.cursors.left.isDown || this.wasd.A.isDown) {
+    const touchDirection = this.touchControls.direction
+
+    if (this.cursors.left.isDown || this.wasd.A.isDown || touchDirection === 'left') {
       velocityX = -PLAYER_SPEED
-    } else if (this.cursors.right.isDown || this.wasd.D.isDown) {
+    } else if (this.cursors.right.isDown || this.wasd.D.isDown || touchDirection === 'right') {
       velocityX = PLAYER_SPEED
-    } else if (this.cursors.up.isDown || this.wasd.W.isDown) {
+    } else if (this.cursors.up.isDown || this.wasd.W.isDown || touchDirection === 'up') {
       velocityY = -PLAYER_SPEED
-    } else if (this.cursors.down.isDown || this.wasd.S.isDown) {
+    } else if (this.cursors.down.isDown || this.wasd.S.isDown || touchDirection === 'down') {
       velocityY = PLAYER_SPEED
     }
 
