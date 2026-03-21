@@ -4,10 +4,32 @@ import { PlayerController } from '../player/PlayerController'
 import { DialogBox } from '../dialog/DialogBox'
 import { TouchControls } from '../mobile/TouchControls'
 
-const OPTIONAL_LAYERS = ['Decorations', 'Car', 'Kiwi', 'Collisions', 'AbovePlayer']
+interface LayerConfig {
+  name: string
+  collision?: 'fromGroup' | 'allTiles'
+}
+
+const LAYERS: LayerConfig[] = [
+  { name: 'Ground', collision: 'fromGroup' },
+  { name: 'Decorations', collision: 'fromGroup' },
+  { name: 'Car', collision: 'fromGroup' },
+  { name: 'Kiwi', collision: 'allTiles' },
+  { name: 'Buildings', collision: 'fromGroup' },
+  { name: 'Tree', collision: 'fromGroup' },
+]
+
+interface TileAnimation {
+  layer: Phaser.Tilemaps.TilemapLayer
+  row: number
+  col: number
+  frames: { gid: number; duration: number }[]
+  frameIndex: number
+  elapsed: number
+}
 
 export class OverworldScene extends Phaser.Scene {
   private playerController!: PlayerController
+  private tileAnimations: TileAnimation[] = []
 
   constructor() {
     super({ key: 'OverworldScene' })
@@ -25,26 +47,9 @@ export class OverworldScene extends Phaser.Scene {
       map.addTilesetImage('Blue_SUPERCAR_CLEAN_All_000-sheet-2', 'supercar-blue')!,
     ]
 
-    map.createLayer('Ground', tilesets)
-    map.createLayer('Buildings', tilesets)
-    map.createLayer('Tree', tilesets)
+    const layers = _createLayers(map, tilesets)
 
-    let collisionLayer: Phaser.Tilemaps.TilemapLayer | null = null
-
-    for (const layerName of OPTIONAL_LAYERS) {
-      const layer = map.createLayer(layerName, tilesets)
-      if (!layer) continue
-
-      if (layerName === 'Collisions') {
-        layer.setCollisionByExclusion([-1])
-        layer.setVisible(false)
-        collisionLayer = layer
-      }
-
-      if (layerName === 'AbovePlayer') {
-        layer.setDepth(10)
-      }
-    }
+    this.tileAnimations = _buildTileAnimations(map, layers)
 
     createPlayerAnimations(this)
 
@@ -52,8 +57,8 @@ export class OverworldScene extends Phaser.Scene {
     const spawnY = Math.floor(map.heightInPixels / 2)
     const player = new PlayerSprite(this, spawnX, spawnY)
 
-    if (collisionLayer) {
-      this.physics.add.collider(player, collisionLayer)
+    for (const layer of layers) {
+      this.physics.add.collider(player, layer)
     }
 
     this.cameras.main.startFollow(player, true)
@@ -68,7 +73,80 @@ export class OverworldScene extends Phaser.Scene {
     dialog.show("Hi, I'm Omar Ali Khan! Welcome to my page.", () => this.playerController.unfreeze())
   }
 
-  update() {
+  update(_time: number, delta: number) {
     this.playerController.update()
+    _updateTileAnimations(this.tileAnimations, delta)
+  }
+}
+
+function _createLayers(
+  map: Phaser.Tilemaps.Tilemap,
+  tilesets: Phaser.Tilemaps.Tileset[],
+): Phaser.Tilemaps.TilemapLayer[] {
+  const layers: Phaser.Tilemaps.TilemapLayer[] = []
+
+  for (const config of LAYERS) {
+    const layer = map.createLayer(config.name, tilesets)!
+
+    if (config.collision === 'fromGroup') {
+      layer.setCollisionFromCollisionGroup()
+    } else if (config.collision === 'allTiles') {
+      layer.setCollisionByExclusion([-1])
+    }
+
+    layers.push(layer)
+  }
+
+  return layers
+}
+
+function _buildTileAnimations(map: Phaser.Tilemaps.Tilemap, layers: Phaser.Tilemaps.TilemapLayer[]): TileAnimation[] {
+  // NOTE: Build a lookup of GID -> animation frames from tileset data
+  const animatedTiles = new Map<number, { firstgid: number; frames: { tileid: number; duration: number }[] }>()
+
+  for (const tileset of map.tilesets) {
+    const tileData = tileset.tileData as Record<string, { animation?: { tileid: number; duration: number }[] }>
+    for (const [localId, data] of Object.entries(tileData)) {
+      if (data.animation) {
+        const gid = tileset.firstgid + parseInt(localId, 10)
+        animatedTiles.set(gid, { firstgid: tileset.firstgid, frames: data.animation })
+      }
+    }
+  }
+
+  const animations: TileAnimation[] = []
+
+  for (const layer of layers) {
+    layer.forEachTile((tile) => {
+      const animData = animatedTiles.get(tile.index)
+      if (!animData) return
+
+      animations.push({
+        layer,
+        row: tile.y,
+        col: tile.x,
+        frames: animData.frames.map((frame) => ({
+          gid: animData.firstgid + frame.tileid,
+          duration: frame.duration,
+        })),
+        frameIndex: 0,
+        elapsed: 0,
+      })
+    })
+  }
+
+  return animations
+}
+
+function _updateTileAnimations(animations: TileAnimation[], delta: number) {
+  for (const anim of animations) {
+    anim.elapsed += delta
+    const currentFrame = anim.frames[anim.frameIndex]
+    if (anim.elapsed >= currentFrame.duration) {
+      anim.elapsed -= currentFrame.duration
+      anim.frameIndex = (anim.frameIndex + 1) % anim.frames.length
+      const tile = anim.layer.putTileAt(anim.frames[anim.frameIndex].gid, anim.col, anim.row)
+      tile.setCollision(true)
+    }
   }
 }
