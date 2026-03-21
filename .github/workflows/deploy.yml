@@ -39,8 +39,9 @@ jobs:
       - run: npx playwright install chromium --with-deps
         if: steps.playwright-cache.outputs.cache-hit != 'true'
 
-      - run: npx playwright install-deps chromium
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
+      # NOTE: system deps (libnss3, libgbm1, xvfb, etc.) are pre-installed on
+      # ubuntu-latest. Only font packages are missing, which headless tests
+      # don't need. Full --with-deps runs on cache miss above.
 
       - run: npm run lint
       - run: npm run format:check
