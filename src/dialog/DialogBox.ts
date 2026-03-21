@@ -50,6 +50,8 @@ export class DialogBox {
     this.indicator.setVisible(false)
 
     this.container = scene.add.container(BOX_MARGIN, BOX_Y, [background, this.textObject, this.indicator])
+    // NOTE: scrollFactor(0) pins the dialog to the screen, not the world — it stays
+    // at the bottom of the viewport regardless of camera position.
     this.container.setScrollFactor(0)
     this.container.setDepth(100)
     this.container.setVisible(false)

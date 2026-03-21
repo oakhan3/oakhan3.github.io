@@ -65,9 +65,9 @@ describe('touch controls', () => {
     const startX = player.x
     const startY = player.y
 
-    // NOTE: Drag only 5px, which is within the 8px deadzone.
+    // NOTE: Drag only 3px, which is within the 4px deadzone.
     simulatePointerDown(game, GBA_WIDTH / 2, GBA_HEIGHT / 2)
-    simulatePointerMove(game, GBA_WIDTH / 2 + 5, GBA_HEIGHT / 2)
+    simulatePointerMove(game, GBA_WIDTH / 2 + 3, GBA_HEIGHT / 2)
     await delay(200)
 
     expect(player.x).toBe(startX)

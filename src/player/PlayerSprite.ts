@@ -15,6 +15,7 @@ export class PlayerSprite extends Phaser.Physics.Matter.Sprite {
   }
 }
 
+// NOTE: No walk-left animation — walk-right is reused with setFlipX(true) in the controller.
 export function createPlayerAnimations(scene: Phaser.Scene): void {
   scene.anims.create({
     key: 'walk-down',

@@ -3,7 +3,7 @@ import { Direction } from '../config'
 
 // NOTE: Minimum drag distance (in game pixels) before registering a direction.
 // Prevents accidental movement from tapping.
-const DEADZONE = 8
+const DEADZONE = 4
 
 export class TouchControls {
   private activeDirection: Direction = 'none'

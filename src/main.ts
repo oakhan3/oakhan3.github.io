@@ -19,10 +19,13 @@ export const GAME_CONFIG: Phaser.Types.Core.GameConfig = {
   physics: {
     default: 'matter',
     matter: {
+      // NOTE: Zero gravity for top-down RPG — no downward pull.
       gravity: { x: 0, y: 0 },
       debug: false,
     },
   },
+  // NOTE: Phaser's delta smoothing causes sluggish movement for ~5s on startup
+  // while it calibrates. Disabling it makes speed consistent from frame one.
   fps: {
     smoothStep: false,
   },

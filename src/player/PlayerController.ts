@@ -24,6 +24,8 @@ export class PlayerController {
   }
 
   update(): void {
+    // NOTE: Must explicitly zero velocity each frame while frozen — Matter bodies
+    // retain momentum from the previous frame otherwise.
     if (this.frozen) {
       this.player.setVelocity(0, 0)
       this.player.anims.stop()
@@ -35,6 +37,7 @@ export class PlayerController {
 
     const touchDirection = this.touchControls.direction
 
+    // NOTE: else-if chain enforces 4-directional movement — no diagonal.
     if (this.cursors.left.isDown || this.wasd.A.isDown || touchDirection === 'left') {
       velocityX = -PLAYER_SPEED
     } else if (this.cursors.right.isDown || this.wasd.D.isDown || touchDirection === 'right') {

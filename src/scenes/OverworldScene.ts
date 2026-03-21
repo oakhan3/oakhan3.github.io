@@ -9,6 +9,9 @@ interface LayerConfig {
   collision?: 'fromGroup' | 'allTiles'
 }
 
+// NOTE: 'fromGroup' reads per-tile objectgroup collision shapes from the tileset in Tiled.
+// 'allTiles' blocks every non-empty tile — used for Kiwi because its objectgroup shapes
+// weren't picked up by setCollisionFromCollisionGroup() despite being defined in Tiled.
 const LAYERS: LayerConfig[] = [
   { name: 'Ground', collision: 'fromGroup' },
   { name: 'Decorations', collision: 'fromGroup' },
@@ -37,14 +40,16 @@ export class OverworldScene extends Phaser.Scene {
 
   create() {
     const map = this.make.tilemap({ key: 'overworld-map' })
+    // NOTE: Tileset names in the Tiled JSON match the Phaser cache keys from
+    // PreloadScene, so a single arg is sufficient.
     const tilesets = [
-      map.addTilesetImage('tileset', 'tiny-realm')!,
-      map.addTilesetImage('Grass_Middle', 'grass')!,
-      map.addTilesetImage('Cliff_Tile', 'cliff')!,
-      map.addTilesetImage('Path_Tile', 'path')!,
-      map.addTilesetImage('Water_Tile', 'water')!,
-      map.addTilesetImage('SpriteSheetBlue', 'parrot-blue')!,
-      map.addTilesetImage('Blue_SUPERCAR_CLEAN_All_000-sheet-2', 'supercar-blue')!,
+      map.addTilesetImage('tiny-realm')!,
+      map.addTilesetImage('grass')!,
+      map.addTilesetImage('cliff')!,
+      map.addTilesetImage('path')!,
+      map.addTilesetImage('water')!,
+      map.addTilesetImage('parrot-blue')!,
+      map.addTilesetImage('supercar-blue')!,
     ]
 
     const layers = _createLayers(map, tilesets)
@@ -90,6 +95,8 @@ function _createLayers(
   for (const config of LAYERS) {
     const layer = map.createLayer(config.name, tilesets)!
 
+    // NOTE: Collision flags must be set BEFORE convertTilemapLayer() — only
+    // tiles marked as colliding get converted to Matter bodies.
     if (config.collision === 'fromGroup') {
       layer.setCollisionFromCollisionGroup()
     } else if (config.collision === 'allTiles') {
@@ -147,6 +154,9 @@ function _updateTileAnimations(animations: TileAnimation[], delta: number) {
     if (anim.elapsed >= currentFrame.duration) {
       anim.elapsed -= currentFrame.duration
       anim.frameIndex = (anim.frameIndex + 1) % anim.frames.length
+      // NOTE: putTileAt swaps the visual tile but the MatterTileBody created by
+      // convertTilemapLayer persists. This works because all animation frames share
+      // the same collision shape (full-tile blockers) (for now!).
       anim.layer.putTileAt(anim.frames[anim.frameIndex].gid, anim.col, anim.row)
     }
   }
