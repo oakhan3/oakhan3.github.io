@@ -1,4 +1,5 @@
 import Phaser from 'phaser'
+import { DEPTH_PLAYER } from '../config'
 
 export class PlayerSprite extends Phaser.Physics.Matter.Sprite {
   constructor(scene: Phaser.Scene, x: number, y: number) {
@@ -11,7 +12,7 @@ export class PlayerSprite extends Phaser.Physics.Matter.Sprite {
     this.setFriction(0)
     this.setFrictionAir(0)
     this.setFrictionStatic(0)
-    this.setDepth(5)
+    this.setDepth(DEPTH_PLAYER)
   }
 }
 

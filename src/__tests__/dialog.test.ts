@@ -1,5 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest'
 import { createGame } from '../main'
+import { DEPTH_DIALOG } from '../config'
 import {
   bootToOverworld,
   delay,
@@ -12,7 +13,7 @@ import {
 
 function findDialogContainer(scene: Phaser.Scene): Phaser.GameObjects.Container {
   return scene.children.list.find(
-    (child) => child instanceof Phaser.GameObjects.Container && child.depth === 100,
+    (child) => child instanceof Phaser.GameObjects.Container && child.depth === DEPTH_DIALOG,
   ) as Phaser.GameObjects.Container
 }
 

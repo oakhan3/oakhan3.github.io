@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest'
 import { createGame } from '../main'
-import { GBA_WIDTH, GBA_HEIGHT } from '../config'
+import { GBA_WIDTH, GBA_HEIGHT, DEPTH_JOYSTICK_BASE, DEPTH_JOYSTICK_KNOB, DEPTH_DIALOG } from '../config'
 import {
   bootToOverworld,
   delay,
@@ -19,6 +19,21 @@ afterEach(() => {
     game = null
   }
 })
+
+// NOTE: Joystick base is depth 90, knob is depth 91. Find them by depth among
+// the scene's Graphics children.
+function findJoystick(scene: Phaser.Scene): {
+  base: Phaser.GameObjects.Graphics
+  knob: Phaser.GameObjects.Graphics
+} {
+  const graphics = scene.children.list.filter(
+    (child) => child instanceof Phaser.GameObjects.Graphics,
+  ) as Phaser.GameObjects.Graphics[]
+  return {
+    base: graphics.find((graphic) => graphic.depth === DEPTH_JOYSTICK_BASE)!,
+    knob: graphics.find((graphic) => graphic.depth === DEPTH_JOYSTICK_KNOB)!,
+  }
+}
 
 describe('touch controls', () => {
   it('moves player right when dragging right', async () => {
@@ -101,7 +116,7 @@ describe('touch controls', () => {
     await delay(100)
 
     const container = scene.children.list.find(
-      (child) => child instanceof Phaser.GameObjects.Container && child.depth === 100,
+      (child) => child instanceof Phaser.GameObjects.Container && child.depth === DEPTH_DIALOG,
     ) as Phaser.GameObjects.Container
 
     // NOTE: First pointerdown rushes text, second pointerdown dismisses.
@@ -112,5 +127,49 @@ describe('touch controls', () => {
     await delay(50)
 
     expect(container.visible).toBe(false)
+  })
+
+  it('shows joystick on touch and hides on release', async () => {
+    game = createGame()
+    const scene = await bootToOverworld(game)
+    await dismissDialog(game)
+
+    const { base, knob } = findJoystick(scene)
+    expect(base.visible).toBe(false)
+    expect(knob.visible).toBe(false)
+
+    simulatePointerDown(game, GBA_WIDTH / 2, GBA_HEIGHT / 2)
+    await delay(50)
+
+    expect(base.visible).toBe(true)
+    expect(knob.visible).toBe(true)
+
+    simulatePointerUp(game, GBA_WIDTH / 2, GBA_HEIGHT / 2)
+    await delay(50)
+
+    expect(base.visible).toBe(false)
+    expect(knob.visible).toBe(false)
+  })
+
+  it('knob follows drag direction', async () => {
+    game = createGame()
+    const scene = await bootToOverworld(game)
+    await dismissDialog(game)
+
+    const { base, knob } = findJoystick(scene)
+    const originX = GBA_WIDTH / 2
+    const originY = GBA_HEIGHT / 2
+
+    simulatePointerDown(game, originX, originY)
+    simulatePointerMove(game, originX + 20, originY)
+    await delay(50)
+
+    // NOTE: Base stays at origin, knob moves toward the drag direction.
+    expect(base.x).toBe(originX)
+    expect(base.y).toBe(originY)
+    expect(knob.x).toBeGreaterThan(originX)
+    expect(knob.y).toBe(originY)
+
+    simulatePointerUp(game, originX + 20, originY)
   })
 })

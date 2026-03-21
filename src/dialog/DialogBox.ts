@@ -1,5 +1,5 @@
 import Phaser from 'phaser'
-import { GBA_WIDTH, GBA_HEIGHT } from '../config'
+import { GBA_WIDTH, GBA_HEIGHT, DEPTH_DIALOG } from '../config'
 
 const BOX_MARGIN = 8
 const BOX_PADDING = 10
@@ -53,7 +53,7 @@ export class DialogBox {
     // NOTE: scrollFactor(0) pins the dialog to the screen, not the world — it stays
     // at the bottom of the viewport regardless of camera position.
     this.container.setScrollFactor(0)
-    this.container.setDepth(100)
+    this.container.setDepth(DEPTH_DIALOG)
     this.container.setVisible(false)
 
     this.advanceKeys = [scene.input.keyboard!.addKey('SPACE'), scene.input.keyboard!.addKey('ENTER')]
