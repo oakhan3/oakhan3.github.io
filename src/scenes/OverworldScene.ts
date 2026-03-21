@@ -4,7 +4,7 @@ import { PlayerController } from '../player/PlayerController'
 import { DialogBox } from '../dialog/DialogBox'
 import { TouchControls } from '../mobile/TouchControls'
 
-const OPTIONAL_LAYERS = ['Decoration', 'Collisions', 'AbovePlayer']
+const OPTIONAL_LAYERS = ['Decorations', 'Car', 'Kiwi', 'Collisions', 'AbovePlayer']
 
 export class OverworldScene extends Phaser.Scene {
   private playerController!: PlayerController
@@ -15,15 +15,24 @@ export class OverworldScene extends Phaser.Scene {
 
   create() {
     const map = this.make.tilemap({ key: 'overworld-map' })
-    const tileset = map.addTilesetImage('overworld', 'overworld-tiles')!
+    const tilesets = [
+      map.addTilesetImage('tileset', 'tiny-realm')!,
+      map.addTilesetImage('Grass_Middle', 'grass')!,
+      map.addTilesetImage('Cliff_Tile', 'cliff')!,
+      map.addTilesetImage('Path_Tile', 'path')!,
+      map.addTilesetImage('Water_Tile', 'water')!,
+      map.addTilesetImage('SpriteSheetBlue', 'parrot-blue')!,
+      map.addTilesetImage('Blue_SUPERCAR_CLEAN_All_000-sheet-2', 'supercar-blue')!,
+    ]
 
-    map.createLayer('Ground', tileset)
-    map.createLayer('Buildings', tileset)
+    map.createLayer('Ground', tilesets)
+    map.createLayer('Buildings', tilesets)
+    map.createLayer('Tree', tilesets)
 
     let collisionLayer: Phaser.Tilemaps.TilemapLayer | null = null
 
     for (const layerName of OPTIONAL_LAYERS) {
-      const layer = map.createLayer(layerName, tileset)
+      const layer = map.createLayer(layerName, tilesets)
       if (!layer) continue
 
       if (layerName === 'Collisions') {
