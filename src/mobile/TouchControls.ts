@@ -1,11 +1,14 @@
 import Phaser from 'phaser'
-import { GBA_WIDTH, GBA_HEIGHT, Direction } from '../config'
+import { Direction } from '../config'
 
-const CENTER_X = GBA_WIDTH / 2
-const CENTER_Y = GBA_HEIGHT / 2
+// NOTE: Minimum drag distance (in game pixels) before registering a direction.
+// Prevents accidental movement from tapping.
+const DEADZONE = 8
 
 export class TouchControls {
   private activeDirection: Direction = 'none'
+  private originX = 0
+  private originY = 0
 
   constructor(scene: Phaser.Scene) {
     scene.input.on('pointerdown', this.handlePointerDown, this)
@@ -18,27 +21,26 @@ export class TouchControls {
   }
 
   private handlePointerDown(pointer: Phaser.Input.Pointer): void {
-    this.updateDirection(pointer)
+    this.originX = pointer.x
+    this.originY = pointer.y
+    this.activeDirection = 'none'
   }
 
   private handlePointerMove(pointer: Phaser.Input.Pointer): void {
     if (!pointer.isDown) return
-    this.updateDirection(pointer)
+    this.activeDirection = _directionFromDelta(pointer.x - this.originX, pointer.y - this.originY)
   }
 
   private handlePointerUp(): void {
     this.activeDirection = 'none'
   }
+}
 
-  private updateDirection(pointer: Phaser.Input.Pointer): void {
-    // NOTE: Use game-space coords (pointer.x/y are already in game resolution via Phaser's scaling).
-    const deltaX = pointer.x - CENTER_X
-    const deltaY = pointer.y - CENTER_Y
+function _directionFromDelta(deltaX: number, deltaY: number): Direction {
+  if (Math.abs(deltaX) < DEADZONE && Math.abs(deltaY) < DEADZONE) return 'none'
 
-    if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      this.activeDirection = deltaX < 0 ? 'left' : 'right'
-    } else {
-      this.activeDirection = deltaY < 0 ? 'up' : 'down'
-    }
+  if (Math.abs(deltaX) > Math.abs(deltaY)) {
+    return deltaX < 0 ? 'left' : 'right'
   }
+  return deltaY < 0 ? 'up' : 'down'
 }
