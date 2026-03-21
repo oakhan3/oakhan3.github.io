@@ -4,9 +4,10 @@ Personal portfolio site built as a GBA-style RPG overworld using Phaser 3.
 
 ## Stack
 
-- **Phaser 3** - 2D game engine
-- **Vite** - build tool
+- **Phaser 3** — 2D game engine (Matter.js physics)
+- **Vite** — build tool
 - **TypeScript**
+- **Vitest + Playwright** — browser-mode tests
 
 ## Development
 
@@ -37,7 +38,7 @@ The overworld map is built in [Tiled](https://www.mapeditor.org/) and exported a
 
 ### Tilesets
 
-Multiple tilesets are used, all stored in `public/assets/tilesets/`:
+All stored in `public/assets/tilesets/`, 16x16 tile size. Tileset names in the Tiled JSON match the Phaser cache keys, so `addTilesetImage()` only needs a single argument.
 
 | File | Source |
 |------|--------|
@@ -46,7 +47,7 @@ Multiple tilesets are used, all stored in `public/assets/tilesets/`:
 | `parrot-blue.png` | Ninja Adventure Asset Pack |
 | `supercar-blue.png` | TopDown Vehicles |
 
-Tile size is 16x16. All tilesets must be **embedded** in the map (right-click tileset tab > Embed Tileset).
+All tilesets must be embedded in the map.
 
 ### Layers
 
@@ -63,10 +64,12 @@ Layers in order (bottom to top):
 
 ### Exporting
 
-File > Export As > save to `public/assets/maps/overworld-v2.json`. Make sure all tilesets are **embedded**.
+File → Export As → save to `public/assets/maps/overworld-v2.json`. Make sure all tilesets are embedded.
 
 ## How It Works
 
-The site renders at 480x320 and scales up to fill the browser window with nearest-neighbor interpolation for a crisp pixel art look.
+The site renders at GBA resolution (480x320) and scales up to fill the browser window with nearest-neighbor interpolation for a crisp pixel art look.
 
-Scenes flow: **Boot** (press any key) -> **Preload** (asset loading) -> **Overworld** (explore and interact).
+Scenes flow: **Boot** (press any key) → **Preload** (asset loading) → **Overworld** (explore and interact).
+
+Uses Matter.js physics for pixel-accurate tile collisions matching Tiled objectgroup polygon shapes. Controls are WASD/arrows on desktop and drag-from-origin with visual joystick on mobile.
