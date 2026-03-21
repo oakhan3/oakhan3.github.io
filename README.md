@@ -33,28 +33,37 @@ The overworld map is built in [Tiled](https://www.mapeditor.org/) and exported a
 ### Setup
 
 1. Install [Tiled](https://www.mapeditor.org/)
-2. Open `public/assets/maps/overworld.tmx`
+2. Open `public/assets/maps/overworld-v2.json` in Tiled
 
-### Tileset
+### Tilesets
 
-The tileset is from [Tiny Realm Asset Pack](https://trislin.itch.io/pixel-lands-village) by trislin (non-commercial license). Tile size is 16x16.
+Multiple tilesets are used, all stored in `public/assets/tilesets/`:
+
+| File | Source |
+|------|--------|
+| `tiny-realm.png` | [Tiny Realm Asset Pack](https://trislin.itch.io/pixel-lands-village) by trislin |
+| `grass.png`, `cliff.png`, `path.png`, `water.png` | Cute Fantasy Free |
+| `parrot-blue.png` | Ninja Adventure Asset Pack |
+| `supercar-blue.png` | TopDown Vehicles |
+
+Tile size is 16x16. All tilesets must be **embedded** in the map (right-click tileset tab > Embed Tileset).
 
 ### Layers
 
-Create layers in this order (bottom to top):
+Layers in order (bottom to top):
 
 | Layer | Type | Purpose |
 |-------|------|---------|
 | Ground | Tile | Grass, paths, water -- fill the entire map |
-| Decoration | Tile | Flowers, signs, small objects |
+| Decorations | Tile | Flowers, signs, small objects |
+| Car | Tile | Vehicle tiles |
+| Kiwi | Tile | Animated parrot |
 | Buildings | Tile | Walls, roofs -- transparency shows Ground beneath |
-| Collisions | Tile | Paint any tile on impassable areas (hidden in game) |
-| AbovePlayer | Tile | Tree canopy, roof overhangs -- renders above the player |
-| Interactables | Object | Rectangle objects where the player can interact |
+| Tree | Tile | Trees and foliage |
 
 ### Exporting
 
-File > Export As > save to `public/assets/maps/overworld.json`. Make sure the tileset is **embedded** (right-click tileset tab > Embed Tileset).
+File > Export As > save to `public/assets/maps/overworld-v2.json`. Make sure all tilesets are **embedded**.
 
 ## How It Works
 
