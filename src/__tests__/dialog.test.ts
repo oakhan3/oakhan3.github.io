@@ -1,6 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest'
 import { createGame } from '../main'
-import { PLAYER_SPEED } from '../config'
 import {
   bootToOverworld,
   delay,
@@ -54,15 +53,16 @@ describe('dialog box', () => {
     const scene = await bootToOverworld(game)
     await delay(100)
 
-    simulateKeyDown(game, 'd', 68)
-    await delay(100)
-
     const player = findPlayer(scene)
-    const body = player.body as Phaser.Physics.Arcade.Body
-    expect(body.velocity.x).toBe(0)
-    expect(body.velocity.y).toBe(0)
+    const startX = player.x
+    const startY = player.y
 
+    simulateKeyDown(game, 'd', 68)
+    await delay(200)
     simulateKeyUp(game, 'd', 68)
+
+    expect(player.x).toBe(startX)
+    expect(player.y).toBe(startY)
   })
 
   it('space rushes typewriter then dismisses', async () => {
@@ -135,13 +135,13 @@ describe('dialog box', () => {
     const scene = await bootToOverworld(game)
     await dismissDialog(game)
 
-    simulateKeyDown(game, 'd', 68)
-    await delay(100)
-
     const player = findPlayer(scene)
-    const body = player.body as Phaser.Physics.Arcade.Body
-    expect(body.velocity.x).toBe(PLAYER_SPEED)
+    const startX = player.x
 
+    simulateKeyDown(game, 'd', 68)
+    await delay(200)
     simulateKeyUp(game, 'd', 68)
+
+    expect(player.x).toBeGreaterThan(startX)
   })
 })

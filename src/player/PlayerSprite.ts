@@ -1,14 +1,17 @@
 import Phaser from 'phaser'
 
-export class PlayerSprite extends Phaser.Physics.Arcade.Sprite {
+export class PlayerSprite extends Phaser.Physics.Matter.Sprite {
   constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, 'player', 0)
+    super(scene.matter.world, x, y, 'player', 0)
     scene.add.existing(this)
-    scene.physics.add.existing(this)
-    this.setSize(12, 12)
-    this.setOffset(18, 32)
+    // NOTE: 12x12 rectangle body at the player's feet. Zero friction for
+    // top-down RPG movement where velocity is set directly each frame.
+    this.setRectangle(12, 12)
+    this.setFixedRotation()
+    this.setFriction(0)
+    this.setFrictionAir(0)
+    this.setFrictionStatic(0)
     this.setDepth(5)
-    this.setCollideWorldBounds(true)
   }
 }
 

@@ -17,8 +17,8 @@ export const GAME_CONFIG: Phaser.Types.Core.GameConfig = {
     height: GBA_HEIGHT,
   },
   physics: {
-    default: 'arcade',
-    arcade: {
+    default: 'matter',
+    matter: {
       gravity: { x: 0, y: 0 },
       debug: false,
     },

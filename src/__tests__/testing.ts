@@ -87,11 +87,8 @@ export function findPlayerController(scene: Phaser.Scene): PlayerController {
   return (scene as any).playerController
 }
 
-export function findPlayer(scene: Phaser.Scene): Phaser.Physics.Arcade.Sprite {
-  const bodies = scene.physics.world.bodies.getArray()
-  const playerBody = bodies.find((body) => {
-    const gameObject = body.gameObject as Phaser.Physics.Arcade.Sprite
-    return gameObject?.texture?.key === 'player'
-  })
-  return playerBody!.gameObject as Phaser.Physics.Arcade.Sprite
+export function findPlayer(scene: Phaser.Scene): Phaser.Physics.Matter.Sprite {
+  return scene.children.list.find(
+    (child) => child instanceof Phaser.Physics.Matter.Sprite && child.texture.key === 'player',
+  ) as Phaser.Physics.Matter.Sprite
 }

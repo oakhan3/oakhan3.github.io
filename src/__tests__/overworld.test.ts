@@ -89,21 +89,28 @@ describe('tile animations', () => {
     expect(observedIndices.size).toBeGreaterThanOrEqual(2)
   })
 
-  it('preserves collision on tiles after an animation frame swap', async () => {
+  it('still blocks player after an animation frame swap', async () => {
     game = createGame()
     const scene = await bootToOverworld(game)
     await dismissDialog(game)
 
+    const player = findPlayer(scene)
     const animations = findTileAnimations(scene)
     const anim = animations[0]
 
-    // NOTE: Wait for at least one frame swap to occur.
+    // NOTE: Wait for at least one animation frame swap.
     await delay(200)
 
-    const tile = anim.layer.getTileAt(anim.col, anim.row)
-    expect(tile.collideUp).toBe(true)
-    expect(tile.collideDown).toBe(true)
-    expect(tile.collideLeft).toBe(true)
-    expect(tile.collideRight).toBe(true)
+    // NOTE: Teleport the player next to the animated tile and try to walk through it.
+    const tilePixelX = anim.col * 16
+    player.setPosition(tilePixelX + 24, anim.row * 16)
+    await delay(50)
+
+    simulateKeyDown(game, 'a', 65)
+    await delay(500)
+    simulateKeyUp(game, 'a', 65)
+
+    // NOTE: The player should be blocked by the animated tile's Matter body.
+    expect(player.x).toBeGreaterThan(tilePixelX)
   })
 })

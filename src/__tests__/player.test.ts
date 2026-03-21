@@ -1,6 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest'
 import { createGame } from '../main'
-import { PLAYER_SPEED } from '../config'
 import {
   bootToOverworld,
   delay,
@@ -26,16 +25,15 @@ describe('player movement', () => {
     const scene = await bootToOverworld(game)
     await dismissDialog(game)
 
-    simulateKeyDown(game, 'd', 68)
-    await delay(100)
-
     const player = findPlayer(scene)
-    const body = player.body as Phaser.Physics.Arcade.Body
-    expect(body.velocity.x).toBe(PLAYER_SPEED)
-    expect(body.velocity.y).toBe(0)
-    expect(findPlayerController(scene).facing).toBe('right')
+    const startX = player.x
 
+    simulateKeyDown(game, 'd', 68)
+    await delay(200)
     simulateKeyUp(game, 'd', 68)
+
+    expect(player.x).toBeGreaterThan(startX)
+    expect(findPlayerController(scene).facing).toBe('right')
   })
 
   it('flips sprite when moving left', async () => {
@@ -43,16 +41,16 @@ describe('player movement', () => {
     const scene = await bootToOverworld(game)
     await dismissDialog(game)
 
-    simulateKeyDown(game, 'a', 65)
-    await delay(100)
-
     const player = findPlayer(scene)
-    const body = player.body as Phaser.Physics.Arcade.Body
-    expect(body.velocity.x).toBe(-PLAYER_SPEED)
+    const startX = player.x
+
+    simulateKeyDown(game, 'a', 65)
+    await delay(200)
+    simulateKeyUp(game, 'a', 65)
+
+    expect(player.x).toBeLessThan(startX)
     expect(player.flipX).toBe(true)
     expect(findPlayerController(scene).facing).toBe('left')
-
-    simulateKeyUp(game, 'a', 65)
   })
 
   it('retains facing direction after stopping', async () => {
@@ -61,14 +59,10 @@ describe('player movement', () => {
     await dismissDialog(game)
 
     simulateKeyDown(game, 'd', 68)
-    await delay(100)
+    await delay(200)
     simulateKeyUp(game, 'd', 68)
     await delay(100)
 
-    const player = findPlayer(scene)
-    const body = player.body as Phaser.Physics.Arcade.Body
-    expect(body.velocity.x).toBe(0)
-    expect(body.velocity.y).toBe(0)
     expect(findPlayerController(scene).facing).toBe('right')
   })
 
@@ -76,18 +70,20 @@ describe('player movement', () => {
     game = createGame()
     const scene = await bootToOverworld(game)
 
+    const player = findPlayer(scene)
+    const startX = player.x
+    const startY = player.y
+
     const controller = findPlayerController(scene)
     controller.freeze()
 
     simulateKeyDown(game, 'd', 68)
-    await delay(100)
-
-    const player = findPlayer(scene)
-    const body = player.body as Phaser.Physics.Arcade.Body
-    expect(body.velocity.x).toBe(0)
-    expect(body.velocity.y).toBe(0)
-
+    await delay(200)
     simulateKeyUp(game, 'd', 68)
+
+    expect(player.x).toBe(startX)
+    expect(player.y).toBe(startY)
+
     controller.unfreeze()
   })
 })

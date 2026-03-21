@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest'
 import { createGame } from '../main'
-import { PLAYER_SPEED, GBA_WIDTH, GBA_HEIGHT } from '../config'
+import { GBA_WIDTH, GBA_HEIGHT } from '../config'
 import {
   bootToOverworld,
   delay,
@@ -26,15 +26,15 @@ describe('touch controls', () => {
     const scene = await bootToOverworld(game)
     await dismissDialog(game)
 
+    const player = findPlayer(scene)
+    const startX = player.x
+
     // NOTE: Touch down at center, drag right past the deadzone (8px).
     simulatePointerDown(game, GBA_WIDTH / 2, GBA_HEIGHT / 2)
     simulatePointerMove(game, GBA_WIDTH / 2 + 20, GBA_HEIGHT / 2)
-    await delay(100)
+    await delay(200)
 
-    const player = findPlayer(scene)
-    const body = player.body as Phaser.Physics.Arcade.Body
-    expect(body.velocity.x).toBe(PLAYER_SPEED)
-    expect(body.velocity.y).toBe(0)
+    expect(player.x).toBeGreaterThan(startX)
 
     simulatePointerUp(game, GBA_WIDTH / 2 + 20, GBA_HEIGHT / 2)
   })
@@ -44,13 +44,14 @@ describe('touch controls', () => {
     const scene = await bootToOverworld(game)
     await dismissDialog(game)
 
+    const player = findPlayer(scene)
+    const startX = player.x
+
     simulatePointerDown(game, GBA_WIDTH / 2, GBA_HEIGHT / 2)
     simulatePointerMove(game, GBA_WIDTH / 2 - 20, GBA_HEIGHT / 2)
-    await delay(100)
+    await delay(200)
 
-    const player = findPlayer(scene)
-    const body = player.body as Phaser.Physics.Arcade.Body
-    expect(body.velocity.x).toBe(-PLAYER_SPEED)
+    expect(player.x).toBeLessThan(startX)
 
     simulatePointerUp(game, GBA_WIDTH / 2 - 20, GBA_HEIGHT / 2)
   })
@@ -60,15 +61,17 @@ describe('touch controls', () => {
     const scene = await bootToOverworld(game)
     await dismissDialog(game)
 
+    const player = findPlayer(scene)
+    const startX = player.x
+    const startY = player.y
+
     // NOTE: Drag only 5px, which is within the 8px deadzone.
     simulatePointerDown(game, GBA_WIDTH / 2, GBA_HEIGHT / 2)
     simulatePointerMove(game, GBA_WIDTH / 2 + 5, GBA_HEIGHT / 2)
-    await delay(100)
+    await delay(200)
 
-    const player = findPlayer(scene)
-    const body = player.body as Phaser.Physics.Arcade.Body
-    expect(body.velocity.x).toBe(0)
-    expect(body.velocity.y).toBe(0)
+    expect(player.x).toBe(startX)
+    expect(player.y).toBe(startY)
 
     simulatePointerUp(game, GBA_WIDTH / 2 + 5, GBA_HEIGHT / 2)
   })
@@ -80,14 +83,16 @@ describe('touch controls', () => {
 
     simulatePointerDown(game, GBA_WIDTH / 2, GBA_HEIGHT / 2)
     simulatePointerMove(game, GBA_WIDTH / 2 + 20, GBA_HEIGHT / 2)
-    await delay(100)
+    await delay(200)
     simulatePointerUp(game, GBA_WIDTH / 2 + 20, GBA_HEIGHT / 2)
-    await delay(100)
+    await delay(200)
 
     const player = findPlayer(scene)
-    const body = player.body as Phaser.Physics.Arcade.Body
-    expect(body.velocity.x).toBe(0)
-    expect(body.velocity.y).toBe(0)
+    const posAfterRelease = player.x
+
+    // NOTE: Wait a bit more and verify player hasn't moved further.
+    await delay(200)
+    expect(player.x).toBe(posAfterRelease)
   })
 
   it('tap dismisses dialog', async () => {

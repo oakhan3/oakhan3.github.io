@@ -57,13 +57,15 @@ export class OverworldScene extends Phaser.Scene {
     const spawnY = Math.floor(map.heightInPixels / 2)
     const player = new PlayerSprite(this, spawnX, spawnY)
 
+    // NOTE: convertTilemapLayer reads Tiled objectgroup polygon shapes and creates
+    // accurate Matter bodies instead of full-tile rectangles.
     for (const layer of layers) {
-      this.physics.add.collider(player, layer)
+      this.matter.world.convertTilemapLayer(layer)
     }
 
     this.cameras.main.startFollow(player, true)
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
-    this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
+    this.matter.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
 
     const touchControls = new TouchControls(this)
     this.playerController = new PlayerController(this, player, touchControls)
@@ -145,8 +147,7 @@ function _updateTileAnimations(animations: TileAnimation[], delta: number) {
     if (anim.elapsed >= currentFrame.duration) {
       anim.elapsed -= currentFrame.duration
       anim.frameIndex = (anim.frameIndex + 1) % anim.frames.length
-      const tile = anim.layer.putTileAt(anim.frames[anim.frameIndex].gid, anim.col, anim.row)
-      tile.setCollision(true)
+      anim.layer.putTileAt(anim.frames[anim.frameIndex].gid, anim.col, anim.row)
     }
   }
 }
