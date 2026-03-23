@@ -5,9 +5,8 @@ import { DEPTH_LIGHTING, TILE_SIZE } from '../config'
 const TARGET_TILE_X = 39
 const TARGET_TILE_Y = 8
 
-// NOTE: Bolt originates this many pixels above the target and strikes
-// downward to hit it. Simulates lightning coming from the sky.
-const BOLT_LENGTH = 96
+// NOTE: Bolt originates from the very top of the map (Y = 0) and strikes
+// downward to the target tile.
 
 // NOTE: Random interval range between strikes (milliseconds). The bolt fires
 // at a random time within this window, creating unpredictable timing.
@@ -130,14 +129,13 @@ function _generateBolt(time: number): ActiveBolt {
   const targetX = TARGET_TILE_X * TILE_SIZE + TILE_SIZE / 2
   const targetY = TARGET_TILE_Y * TILE_SIZE + TILE_SIZE / 2
 
-  // NOTE: Source is directly above the target with slight horizontal wander
-  // so each strike enters from a slightly different angle.
+  // NOTE: Source starts at the very top of the map (Y = 0) with slight
+  // horizontal wander so each strike enters from a slightly different angle.
   const sourceX = targetX + (Math.random() - 0.5) * 20
-  const sourceY = targetY - BOLT_LENGTH
-  const endX = targetX
-  const endY = targetY
+  const sourceY = 0
+  const boltLength = targetY
 
-  const segments = _midpointDisplacement(sourceX, sourceY, endX, endY, DISPLACEMENT_INITIAL, SUBDIVISION_DEPTH)
+  const segments = _midpointDisplacement(sourceX, sourceY, targetX, targetY, DISPLACEMENT_INITIAL, SUBDIVISION_DEPTH)
 
   // NOTE: Generate branches from random segments along the main bolt.
   const branches: BoltSegment[][] = []
@@ -146,7 +144,7 @@ function _generateBolt(time: number): ActiveBolt {
       const segment = segments[index]
       // NOTE: Branch angles off to the side, biased away from center.
       const branchAngle = (Math.random() > 0.5 ? 1 : -1) * (Math.PI / 6 + (Math.random() * Math.PI) / 6)
-      const branchLength = BOLT_LENGTH * BRANCH_LENGTH_RATIO * (1 - index / segments.length)
+      const branchLength = boltLength * BRANCH_LENGTH_RATIO * (1 - index / segments.length)
       const branchEndX = segment.x2 + Math.sin(branchAngle) * branchLength
       const branchEndY = segment.y2 + Math.cos(branchAngle) * branchLength * 0.7
 
