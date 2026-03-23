@@ -171,6 +171,9 @@ const FIXED_LIGHTS: FixedLight[] = [
   { pixelX: 42 * TILE_SIZE - 1, pixelY: 21.5 * TILE_SIZE + 8, radius: 12, color: 0xdd1111, glow: true },
   { pixelX: 42 * TILE_SIZE - 1, pixelY: 22.5 * TILE_SIZE, radius: 12, color: 0xdd1111, glow: true },
 
+  // Red glow dot at tile 16,3.
+  { pixelX: 16.5 * TILE_SIZE, pixelY: 3.5 * TILE_SIZE, radius: 10, color: 0xff0000, glow: true },
+
   // Additional ambient lights
   { pixelX: 39 * TILE_SIZE, pixelY: 9 * TILE_SIZE, radius: 96, color: 0xffeedd },
   { pixelX: 17 * TILE_SIZE, pixelY: 12 * TILE_SIZE, radius: 96, color: 0xffeedd },
