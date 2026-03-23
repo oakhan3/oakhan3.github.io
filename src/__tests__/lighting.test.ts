@@ -264,6 +264,5 @@ describe('lightning overlay', () => {
     }
 
     expect(sawBolt).toBe(true)
-  }, // NOTE: Extended timeout because the bolt may not fire until 8s in.
-  15000)
+  }, 15000) // NOTE: Extended timeout because the bolt may not fire until 8s in.
 })
