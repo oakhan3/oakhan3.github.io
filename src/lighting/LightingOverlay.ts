@@ -20,7 +20,7 @@ const STAGE_CONE_HEIGHT = 40
 const LAMP_CONE_WIDTH = 32
 const LAMP_CONE_HEIGHT = 40
 // NOTE: Headlight cone projects horizontally to the left from the car.
-const HEADLIGHT_CONE_LENGTH = 64
+const HEADLIGHT_CONE_LENGTH = 40
 const HEADLIGHT_CONE_SPREAD = 16
 
 interface FixedLight {
@@ -31,6 +31,10 @@ interface FixedLight {
   cone?: 'stage' | 'lamp' | 'headlight'
   // NOTE: Rotation in degrees applied to the cone. Positive = clockwise.
   coneAngle?: number
+  // NOTE: Glow lights use a second ADD-blended layer so colors appear vibrant
+  // instead of being darkened by MULTIPLY. The MULTIPLY layer reveals the area
+  // as white, then the ADD layer paints the color on top.
+  glow?: boolean
 }
 
 // NOTE: Tile coords x TILE_SIZE = pixel coords. Spotlights are placed a few
@@ -49,17 +53,17 @@ const FIXED_LIGHTS: FixedLight[] = [
   { pixelX: 26 * TILE_SIZE + 3, pixelY: 9 * TILE_SIZE + 3, radius: 51, color: 0xffe8a0, cone: 'lamp', coneAngle: -12 },
   { pixelX: 29 * TILE_SIZE + 12, pixelY: 9 * TILE_SIZE + 3, radius: 51, color: 0xffe8a0, cone: 'lamp', coneAngle: 12 },
 
-  // Building windows — blue glow across the window area (33.5,16) to (37.5,19)
-  { pixelX: 34.5 * TILE_SIZE, pixelY: 17 * TILE_SIZE, radius: 40, color: 0x44aaff },
-  { pixelX: 36.5 * TILE_SIZE, pixelY: 17 * TILE_SIZE, radius: 40, color: 0x44aaff },
-  { pixelX: 34.5 * TILE_SIZE, pixelY: 18.5 * TILE_SIZE, radius: 40, color: 0x44aaff },
-  { pixelX: 36.5 * TILE_SIZE, pixelY: 18.5 * TILE_SIZE, radius: 40, color: 0x44aaff },
+  // Building windows — vibrant blue glow via ADD blend layer
+  { pixelX: 34.5 * TILE_SIZE, pixelY: 17 * TILE_SIZE, radius: 40, color: 0x0e3388, glow: true },
+  { pixelX: 36.5 * TILE_SIZE, pixelY: 17 * TILE_SIZE, radius: 40, color: 0x0e3388, glow: true },
+  { pixelX: 34.5 * TILE_SIZE, pixelY: 18.5 * TILE_SIZE, radius: 40, color: 0x0e3388, glow: true },
+  { pixelX: 36.5 * TILE_SIZE, pixelY: 18.5 * TILE_SIZE, radius: 40, color: 0x0e3388, glow: true },
   // Building glass door
-  { pixelX: 35.5 * TILE_SIZE, pixelY: 20 * TILE_SIZE, radius: 30, color: 0x44aaff },
+  { pixelX: 35.5 * TILE_SIZE, pixelY: 20 * TILE_SIZE, radius: 30, color: 0x0e3388, glow: true },
 
   // Car headlights — beams project left from tile 39. Start 5% into the tile.
-  { pixelX: 39 * TILE_SIZE + 1, pixelY: 21.5 * TILE_SIZE + 8, radius: 20, color: 0xffffff, cone: 'headlight' },
-  { pixelX: 39 * TILE_SIZE + 1, pixelY: 22.5 * TILE_SIZE, radius: 20, color: 0xffffff, cone: 'headlight' },
+  { pixelX: 39 * TILE_SIZE + 1, pixelY: 21.5 * TILE_SIZE + 8, radius: 20, color: 0xffeecc, cone: 'headlight' },
+  { pixelX: 39 * TILE_SIZE + 1, pixelY: 22.5 * TILE_SIZE, radius: 20, color: 0xffeecc, cone: 'headlight' },
 
   // Additional ambient lights
   { pixelX: 39 * TILE_SIZE, pixelY: 9 * TILE_SIZE, radius: 96, color: 0xffeedd },
@@ -70,6 +74,10 @@ const FIXED_LIGHTS: FixedLight[] = [
 
 export class LightingOverlay {
   private renderTexture: Phaser.GameObjects.RenderTexture
+  // NOTE: Second layer with ADD blend for vibrant colored glows. MULTIPLY can
+  // only darken, so colored lights look dim. ADD composites color on top of the
+  // scene, producing bright, saturated light effects.
+  private glowTexture: Phaser.GameObjects.RenderTexture
   private lightBrush: Phaser.GameObjects.Image
   private stageConeBrush: Phaser.GameObjects.Image
   private lampConeBrush: Phaser.GameObjects.Image
@@ -101,6 +109,11 @@ export class LightingOverlay {
     this.renderTexture.setBlendMode(Phaser.BlendModes.MULTIPLY)
     this.renderTexture.setDepth(DEPTH_LIGHTING)
 
+    this.glowTexture = scene.add.renderTexture(0, 0, mapWidth, mapHeight)
+    this.glowTexture.setOrigin(0, 0)
+    this.glowTexture.setBlendMode(Phaser.BlendModes.ADD)
+    this.glowTexture.setDepth(DEPTH_LIGHTING + 1)
+
     // NOTE: Initial draw so the first frame isn't unlit.
     this.update()
   }
@@ -114,6 +127,8 @@ export class LightingOverlay {
     this.lightBrush.setScale(PLAYER_LIGHT_RADIUS / BRUSH_BASE_RADIUS)
     this.renderTexture.draw(this.lightBrush, this.player.x, this.player.y)
 
+    this.glowTexture.clear()
+
     for (const light of FIXED_LIGHTS) {
       // NOTE: For cone lights, the circular pool sits at the end of the cone
       // (where the beam hits the ground/surface), not at the source.
@@ -126,9 +141,20 @@ export class LightingOverlay {
       } else if (light.cone === 'stage') {
         poolY += STAGE_CONE_HEIGHT
       }
-      this.lightBrush.setTint(light.color)
+
       this.lightBrush.setScale(light.radius / BRUSH_BASE_RADIUS)
-      this.renderTexture.draw(this.lightBrush, poolX, poolY)
+
+      if (light.glow) {
+        // NOTE: Glow lights get drawn white on the MULTIPLY layer (to reveal
+        // the area) and colored on the ADD layer (to paint vibrant color).
+        this.lightBrush.setTint(0xffffff)
+        this.renderTexture.draw(this.lightBrush, poolX, poolY)
+        this.lightBrush.setTint(light.color)
+        this.glowTexture.draw(this.lightBrush, poolX, poolY)
+      } else {
+        this.lightBrush.setTint(light.color)
+        this.renderTexture.draw(this.lightBrush, poolX, poolY)
+      }
 
       if (light.cone === 'headlight') {
         // NOTE: Headlight cone projects left from the source point.
