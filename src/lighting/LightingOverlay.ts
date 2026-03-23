@@ -29,6 +29,8 @@ interface FixedLight {
   radius: number
   color: number
   cone?: 'stage' | 'lamp' | 'headlight'
+  // NOTE: Rotation in degrees applied to the cone. Positive = clockwise.
+  coneAngle?: number
 }
 
 // NOTE: Tile coords x TILE_SIZE = pixel coords. Spotlights are placed a few
@@ -43,17 +45,17 @@ const FIXED_LIGHTS: FixedLight[] = [
   { pixelX: 30 * TILE_SIZE, pixelY: 0 * TILE_SIZE, radius: 30, color: 0xff44aa, cone: 'stage' },
 
   // Lamps — center of island. Pixel offsets nudge the cone to align with the
-  // lamp head sprite (left lamp +3px right, right lamp +8px right).
-  { pixelX: 26 * TILE_SIZE + 3, pixelY: 9 * TILE_SIZE + 3, radius: 35, color: 0xffe8a0, cone: 'lamp' },
-  { pixelX: 29 * TILE_SIZE + 12, pixelY: 9 * TILE_SIZE + 3, radius: 35, color: 0xffe8a0, cone: 'lamp' },
+  // lamp head sprite. Cones tilt 20 degrees inward (left tilts right, right tilts left).
+  { pixelX: 26 * TILE_SIZE + 3, pixelY: 9 * TILE_SIZE + 3, radius: 51, color: 0xffe8a0, cone: 'lamp', coneAngle: -12 },
+  { pixelX: 29 * TILE_SIZE + 12, pixelY: 9 * TILE_SIZE + 3, radius: 51, color: 0xffe8a0, cone: 'lamp', coneAngle: 12 },
 
   // Building windows — blue glow across the window area (33.5,16) to (37.5,19)
-  { pixelX: 34.5 * TILE_SIZE, pixelY: 17 * TILE_SIZE, radius: 40, color: 0x6688ff },
-  { pixelX: 36.5 * TILE_SIZE, pixelY: 17 * TILE_SIZE, radius: 40, color: 0x6688ff },
-  { pixelX: 34.5 * TILE_SIZE, pixelY: 18.5 * TILE_SIZE, radius: 40, color: 0x6688ff },
-  { pixelX: 36.5 * TILE_SIZE, pixelY: 18.5 * TILE_SIZE, radius: 40, color: 0x6688ff },
+  { pixelX: 34.5 * TILE_SIZE, pixelY: 17 * TILE_SIZE, radius: 40, color: 0x44aaff },
+  { pixelX: 36.5 * TILE_SIZE, pixelY: 17 * TILE_SIZE, radius: 40, color: 0x44aaff },
+  { pixelX: 34.5 * TILE_SIZE, pixelY: 18.5 * TILE_SIZE, radius: 40, color: 0x44aaff },
+  { pixelX: 36.5 * TILE_SIZE, pixelY: 18.5 * TILE_SIZE, radius: 40, color: 0x44aaff },
   // Building glass door
-  { pixelX: 35.5 * TILE_SIZE, pixelY: 20 * TILE_SIZE, radius: 30, color: 0x6688ff },
+  { pixelX: 35.5 * TILE_SIZE, pixelY: 20 * TILE_SIZE, radius: 30, color: 0x44aaff },
 
   // Car headlights — beams project left from tile 39. Start 5% into the tile.
   { pixelX: 39 * TILE_SIZE + 1, pixelY: 21.5 * TILE_SIZE + 8, radius: 20, color: 0xffffff, cone: 'headlight' },
@@ -137,7 +139,10 @@ export class LightingOverlay {
         // grid cell where the lamp head sits) and projects downward.
         const coneBrush = light.cone === 'lamp' ? this.lampConeBrush : this.stageConeBrush
         coneBrush.setTint(light.color)
+        const angleRad = ((light.coneAngle ?? 0) * Math.PI) / 180
+        coneBrush.setRotation(angleRad)
         this.renderTexture.draw(coneBrush, light.pixelX, light.pixelY + TILE_SIZE / 2)
+        coneBrush.setRotation(0)
       }
     }
   }
@@ -181,14 +186,14 @@ function _createConeTexture(scene: Phaser.Scene, key: string, baseWidth: number,
   context.closePath()
 
   const gradient = context.createLinearGradient(0, 0, 0, height)
-  gradient.addColorStop(0, 'rgba(255, 255, 255, 0.6)')
-  gradient.addColorStop(0.4, 'rgba(255, 255, 255, 0.3)')
+  gradient.addColorStop(0, 'rgba(255, 255, 255, 0.45)')
+  gradient.addColorStop(0.3, 'rgba(255, 255, 255, 0.2)')
   gradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
 
   // NOTE: Shadow blur feathers the edges of the cone shape so it doesn't
   // have hard pixel boundaries.
-  context.shadowColor = 'rgba(255, 255, 255, 0.3)'
-  context.shadowBlur = 10
+  context.shadowColor = 'rgba(255, 255, 255, 0.4)'
+  context.shadowBlur = 16
 
   context.fillStyle = gradient
   context.fill()
