@@ -4,7 +4,7 @@ import { DEPTH_LIGHTING, TILE_SIZE } from '../config'
 // NOTE: Dark blue-black ambient color for nighttime. With MULTIPLY blend mode,
 // dark pixels darken the scene and bright pixels leave it unchanged. Drawing
 // colored circles onto this dark fill creates tinted light effects.
-const AMBIENT_COLOR = 0x111133
+const AMBIENT_COLOR = 0x334466
 
 // NOTE: Player light radius in pixels.
 const PLAYER_LIGHT_RADIUS = 80
@@ -19,13 +19,16 @@ const STAGE_CONE_WIDTH = 48
 const STAGE_CONE_HEIGHT = 40
 const LAMP_CONE_WIDTH = 32
 const LAMP_CONE_HEIGHT = 56
+// NOTE: Headlight cone projects horizontally to the left from the car.
+const HEADLIGHT_CONE_LENGTH = 64
+const HEADLIGHT_CONE_SPREAD = 16
 
 interface FixedLight {
   pixelX: number
   pixelY: number
   radius: number
   color: number
-  cone?: 'stage' | 'lamp'
+  cone?: 'stage' | 'lamp' | 'headlight'
 }
 
 // NOTE: Tile coords x TILE_SIZE = pixel coords. Spotlights are placed a few
@@ -55,6 +58,10 @@ const FIXED_LIGHTS: FixedLight[] = [
   // Building glass door
   { pixelX: 35.5 * TILE_SIZE, pixelY: 20 * TILE_SIZE, radius: 30, color: 0x6688ff },
 
+  // Car headlights — beams project left from tile 39. Start 5% into the tile.
+  { pixelX: 39 * TILE_SIZE + 1, pixelY: 21.5 * TILE_SIZE + 8, radius: 20, color: 0xffffff, cone: 'headlight' },
+  { pixelX: 39 * TILE_SIZE + 1, pixelY: 22.5 * TILE_SIZE, radius: 20, color: 0xffffff, cone: 'headlight' },
+
   // Beach umbrella (red/white)
   { pixelX: 20 * TILE_SIZE, pixelY: 22 * TILE_SIZE, radius: 40, color: 0xffeedd },
 
@@ -76,6 +83,7 @@ export class LightingOverlay {
   private lightBrush: Phaser.GameObjects.Image
   private stageConeBrush: Phaser.GameObjects.Image
   private lampConeBrush: Phaser.GameObjects.Image
+  private headlightConeBrush: Phaser.GameObjects.Image
   private player: Phaser.GameObjects.Sprite
 
   constructor(scene: Phaser.Scene, mapWidth: number, mapHeight: number, player: Phaser.GameObjects.Sprite) {
@@ -85,13 +93,18 @@ export class LightingOverlay {
     _createConeTexture(scene, 'stage-cone', STAGE_CONE_WIDTH, STAGE_CONE_HEIGHT, 0.3)
     // NOTE: Lamp cone has a much narrower tip (0.42 inset) to match the small lamp heads.
     _createConeTexture(scene, 'lamp-cone', LAMP_CONE_WIDTH, LAMP_CONE_HEIGHT, 0.42)
+    // NOTE: Headlight cone is horizontal — narrow on right (headlight), wide on left.
+    _createHorizontalConeTexture(scene, 'headlight-cone', HEADLIGHT_CONE_LENGTH, HEADLIGHT_CONE_SPREAD, 0.35)
 
     this.lightBrush = scene.make.image({ key: 'light-gradient', add: false })
     this.stageConeBrush = scene.make.image({ key: 'stage-cone', add: false })
     this.lampConeBrush = scene.make.image({ key: 'lamp-cone', add: false })
+    this.headlightConeBrush = scene.make.image({ key: 'headlight-cone', add: false })
     // NOTE: Cone origin at top-center so it draws downward from the lamp source.
     this.stageConeBrush.setOrigin(0.5, 0)
     this.lampConeBrush.setOrigin(0.5, 0)
+    // NOTE: Headlight origin at right-center so it draws leftward from the headlight.
+    this.headlightConeBrush.setOrigin(1, 0.5)
 
     this.renderTexture = scene.add.renderTexture(0, 0, mapWidth, mapHeight)
     this.renderTexture.setOrigin(0, 0)
@@ -112,15 +125,26 @@ export class LightingOverlay {
     this.renderTexture.draw(this.lightBrush, this.player.x, this.player.y)
 
     for (const light of FIXED_LIGHTS) {
-      // NOTE: For cone lights, the circular pool sits at the bottom of the cone
-      // (where the beam hits the ground), not at the lamp head.
-      const coneHeight = light.cone === 'lamp' ? LAMP_CONE_HEIGHT : light.cone === 'stage' ? STAGE_CONE_HEIGHT : 0
-      const poolY = light.cone ? light.pixelY + coneHeight : light.pixelY
+      // NOTE: For cone lights, the circular pool sits at the end of the cone
+      // (where the beam hits the ground/surface), not at the source.
+      let poolX = light.pixelX
+      let poolY = light.pixelY
+      if (light.cone === 'headlight') {
+        poolX -= HEADLIGHT_CONE_LENGTH
+      } else if (light.cone === 'lamp') {
+        poolY += LAMP_CONE_HEIGHT
+      } else if (light.cone === 'stage') {
+        poolY += STAGE_CONE_HEIGHT
+      }
       this.lightBrush.setTint(light.color)
       this.lightBrush.setScale(light.radius / BRUSH_BASE_RADIUS)
-      this.renderTexture.draw(this.lightBrush, light.pixelX, poolY)
+      this.renderTexture.draw(this.lightBrush, poolX, poolY)
 
-      if (light.cone) {
+      if (light.cone === 'headlight') {
+        // NOTE: Headlight cone projects left from the source point.
+        this.headlightConeBrush.setTint(light.color)
+        this.renderTexture.draw(this.headlightConeBrush, light.pixelX, light.pixelY)
+      } else if (light.cone) {
         // NOTE: Cone starts half a tile below the raw coordinate (center of the
         // grid cell where the lamp head sits) and projects downward.
         const coneBrush = light.cone === 'lamp' ? this.lampConeBrush : this.stageConeBrush
@@ -174,6 +198,42 @@ function _createConeTexture(scene: Phaser.Scene, key: string, baseWidth: number,
 
   // NOTE: Shadow blur feathers the edges of the cone shape so it doesn't
   // have hard pixel boundaries.
+  context.shadowColor = 'rgba(255, 255, 255, 0.3)'
+  context.shadowBlur = 10
+
+  context.fillStyle = gradient
+  context.fill()
+
+  canvasTexture.refresh()
+}
+
+function _createHorizontalConeTexture(
+  scene: Phaser.Scene,
+  key: string,
+  length: number,
+  spread: number,
+  tipInsetRatio: number,
+) {
+  const canvasTexture = scene.textures.createCanvas(key, length, spread)!
+  const context = canvasTexture.getContext()
+
+  // NOTE: Horizontal cone — narrow tip on the right (headlight source), wide
+  // base on the left (where the beam spreads). tipInsetRatio controls how
+  // narrow the tip is (higher = narrower).
+  const tipInset = spread * tipInsetRatio
+  context.beginPath()
+  context.moveTo(length, tipInset)
+  context.lineTo(length, spread - tipInset)
+  context.lineTo(0, spread)
+  context.lineTo(0, 0)
+  context.closePath()
+
+  // NOTE: Gradient runs right to left — bright at the headlight, fading out.
+  const gradient = context.createLinearGradient(length, 0, 0, 0)
+  gradient.addColorStop(0, 'rgba(255, 255, 255, 0.6)')
+  gradient.addColorStop(0.4, 'rgba(255, 255, 255, 0.3)')
+  gradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
+
   context.shadowColor = 'rgba(255, 255, 255, 0.3)'
   context.shadowBlur = 10
 
