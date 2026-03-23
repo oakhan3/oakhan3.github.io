@@ -6,6 +6,7 @@ import { TouchControls } from '../mobile/TouchControls'
 import { LightingOverlay } from '../lighting/LightingOverlay'
 import { SparkleOverlay } from '../lighting/SparkleOverlay'
 import { LightningOverlay } from '../lighting/LightningOverlay'
+import { createObjectCollisions } from '../collision/ObjectCollisions'
 
 interface LayerConfig {
   name: string
@@ -21,8 +22,8 @@ const LAYERS: LayerConfig[] = [
   { name: 'BackTree', collision: 'fromGroup' },
   { name: 'Tile Rise', collision: 'fromGroup' },
   { name: 'BeachFun', collision: 'fromGroup' },
-  { name: 'Tile Layer 8', collision: 'fromGroup' },
-  { name: 'Tile Layer 7', collision: 'fromGroup' },
+  { name: 'MiscOverlays', collision: 'fromGroup' },
+  { name: 'StageLights', collision: 'fromGroup' },
 ]
 
 interface TileAnimation {
@@ -66,6 +67,10 @@ export class OverworldScene extends Phaser.Scene {
     for (const layer of layers) {
       this.matter.world.convertTilemapLayer(layer)
     }
+
+    // NOTE: Object layer collisions — reads Collisions and Interactables layers
+    // from the Tiled JSON and creates static Matter polygon bodies.
+    createObjectCollisions(this, map)
 
     this.cameras.main.startFollow(player, true)
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels)

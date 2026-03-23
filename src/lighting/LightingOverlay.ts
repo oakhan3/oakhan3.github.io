@@ -200,7 +200,6 @@ const FIXED_LIGHTS: FixedLight[] = [
   { pixelX: 39 * TILE_SIZE, pixelY: 9 * TILE_SIZE, radius: 96, color: 0xffeedd },
   { pixelX: 17 * TILE_SIZE, pixelY: 12 * TILE_SIZE, radius: 96, color: 0xffeedd },
   { pixelX: 20 * TILE_SIZE, pixelY: 22 * TILE_SIZE, radius: 48, color: 0xffeedd },
-  { pixelX: 16 * TILE_SIZE, pixelY: 4 * TILE_SIZE, radius: 64, color: 0xffeedd },
 ]
 
 export class LightingOverlay {
