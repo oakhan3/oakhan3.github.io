@@ -13,42 +13,47 @@ const PLAYER_LIGHT_RADIUS = 80
 // texture, scaled via setScale on the brush image before drawing.
 const BRUSH_BASE_RADIUS = 80
 
-// NOTE: Cone beam dimensions. The cone projects downward from the lamp source.
-// Width is how wide the beam spreads at the bottom, height is how far it reaches.
-const CONE_BASE_WIDTH = 48
-const CONE_HEIGHT = 64
+// NOTE: Stage cones are wider at the tip (big stage lights). Lamp cones have a
+// narrow tip (small lamp heads) that flares out more.
+const STAGE_CONE_WIDTH = 48
+const STAGE_CONE_HEIGHT = 40
+const LAMP_CONE_WIDTH = 32
+const LAMP_CONE_HEIGHT = 56
 
 interface FixedLight {
   pixelX: number
   pixelY: number
   radius: number
   color: number
-  cone?: boolean
+  cone?: 'stage' | 'lamp'
 }
 
 // NOTE: Tile coords x TILE_SIZE = pixel coords. Spotlights are placed a few
 // tiles below the gem sources so the light pools onto the stage surface.
 const FIXED_LIGHTS: FixedLight[] = [
   // Stage spotlights — gems along row 0, beams project down onto stage
-  { pixelX: 25 * TILE_SIZE, pixelY: 0 * TILE_SIZE, radius: 70, color: 0xff4444, cone: true },
-  { pixelX: 26 * TILE_SIZE, pixelY: 0 * TILE_SIZE, radius: 70, color: 0xffff44, cone: true },
-  { pixelX: 27 * TILE_SIZE, pixelY: 0 * TILE_SIZE, radius: 70, color: 0x44ff44, cone: true },
-  { pixelX: 28 * TILE_SIZE, pixelY: 0 * TILE_SIZE, radius: 70, color: 0x4444ff, cone: true },
-  { pixelX: 29 * TILE_SIZE, pixelY: 0 * TILE_SIZE, radius: 70, color: 0xaa44ff, cone: true },
-  { pixelX: 30 * TILE_SIZE, pixelY: 0 * TILE_SIZE, radius: 70, color: 0xff44aa, cone: true },
+  { pixelX: 25 * TILE_SIZE, pixelY: 0 * TILE_SIZE, radius: 30, color: 0xff4444, cone: 'stage' },
+  { pixelX: 26 * TILE_SIZE, pixelY: 0 * TILE_SIZE, radius: 30, color: 0xffff44, cone: 'stage' },
+  { pixelX: 27 * TILE_SIZE, pixelY: 0 * TILE_SIZE, radius: 30, color: 0x44ff44, cone: 'stage' },
+  { pixelX: 28 * TILE_SIZE, pixelY: 0 * TILE_SIZE, radius: 30, color: 0x4444ff, cone: 'stage' },
+  { pixelX: 29 * TILE_SIZE, pixelY: 0 * TILE_SIZE, radius: 30, color: 0xaa44ff, cone: 'stage' },
+  { pixelX: 30 * TILE_SIZE, pixelY: 0 * TILE_SIZE, radius: 30, color: 0xff44aa, cone: 'stage' },
 
-  // Lamps — center of island
-  { pixelX: 26 * TILE_SIZE, pixelY: 9 * TILE_SIZE, radius: 35, color: 0xffdd66, cone: true },
-  { pixelX: 29 * TILE_SIZE, pixelY: 9 * TILE_SIZE, radius: 35, color: 0xffdd66, cone: true },
+  // Lamps — center of island. Pixel offsets nudge the cone to align with the
+  // lamp head sprite (left lamp +3px right, right lamp +8px right).
+  { pixelX: 26 * TILE_SIZE + 3, pixelY: 9 * TILE_SIZE + 3, radius: 35, color: 0xffdd66, cone: 'lamp' },
+  { pixelX: 29 * TILE_SIZE + 12, pixelY: 9 * TILE_SIZE + 3, radius: 35, color: 0xffdd66, cone: 'lamp' },
 
   // Campfire between trees
   { pixelX: 14 * TILE_SIZE, pixelY: 13 * TILE_SIZE, radius: 60, color: 0xffaa44 },
 
-  // Large building entrance
-  { pixelX: 33 * TILE_SIZE, pixelY: 16 * TILE_SIZE, radius: 70, color: 0xccddff },
-
-  // Large building windows
-  { pixelX: 35 * TILE_SIZE, pixelY: 13 * TILE_SIZE, radius: 60, color: 0xffdd88 },
+  // Building windows — blue glow across the window area (33.5,16) to (37.5,19)
+  { pixelX: 34.5 * TILE_SIZE, pixelY: 17 * TILE_SIZE, radius: 40, color: 0x6688ff },
+  { pixelX: 36.5 * TILE_SIZE, pixelY: 17 * TILE_SIZE, radius: 40, color: 0x6688ff },
+  { pixelX: 34.5 * TILE_SIZE, pixelY: 18.5 * TILE_SIZE, radius: 40, color: 0x6688ff },
+  { pixelX: 36.5 * TILE_SIZE, pixelY: 18.5 * TILE_SIZE, radius: 40, color: 0x6688ff },
+  // Building glass door
+  { pixelX: 35.5 * TILE_SIZE, pixelY: 20 * TILE_SIZE, radius: 30, color: 0x6688ff },
 
   // Beach umbrella (red/white)
   { pixelX: 20 * TILE_SIZE, pixelY: 22 * TILE_SIZE, radius: 40, color: 0xffeedd },
@@ -69,19 +74,24 @@ const FIXED_LIGHTS: FixedLight[] = [
 export class LightingOverlay {
   private renderTexture: Phaser.GameObjects.RenderTexture
   private lightBrush: Phaser.GameObjects.Image
-  private coneBrush: Phaser.GameObjects.Image
+  private stageConeBrush: Phaser.GameObjects.Image
+  private lampConeBrush: Phaser.GameObjects.Image
   private player: Phaser.GameObjects.Sprite
 
   constructor(scene: Phaser.Scene, mapWidth: number, mapHeight: number, player: Phaser.GameObjects.Sprite) {
     this.player = player
 
     _createLightTexture(scene, 'light-gradient', BRUSH_BASE_RADIUS)
-    _createConeTexture(scene, 'cone-gradient', CONE_BASE_WIDTH, CONE_HEIGHT)
+    _createConeTexture(scene, 'stage-cone', STAGE_CONE_WIDTH, STAGE_CONE_HEIGHT, 0.3)
+    // NOTE: Lamp cone has a much narrower tip (0.42 inset) to match the small lamp heads.
+    _createConeTexture(scene, 'lamp-cone', LAMP_CONE_WIDTH, LAMP_CONE_HEIGHT, 0.42)
 
     this.lightBrush = scene.make.image({ key: 'light-gradient', add: false })
-    this.coneBrush = scene.make.image({ key: 'cone-gradient', add: false })
+    this.stageConeBrush = scene.make.image({ key: 'stage-cone', add: false })
+    this.lampConeBrush = scene.make.image({ key: 'lamp-cone', add: false })
     // NOTE: Cone origin at top-center so it draws downward from the lamp source.
-    this.coneBrush.setOrigin(0.5, 0)
+    this.stageConeBrush.setOrigin(0.5, 0)
+    this.lampConeBrush.setOrigin(0.5, 0)
 
     this.renderTexture = scene.add.renderTexture(0, 0, mapWidth, mapHeight)
     this.renderTexture.setOrigin(0, 0)
@@ -104,7 +114,8 @@ export class LightingOverlay {
     for (const light of FIXED_LIGHTS) {
       // NOTE: For cone lights, the circular pool sits at the bottom of the cone
       // (where the beam hits the ground), not at the lamp head.
-      const poolY = light.cone ? light.pixelY + CONE_HEIGHT : light.pixelY
+      const coneHeight = light.cone === 'lamp' ? LAMP_CONE_HEIGHT : light.cone === 'stage' ? STAGE_CONE_HEIGHT : 0
+      const poolY = light.cone ? light.pixelY + coneHeight : light.pixelY
       this.lightBrush.setTint(light.color)
       this.lightBrush.setScale(light.radius / BRUSH_BASE_RADIUS)
       this.renderTexture.draw(this.lightBrush, light.pixelX, poolY)
@@ -112,8 +123,9 @@ export class LightingOverlay {
       if (light.cone) {
         // NOTE: Cone starts half a tile below the raw coordinate (center of the
         // grid cell where the lamp head sits) and projects downward.
-        this.coneBrush.setTint(light.color)
-        this.renderTexture.draw(this.coneBrush, light.pixelX, light.pixelY + TILE_SIZE / 2)
+        const coneBrush = light.cone === 'lamp' ? this.lampConeBrush : this.stageConeBrush
+        coneBrush.setTint(light.color)
+        this.renderTexture.draw(coneBrush, light.pixelX, light.pixelY + TILE_SIZE / 2)
       }
     }
   }
@@ -140,14 +152,14 @@ function _createLightTexture(scene: Phaser.Scene, key: string, radius: number) {
   canvasTexture.refresh()
 }
 
-function _createConeTexture(scene: Phaser.Scene, key: string, baseWidth: number, height: number) {
+function _createConeTexture(scene: Phaser.Scene, key: string, baseWidth: number, height: number, topInsetRatio: number) {
   const canvasTexture = scene.textures.createCanvas(key, baseWidth, height)!
   const context = canvasTexture.getContext()
 
-  // NOTE: Trapezoid cone beam — narrow at the top (lamp source), wide at the
-  // bottom (pool on the ground). Linear gradient fades from bright at top to
-  // transparent at bottom so the beam dissolves into the circular pool.
-  const topInset = baseWidth * 0.35
+  // NOTE: Soft trapezoid cone beam — gentle taper from a narrow top to wide
+  // bottom. topInsetRatio controls how narrow the tip is (higher = narrower).
+  // Uses shadow blur to feather edges smoothly into the surrounding darkness.
+  const topInset = baseWidth * topInsetRatio
   context.beginPath()
   context.moveTo(topInset, 0)
   context.lineTo(baseWidth - topInset, 0)
@@ -156,9 +168,14 @@ function _createConeTexture(scene: Phaser.Scene, key: string, baseWidth: number,
   context.closePath()
 
   const gradient = context.createLinearGradient(0, 0, 0, height)
-  gradient.addColorStop(0, 'rgba(255, 255, 255, 0.9)')
-  gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.4)')
+  gradient.addColorStop(0, 'rgba(255, 255, 255, 0.6)')
+  gradient.addColorStop(0.4, 'rgba(255, 255, 255, 0.3)')
   gradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
+
+  // NOTE: Shadow blur feathers the edges of the cone shape so it doesn't
+  // have hard pixel boundaries.
+  context.shadowColor = 'rgba(255, 255, 255, 0.3)'
+  context.shadowBlur = 10
 
   context.fillStyle = gradient
   context.fill()
