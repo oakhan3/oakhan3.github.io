@@ -30,14 +30,8 @@ export class PreloadScene extends Phaser.Scene {
       progressBar.width = (barWidth - 2) * value
     })
 
-    this.load.image('tiny-realm', 'assets/tilesets/tiny-realm.png')
-    this.load.image('grass', 'assets/tilesets/grass.png')
-    this.load.image('cliff', 'assets/tilesets/cliff.png')
-    this.load.image('path', 'assets/tilesets/path.png')
-    this.load.image('water', 'assets/tilesets/water.png')
-    this.load.image('parrot-blue', 'assets/tilesets/parrot-blue.png')
-    this.load.image('supercar-blue', 'assets/tilesets/supercar-blue.png')
-    this.load.tilemapTiledJSON('overworld-map', 'assets/maps/overworld-v2.json')
+    this.load.image('heliodor', 'assets/tilesets/heliodor.png')
+    this.load.tilemapTiledJSON('overworld-map', 'assets/maps/overworld-3.json')
     this.load.spritesheet('player', 'assets/sprites/player.png', {
       frameWidth: PLAYER_FRAME_WIDTH,
       frameHeight: PLAYER_FRAME_HEIGHT,

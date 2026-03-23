@@ -13,12 +13,13 @@ interface LayerConfig {
 // 'allTiles' blocks every non-empty tile — used for Kiwi because its objectgroup shapes
 // weren't picked up by setCollisionFromCollisionGroup() despite being defined in Tiled.
 const LAYERS: LayerConfig[] = [
-  { name: 'Ground', collision: 'fromGroup' },
-  { name: 'Decorations', collision: 'fromGroup' },
-  { name: 'Car', collision: 'fromGroup' },
-  { name: 'Kiwi', collision: 'allTiles' },
-  { name: 'Buildings', collision: 'fromGroup' },
-  { name: 'Tree', collision: 'fromGroup' },
+  { name: 'Ground' },
+  { name: 'BackBackTree', collision: 'fromGroup' },
+  { name: 'BackTree', collision: 'fromGroup' },
+  { name: 'Tile Rise', collision: 'fromGroup' },
+  { name: 'BeachFun', collision: 'fromGroup' },
+  { name: 'Tile Layer 8', collision: 'fromGroup' },
+  { name: 'Tile Layer 7', collision: 'fromGroup' },
 ]
 
 interface TileAnimation {
@@ -42,15 +43,7 @@ export class OverworldScene extends Phaser.Scene {
     const map = this.make.tilemap({ key: 'overworld-map' })
     // NOTE: Tileset names in the Tiled JSON match the Phaser cache keys from
     // PreloadScene, so a single arg is sufficient.
-    const tilesets = [
-      map.addTilesetImage('tiny-realm')!,
-      map.addTilesetImage('grass')!,
-      map.addTilesetImage('cliff')!,
-      map.addTilesetImage('path')!,
-      map.addTilesetImage('water')!,
-      map.addTilesetImage('parrot-blue')!,
-      map.addTilesetImage('supercar-blue')!,
-    ]
+    const tilesets = [map.addTilesetImage('heliodor')!]
 
     const layers = _createLayers(map, tilesets)
 
