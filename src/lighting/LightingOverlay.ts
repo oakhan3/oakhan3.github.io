@@ -169,7 +169,7 @@ const FIXED_LIGHTS: FixedLight[] = [
   // Car tail lights — small red glow at the right edge of tiles 41,21 and 41,22.
   // NOTE: Top light (21) is lowered by 50% of a tile (8px) to align with the sprite.
   {
-    pixelX: 42 * TILE_SIZE - 1,
+    pixelX: 42 * TILE_SIZE - 5,
     pixelY: 21.5 * TILE_SIZE + 8,
     radius: 12,
     color: 0xdd1111,
@@ -177,7 +177,7 @@ const FIXED_LIGHTS: FixedLight[] = [
     animation: 'flicker',
   },
   {
-    pixelX: 42 * TILE_SIZE - 1,
+    pixelX: 42 * TILE_SIZE - 5,
     pixelY: 22.5 * TILE_SIZE,
     radius: 12,
     color: 0xdd1111,
