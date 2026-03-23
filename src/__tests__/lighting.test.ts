@@ -136,10 +136,11 @@ describe('lighting overlay', () => {
     // readCanvasPixel returns all-white for glow positions.
     const { add } = findLightingTextures(scene)
 
-    // NOTE: Sample 5 times over 2.5s. The pulse animation is slow, so
-    // spacing samples across a longer window catches the sine variation.
+    // NOTE: Sample 8 times over 4s. The pulse animation is slow (~3s cycle)
+    // so a longer window is needed to reliably catch sine variation across
+    // different random seed assignments.
     const samples: string[] = []
-    for (let step = 0; step < 5; step++) {
+    for (let step = 0; step < 8; step++) {
       const pixel = readTexturePixel(add, WINDOW_EDGE_X, WINDOW_EDGE_Y)
       samples.push(`${pixel.r},${pixel.g},${pixel.b}`)
       await delay(500)

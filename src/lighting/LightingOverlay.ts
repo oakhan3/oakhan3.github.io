@@ -168,11 +168,33 @@ const FIXED_LIGHTS: FixedLight[] = [
 
   // Car tail lights — small red glow at the right edge of tiles 41,21 and 41,22.
   // NOTE: Top light (21) is lowered by 50% of a tile (8px) to align with the sprite.
-  { pixelX: 42 * TILE_SIZE - 1, pixelY: 21.5 * TILE_SIZE + 8, radius: 12, color: 0xdd1111, glow: true },
-  { pixelX: 42 * TILE_SIZE - 1, pixelY: 22.5 * TILE_SIZE, radius: 12, color: 0xdd1111, glow: true },
+  {
+    pixelX: 42 * TILE_SIZE - 1,
+    pixelY: 21.5 * TILE_SIZE + 8,
+    radius: 12,
+    color: 0xdd1111,
+    glow: true,
+    animation: 'flicker',
+  },
+  {
+    pixelX: 42 * TILE_SIZE - 1,
+    pixelY: 22.5 * TILE_SIZE,
+    radius: 12,
+    color: 0xdd1111,
+    glow: true,
+    animation: 'flicker',
+  },
 
   // Red glow dot at tile 16,3.
-  { pixelX: 16.5 * TILE_SIZE, pixelY: 3.5 * TILE_SIZE, radius: 10, color: 0xff0000, glow: true },
+  { pixelX: 16.5 * TILE_SIZE, pixelY: 3.5 * TILE_SIZE, radius: 10, color: 0xff0000, glow: true, animation: 'flicker' },
+
+  // Fairy lights — bright concentrated glows with lamp-style flicker.
+  // NOTE: Radius 4 (70% smaller than initial 14) for a tight, focused point.
+  { pixelX: 15.5 * TILE_SIZE, pixelY: 11.5 * TILE_SIZE, radius: 4, color: 0xffffff, glow: true, animation: 'flicker' },
+  { pixelX: 19.5 * TILE_SIZE, pixelY: 11.5 * TILE_SIZE, radius: 4, color: 0xffffff, glow: true, animation: 'flicker' },
+  { pixelX: 22.5 * TILE_SIZE, pixelY: 24.5 * TILE_SIZE, radius: 4, color: 0xffffff, glow: true, animation: 'flicker' },
+  { pixelX: 18.5 * TILE_SIZE, pixelY: 21.5 * TILE_SIZE, radius: 4, color: 0xffffff, glow: true, animation: 'flicker' },
+  { pixelX: 13.5 * TILE_SIZE, pixelY: 23.5 * TILE_SIZE, radius: 4, color: 0xffffff, glow: true, animation: 'flicker' },
 
   // Additional ambient lights
   { pixelX: 39 * TILE_SIZE, pixelY: 9 * TILE_SIZE, radius: 96, color: 0xffeedd },
