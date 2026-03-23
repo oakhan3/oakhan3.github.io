@@ -82,4 +82,8 @@ export class PlayerController {
   unfreeze(): void {
     this.frozen = false
   }
+
+  isFrozen(): boolean {
+    return this.frozen
+  }
 }

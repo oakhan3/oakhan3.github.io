@@ -12,6 +12,10 @@ const BACKGROUND_COLOR = 0x1a1b2e
 const BACKGROUND_ALPHA = 0.92
 const INDICATOR_SIZE = 5
 const INDICATOR_BLINK_DURATION = 400
+// NOTE: Link button is positioned in screen space at bottom-left of the dialog box.
+// Lives outside the container so setInteractive() hit-tests correctly with scrollFactor(0).
+const LINK_BUTTON_X = BOX_MARGIN + BOX_PADDING
+const LINK_BUTTON_Y = BOX_Y + BOX_HEIGHT - BOX_PADDING - 11
 
 export class DialogBox {
   private scene: Phaser.Scene
@@ -24,6 +28,8 @@ export class DialogBox {
   private advanceKeys: Phaser.Input.Keyboard.Key[]
   private indicator: Phaser.GameObjects.Graphics
   private indicatorTween: Phaser.Tweens.Tween | null = null
+  private linkButton: Phaser.GameObjects.Text
+  private currentUrl: string | null = null
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene
@@ -56,11 +62,35 @@ export class DialogBox {
     this.container.setDepth(DEPTH_DIALOG)
     this.container.setVisible(false)
 
+    // NOTE: Link button sits outside the container so its interactive hit area is
+    // computed in screen space, matching its scrollFactor(0) visual position.
+    this.linkButton = scene.add.text(LINK_BUTTON_X, LINK_BUTTON_Y, '[ open link ]', {
+      fontFamily: '"Press Start 2P"',
+      fontSize: '6px',
+      color: '#60a5fa',
+    })
+    this.linkButton.setScrollFactor(0)
+    this.linkButton.setDepth(DEPTH_DIALOG + 1)
+    this.linkButton.setVisible(false)
+    this.linkButton.setInteractive({ useHandCursor: true })
+    this.linkButton.on('pointerdown', () => {
+      if (this.currentUrl) window.open(this.currentUrl, '_blank')
+    })
+
     this.advanceKeys = [scene.input.keyboard!.addKey('SPACE'), scene.input.keyboard!.addKey('ENTER')]
   }
 
+  isOpen(): boolean {
+    return this.container.visible
+  }
+
   show(text: string, onClose?: () => void): void {
-    this.fullText = text
+    // NOTE: Extract a URL from the message so it can be shown as an interactive link
+    // button. The URL is stripped from the typewriter text to keep the display clean.
+    const urlMatch = text.match(/https?:\/\/\S+/)
+    this.currentUrl = urlMatch ? urlMatch[0] : null
+    this.fullText = this.currentUrl ? text.replace(this.currentUrl, '').trim() : text
+
     this.displayedLength = 0
     this.onClose = onClose ?? null
     this.textObject.setText('')
@@ -71,7 +101,7 @@ export class DialogBox {
       delay: TYPEWRITER_DELAY,
       callback: this.advanceCharacter,
       callbackScope: this,
-      repeat: text.length - 1,
+      repeat: this.fullText.length - 1,
     })
 
     for (const key of this.advanceKeys) {
@@ -120,6 +150,9 @@ export class DialogBox {
       yoyo: true,
       repeat: -1,
     })
+    // NOTE: Only show the link button once typing is done so the player can read
+    // the message before the link becomes clickable.
+    if (this.currentUrl) this.linkButton.setVisible(true)
   }
 
   private hideIndicator(): void {
@@ -129,6 +162,7 @@ export class DialogBox {
     }
     this.indicator.setVisible(false)
     this.indicator.setAlpha(1)
+    this.linkButton.setVisible(false)
   }
 
   private close(): void {
@@ -142,6 +176,7 @@ export class DialogBox {
       this.typewriterTimer.destroy()
       this.typewriterTimer = null
     }
+    this.currentUrl = null
     if (this.onClose) {
       this.onClose()
     }

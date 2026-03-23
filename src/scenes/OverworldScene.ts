@@ -7,6 +7,7 @@ import { LightingOverlay } from '../lighting/LightingOverlay'
 import { SparkleOverlay } from '../lighting/SparkleOverlay'
 import { LightningOverlay } from '../lighting/LightningOverlay'
 import { createObjectCollisions } from '../collision/ObjectCollisions'
+import { InteractionSystem } from '../interaction/InteractionSystem'
 
 interface LayerConfig {
   name: string
@@ -41,6 +42,7 @@ export class OverworldScene extends Phaser.Scene {
   private lightingOverlay!: LightingOverlay
   private sparkleOverlay!: SparkleOverlay
   private lightningOverlay!: LightningOverlay
+  private interactionSystem!: InteractionSystem
 
   constructor() {
     super({ key: 'OverworldScene' })
@@ -84,12 +86,14 @@ export class OverworldScene extends Phaser.Scene {
     this.playerController = new PlayerController(this, player, touchControls)
 
     const dialog = new DialogBox(this)
+    this.interactionSystem = new InteractionSystem(this, map, player, this.playerController, dialog)
     this.playerController.freeze()
     dialog.show("Hi, I'm Omar Ali Khan! Welcome to my page.", () => this.playerController.unfreeze())
   }
 
   update(_time: number, delta: number) {
     this.playerController.update()
+    this.interactionSystem.update()
     this.lightingOverlay.update()
     this.sparkleOverlay.update()
     this.lightningOverlay.update()
