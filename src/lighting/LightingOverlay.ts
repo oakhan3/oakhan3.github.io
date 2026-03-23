@@ -123,11 +123,11 @@ export class LightingOverlay {
     this.lightSeeds = FIXED_LIGHTS.map(() => Math.random() * 10000)
 
     _createLightTexture(scene, 'light-gradient', BRUSH_BASE_RADIUS)
-    _createConeTexture(scene, 'stage-cone', STAGE_CONE_WIDTH, STAGE_CONE_HEIGHT, 0.3)
+    _createConeTexture(scene, 'stage-cone', _verticalConeSpec(STAGE_CONE_WIDTH, STAGE_CONE_HEIGHT, 0.3))
     // NOTE: Lamp cone has a much narrower tip (0.42 inset) to match the small lamp heads.
-    _createConeTexture(scene, 'lamp-cone', LAMP_CONE_WIDTH, LAMP_CONE_HEIGHT, 0.42)
+    _createConeTexture(scene, 'lamp-cone', _verticalConeSpec(LAMP_CONE_WIDTH, LAMP_CONE_HEIGHT, 0.42))
     // NOTE: Headlight cone is horizontal — narrow on right (headlight), wide on left.
-    _createHorizontalConeTexture(scene, 'headlight-cone', HEADLIGHT_CONE_LENGTH, HEADLIGHT_CONE_SPREAD, 0.25)
+    _createConeTexture(scene, 'headlight-cone', _horizontalConeSpec(HEADLIGHT_CONE_LENGTH, HEADLIGHT_CONE_SPREAD, 0.25))
 
     this.lightBrush = scene.make.image({ key: 'light-gradient', add: false })
     this.stageConeBrush = scene.make.image({ key: 'stage-cone', add: false })
@@ -170,37 +170,7 @@ export class LightingOverlay {
       const light = FIXED_LIGHTS[index]
       const seed = this.lightSeeds[index]
 
-      // NOTE: Compute animated radius scale and color override per light.
-      let radiusScale = 1
-      let color = light.color
-
-      if (light.animation === 'flicker') {
-        // NOTE: Layer three sine waves at different frequencies for organic,
-        // non-repeating jitter. The seed offsets each light's phase.
-        const wave1 = Math.sin(time * FLICKER_SPEED_1 + seed)
-        const wave2 = Math.sin(time * FLICKER_SPEED_2 + seed * 1.3)
-        const wave3 = Math.sin(time * FLICKER_SPEED_3 + seed * 0.7)
-        const combined = (wave1 + wave2 + wave3) / 3
-        radiusScale = 1 + combined * FLICKER_AMPLITUDE
-
-        // NOTE: Occasional deep dip when a slow wave peaks — simulates
-        // the filament momentarily dimming.
-        const slowWave = Math.sin(time * 0.003 + seed * 2.1)
-        if (slowWave > FLICKER_DIP_THRESHOLD) {
-          radiusScale -= FLICKER_DIP_AMOUNT
-        }
-      } else if (light.animation === 'pulse') {
-        // NOTE: Slow sine breathing. Small phase offset per window so they
-        // pulse in near-unison but not perfectly synced.
-        const phase = seed * 0.3
-        radiusScale = 1 + Math.sin(time * PULSE_SPEED + phase) * PULSE_AMPLITUDE
-      } else if (light.animation === 'color-cycle') {
-        // NOTE: Each spotlight starts at a different hue position (spread
-        // evenly across the 6 lights by index) and rotates through the
-        // full wheel over COLOR_CYCLE_PERIOD milliseconds.
-        const hue = ((time / COLOR_CYCLE_PERIOD + index / 6) % 1) * 360
-        color = _hslToHex(hue, 0.9, 0.55)
-      }
+      const { radiusScale, color } = _computeAnimation(light, time, seed, index)
 
       // NOTE: For cone lights, the circular pool sits at the end of the cone
       // (where the beam hits the ground/surface), not at the source.
@@ -273,25 +243,43 @@ function _createLightTexture(scene: Phaser.Scene, key: string, radius: number) {
   canvasTexture.refresh()
 }
 
-function _createConeTexture(scene: Phaser.Scene, key: string, baseWidth: number, height: number, topInsetRatio: number) {
-  const canvasTexture = scene.textures.createCanvas(key, baseWidth, height)!
+// NOTE: Unified cone texture creator. Takes four trapezoid vertices and a
+// gradient definition (start/end points + stops). Both vertical cones (stage,
+// lamp) and the horizontal headlight cone use this same pipeline: draw shape,
+// apply gradient with shadow blur, refresh for WebGL.
+interface ConeGradientStop {
+  offset: number
+  alpha: number
+}
+
+interface ConeSpec {
+  width: number
+  height: number
+  // NOTE: Four vertices defining the trapezoid, in order for beginPath/lineTo.
+  points: { x: number; y: number }[]
+  gradientStart: { x: number; y: number }
+  gradientEnd: { x: number; y: number }
+  gradientStops: ConeGradientStop[]
+}
+
+function _createConeTexture(scene: Phaser.Scene, key: string, spec: ConeSpec) {
+  const canvasTexture = scene.textures.createCanvas(key, spec.width, spec.height)!
   const context = canvasTexture.getContext()
 
-  // NOTE: Soft trapezoid cone beam — gentle taper from a narrow top to wide
-  // bottom. topInsetRatio controls how narrow the tip is (higher = narrower).
-  // Uses shadow blur to feather edges smoothly into the surrounding darkness.
-  const topInset = baseWidth * topInsetRatio
   context.beginPath()
-  context.moveTo(topInset, 0)
-  context.lineTo(baseWidth - topInset, 0)
-  context.lineTo(baseWidth, height)
-  context.lineTo(0, height)
+  context.moveTo(spec.points[0].x, spec.points[0].y)
+  for (let index = 1; index < spec.points.length; index++) {
+    context.lineTo(spec.points[index].x, spec.points[index].y)
+  }
   context.closePath()
 
-  const gradient = context.createLinearGradient(0, 0, 0, height)
-  gradient.addColorStop(0, 'rgba(255, 255, 255, 0.45)')
-  gradient.addColorStop(0.3, 'rgba(255, 255, 255, 0.2)')
-  gradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
+  const gradient = context.createLinearGradient(
+    spec.gradientStart.x, spec.gradientStart.y,
+    spec.gradientEnd.x, spec.gradientEnd.y,
+  )
+  for (const stop of spec.gradientStops) {
+    gradient.addColorStop(stop.offset, `rgba(255, 255, 255, ${stop.alpha})`)
+  }
 
   // NOTE: Shadow blur feathers the edges of the cone shape so it doesn't
   // have hard pixel boundaries.
@@ -304,40 +292,88 @@ function _createConeTexture(scene: Phaser.Scene, key: string, baseWidth: number,
   canvasTexture.refresh()
 }
 
-function _createHorizontalConeTexture(
-  scene: Phaser.Scene,
-  key: string,
-  length: number,
-  spread: number,
-  tipInsetRatio: number,
-) {
-  const canvasTexture = scene.textures.createCanvas(key, length, spread)!
-  const context = canvasTexture.getContext()
+function _verticalConeSpec(baseWidth: number, height: number, topInsetRatio: number): ConeSpec {
+  // NOTE: Soft trapezoid cone beam — gentle taper from a narrow top to wide
+  // bottom. topInsetRatio controls how narrow the tip is (higher = narrower).
+  const topInset = baseWidth * topInsetRatio
+  return {
+    width: baseWidth,
+    height,
+    points: [
+      { x: topInset, y: 0 },
+      { x: baseWidth - topInset, y: 0 },
+      { x: baseWidth, y: height },
+      { x: 0, y: height },
+    ],
+    gradientStart: { x: 0, y: 0 },
+    gradientEnd: { x: 0, y: height },
+    gradientStops: [
+      { offset: 0, alpha: 0.45 },
+      { offset: 0.3, alpha: 0.2 },
+      { offset: 1, alpha: 0 },
+    ],
+  }
+}
 
+function _horizontalConeSpec(length: number, spread: number, tipInsetRatio: number): ConeSpec {
   // NOTE: Horizontal cone — narrow tip on the right (headlight source), wide
-  // base on the left (where the beam spreads). tipInsetRatio controls how
-  // narrow the tip is (higher = narrower).
+  // base on the left (where the beam spreads).
   const tipInset = spread * tipInsetRatio
-  context.beginPath()
-  context.moveTo(length, tipInset)
-  context.lineTo(length, spread - tipInset)
-  context.lineTo(0, spread)
-  context.lineTo(0, 0)
-  context.closePath()
+  return {
+    width: length,
+    height: spread,
+    points: [
+      { x: length, y: tipInset },
+      { x: length, y: spread - tipInset },
+      { x: 0, y: spread },
+      { x: 0, y: 0 },
+    ],
+    // NOTE: Gradient runs right to left — bright at the headlight, fading out.
+    gradientStart: { x: length, y: 0 },
+    gradientEnd: { x: 0, y: 0 },
+    gradientStops: [
+      { offset: 0, alpha: 0.5 },
+      { offset: 0.3, alpha: 0.25 },
+      { offset: 1, alpha: 0 },
+    ],
+  }
+}
 
-  // NOTE: Gradient runs right to left — bright at the headlight, fading out.
-  const gradient = context.createLinearGradient(length, 0, 0, 0)
-  gradient.addColorStop(0, 'rgba(255, 255, 255, 0.5)')
-  gradient.addColorStop(0.3, 'rgba(255, 255, 255, 0.25)')
-  gradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
+function _computeAnimation(
+  light: FixedLight, time: number, seed: number, index: number,
+): { radiusScale: number; color: number } {
+  let radiusScale = 1
+  let color = light.color
 
-  context.shadowColor = 'rgba(255, 255, 255, 0.4)'
-  context.shadowBlur = 16
+  if (light.animation === 'flicker') {
+    // NOTE: Layer three sine waves at different frequencies for organic,
+    // non-repeating jitter. The seed offsets each light's phase.
+    const wave1 = Math.sin(time * FLICKER_SPEED_1 + seed)
+    const wave2 = Math.sin(time * FLICKER_SPEED_2 + seed * 1.3)
+    const wave3 = Math.sin(time * FLICKER_SPEED_3 + seed * 0.7)
+    const combined = (wave1 + wave2 + wave3) / 3
+    radiusScale = 1 + combined * FLICKER_AMPLITUDE
 
-  context.fillStyle = gradient
-  context.fill()
+    // NOTE: Occasional deep dip when a slow wave peaks — simulates
+    // the filament momentarily dimming.
+    const slowWave = Math.sin(time * 0.003 + seed * 2.1)
+    if (slowWave > FLICKER_DIP_THRESHOLD) {
+      radiusScale -= FLICKER_DIP_AMOUNT
+    }
+  } else if (light.animation === 'pulse') {
+    // NOTE: Slow sine breathing. Small phase offset per window so they
+    // pulse in near-unison but not perfectly synced.
+    const phase = seed * 0.3
+    radiusScale = 1 + Math.sin(time * PULSE_SPEED + phase) * PULSE_AMPLITUDE
+  } else if (light.animation === 'color-cycle') {
+    // NOTE: Each spotlight starts at a different hue position (spread
+    // evenly across the 6 lights by index) and rotates through the
+    // full wheel over COLOR_CYCLE_PERIOD milliseconds.
+    const hue = ((time / COLOR_CYCLE_PERIOD + index / 6) % 1) * 360
+    color = _hslToHex(hue, 0.9, 0.55)
+  }
 
-  canvasTexture.refresh()
+  return { radiusScale, color }
 }
 
 // NOTE: Standard HSL-to-RGB conversion. Hue in degrees (0-360), saturation
