@@ -4,6 +4,7 @@ import { PlayerController } from '../player/PlayerController'
 import { DialogBox } from '../dialog/DialogBox'
 import { TouchControls } from '../mobile/TouchControls'
 import { LightingOverlay } from '../lighting/LightingOverlay'
+import { SparkleOverlay } from '../lighting/SparkleOverlay'
 
 interface LayerConfig {
   name: string
@@ -36,6 +37,7 @@ export class OverworldScene extends Phaser.Scene {
   private playerController!: PlayerController
   private tileAnimations: TileAnimation[] = []
   private lightingOverlay!: LightingOverlay
+  private sparkleOverlay!: SparkleOverlay
 
   constructor() {
     super({ key: 'OverworldScene' })
@@ -68,6 +70,7 @@ export class OverworldScene extends Phaser.Scene {
     this.matter.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
 
     this.lightingOverlay = new LightingOverlay(this, map.widthInPixels, map.heightInPixels, player)
+    this.sparkleOverlay = new SparkleOverlay(this, map.widthInPixels, map.heightInPixels)
 
     const touchControls = new TouchControls(this)
     this.playerController = new PlayerController(this, player, touchControls)
@@ -80,6 +83,7 @@ export class OverworldScene extends Phaser.Scene {
   update(_time: number, delta: number) {
     this.playerController.update()
     this.lightingOverlay.update()
+    this.sparkleOverlay.update()
     _updateTileAnimations(this.tileAnimations, delta)
   }
 }

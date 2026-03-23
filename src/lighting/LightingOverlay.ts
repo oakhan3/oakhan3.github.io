@@ -64,20 +64,78 @@ interface FixedLight {
 // tiles below the gem sources so the light pools onto the stage surface.
 const FIXED_LIGHTS: FixedLight[] = [
   // Stage spotlights — gems along row 0, beams project down onto stage
-  { pixelX: 25 * TILE_SIZE, pixelY: 0 * TILE_SIZE, radius: 30, color: 0xff4444, cone: 'stage', animation: 'color-cycle' },
-  { pixelX: 26 * TILE_SIZE, pixelY: 0 * TILE_SIZE, radius: 30, color: 0xffff44, cone: 'stage', animation: 'color-cycle' },
-  { pixelX: 27 * TILE_SIZE, pixelY: 0 * TILE_SIZE, radius: 30, color: 0x44ff44, cone: 'stage', animation: 'color-cycle' },
-  { pixelX: 28 * TILE_SIZE, pixelY: 0 * TILE_SIZE, radius: 30, color: 0x4444ff, cone: 'stage', animation: 'color-cycle' },
-  { pixelX: 29 * TILE_SIZE, pixelY: 0 * TILE_SIZE, radius: 30, color: 0xaa44ff, cone: 'stage', animation: 'color-cycle' },
-  { pixelX: 30 * TILE_SIZE, pixelY: 0 * TILE_SIZE, radius: 30, color: 0xff44aa, cone: 'stage', animation: 'color-cycle' },
+  {
+    pixelX: 25 * TILE_SIZE,
+    pixelY: 0 * TILE_SIZE,
+    radius: 30,
+    color: 0xff4444,
+    cone: 'stage',
+    animation: 'color-cycle',
+  },
+  {
+    pixelX: 26 * TILE_SIZE,
+    pixelY: 0 * TILE_SIZE,
+    radius: 30,
+    color: 0xffff44,
+    cone: 'stage',
+    animation: 'color-cycle',
+  },
+  {
+    pixelX: 27 * TILE_SIZE,
+    pixelY: 0 * TILE_SIZE,
+    radius: 30,
+    color: 0x44ff44,
+    cone: 'stage',
+    animation: 'color-cycle',
+  },
+  {
+    pixelX: 28 * TILE_SIZE,
+    pixelY: 0 * TILE_SIZE,
+    radius: 30,
+    color: 0x4444ff,
+    cone: 'stage',
+    animation: 'color-cycle',
+  },
+  {
+    pixelX: 29 * TILE_SIZE,
+    pixelY: 0 * TILE_SIZE,
+    radius: 30,
+    color: 0xaa44ff,
+    cone: 'stage',
+    animation: 'color-cycle',
+  },
+  {
+    pixelX: 30 * TILE_SIZE,
+    pixelY: 0 * TILE_SIZE,
+    radius: 30,
+    color: 0xff44aa,
+    cone: 'stage',
+    animation: 'color-cycle',
+  },
 
   // Lamps — center of island. Pixel offsets nudge the cone to align with the
   // lamp head sprite. Cones tilt 12 degrees inward.
   // Small glow at the lamp head so the cone doesn't emerge from darkness.
   { pixelX: 26 * TILE_SIZE + 3, pixelY: 9 * TILE_SIZE + 5, radius: 10, color: 0x998866 },
   { pixelX: 29 * TILE_SIZE + 12, pixelY: 9 * TILE_SIZE + 5, radius: 10, color: 0x998866 },
-  { pixelX: 26 * TILE_SIZE + 3, pixelY: 9 * TILE_SIZE + 3, radius: 51, color: 0xffe8a0, cone: 'lamp', coneAngle: -12, animation: 'flicker' },
-  { pixelX: 29 * TILE_SIZE + 12, pixelY: 9 * TILE_SIZE + 3, radius: 51, color: 0xffe8a0, cone: 'lamp', coneAngle: 12, animation: 'flicker' },
+  {
+    pixelX: 26 * TILE_SIZE + 3,
+    pixelY: 9 * TILE_SIZE + 3,
+    radius: 51,
+    color: 0xffe8a0,
+    cone: 'lamp',
+    coneAngle: -12,
+    animation: 'flicker',
+  },
+  {
+    pixelX: 29 * TILE_SIZE + 12,
+    pixelY: 9 * TILE_SIZE + 3,
+    radius: 51,
+    color: 0xffe8a0,
+    cone: 'lamp',
+    coneAngle: 12,
+    animation: 'flicker',
+  },
 
   // Building windows — vibrant blue glow via ADD blend layer
   { pixelX: 34.5 * TILE_SIZE, pixelY: 17 * TILE_SIZE, radius: 40, color: 0x0e3388, glow: true, animation: 'pulse' },
@@ -91,8 +149,22 @@ const FIXED_LIGHTS: FixedLight[] = [
   // Small glow at the headlight source so the cone doesn't emerge from darkness.
   { pixelX: 39 * TILE_SIZE + 1, pixelY: 21.5 * TILE_SIZE + 8, radius: 10, color: 0x665533 },
   { pixelX: 39 * TILE_SIZE + 1, pixelY: 22.5 * TILE_SIZE, radius: 10, color: 0x665533 },
-  { pixelX: 39 * TILE_SIZE + 1, pixelY: 21.5 * TILE_SIZE + 8, radius: 20, color: 0xffeecc, cone: 'headlight', animation: 'flicker' },
-  { pixelX: 39 * TILE_SIZE + 1, pixelY: 22.5 * TILE_SIZE, radius: 20, color: 0xffeecc, cone: 'headlight', animation: 'flicker' },
+  {
+    pixelX: 39 * TILE_SIZE + 1,
+    pixelY: 21.5 * TILE_SIZE + 8,
+    radius: 20,
+    color: 0xffeecc,
+    cone: 'headlight',
+    animation: 'flicker',
+  },
+  {
+    pixelX: 39 * TILE_SIZE + 1,
+    pixelY: 22.5 * TILE_SIZE,
+    radius: 20,
+    color: 0xffeecc,
+    cone: 'headlight',
+    animation: 'flicker',
+  },
 
   // Additional ambient lights
   { pixelX: 39 * TILE_SIZE, pixelY: 9 * TILE_SIZE, radius: 96, color: 0xffeedd },
@@ -274,8 +346,10 @@ function _createConeTexture(scene: Phaser.Scene, key: string, spec: ConeSpec) {
   context.closePath()
 
   const gradient = context.createLinearGradient(
-    spec.gradientStart.x, spec.gradientStart.y,
-    spec.gradientEnd.x, spec.gradientEnd.y,
+    spec.gradientStart.x,
+    spec.gradientStart.y,
+    spec.gradientEnd.x,
+    spec.gradientEnd.y,
   )
   for (const stop of spec.gradientStops) {
     gradient.addColorStop(stop.offset, `rgba(255, 255, 255, ${stop.alpha})`)
@@ -340,7 +414,10 @@ function _horizontalConeSpec(length: number, spread: number, tipInsetRatio: numb
 }
 
 function _computeAnimation(
-  light: FixedLight, time: number, seed: number, index: number,
+  light: FixedLight,
+  time: number,
+  seed: number,
+  index: number,
 ): { radiusScale: number; color: number } {
   let radiusScale = 1
   let color = light.color
@@ -388,17 +465,23 @@ function _hslToHex(hue: number, saturation: number, lightness: number): number {
   let blue = 0
 
   if (huePrime < 1) {
-    red = chroma; green = secondary
+    red = chroma
+    green = secondary
   } else if (huePrime < 2) {
-    red = secondary; green = chroma
+    red = secondary
+    green = chroma
   } else if (huePrime < 3) {
-    green = chroma; blue = secondary
+    green = chroma
+    blue = secondary
   } else if (huePrime < 4) {
-    green = secondary; blue = chroma
+    green = secondary
+    blue = chroma
   } else if (huePrime < 5) {
-    red = secondary; blue = chroma
+    red = secondary
+    blue = chroma
   } else {
-    red = chroma; blue = secondary
+    red = chroma
+    blue = secondary
   }
 
   const lightnessMatch = lightness - chroma / 2
