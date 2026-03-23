@@ -49,7 +49,10 @@ const FIXED_LIGHTS: FixedLight[] = [
   { pixelX: 30 * TILE_SIZE, pixelY: 0 * TILE_SIZE, radius: 30, color: 0xff44aa, cone: 'stage' },
 
   // Lamps — center of island. Pixel offsets nudge the cone to align with the
-  // lamp head sprite. Cones tilt 20 degrees inward (left tilts right, right tilts left).
+  // lamp head sprite. Cones tilt 12 degrees inward.
+  // Small glow at the lamp head so the cone doesn't emerge from darkness.
+  { pixelX: 26 * TILE_SIZE + 3, pixelY: 9 * TILE_SIZE + 5, radius: 10, color: 0x998866 },
+  { pixelX: 29 * TILE_SIZE + 12, pixelY: 9 * TILE_SIZE + 5, radius: 10, color: 0x998866 },
   { pixelX: 26 * TILE_SIZE + 3, pixelY: 9 * TILE_SIZE + 3, radius: 51, color: 0xffe8a0, cone: 'lamp', coneAngle: -12 },
   { pixelX: 29 * TILE_SIZE + 12, pixelY: 9 * TILE_SIZE + 3, radius: 51, color: 0xffe8a0, cone: 'lamp', coneAngle: 12 },
 
@@ -62,6 +65,9 @@ const FIXED_LIGHTS: FixedLight[] = [
   { pixelX: 35.5 * TILE_SIZE, pixelY: 20 * TILE_SIZE, radius: 30, color: 0x0e3388, glow: true },
 
   // Car headlights — beams project left from tile 39. Start 5% into the tile.
+  // Small glow at the headlight source so the cone doesn't emerge from darkness.
+  { pixelX: 39 * TILE_SIZE + 1, pixelY: 21.5 * TILE_SIZE + 8, radius: 10, color: 0x665533 },
+  { pixelX: 39 * TILE_SIZE + 1, pixelY: 22.5 * TILE_SIZE, radius: 10, color: 0x665533 },
   { pixelX: 39 * TILE_SIZE + 1, pixelY: 21.5 * TILE_SIZE + 8, radius: 20, color: 0xffeecc, cone: 'headlight' },
   { pixelX: 39 * TILE_SIZE + 1, pixelY: 22.5 * TILE_SIZE, radius: 20, color: 0xffeecc, cone: 'headlight' },
 
