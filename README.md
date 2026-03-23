@@ -42,10 +42,7 @@ All stored in `public/assets/tilesets/`, 16x16 tile size. Tileset names in the T
 
 | File | Source |
 |------|--------|
-| `tiny-realm.png` | [Tiny Realm Asset Pack](https://trislin.itch.io/pixel-lands-village) by trislin |
-| `grass.png`, `cliff.png`, `path.png`, `water.png` | Cute Fantasy Free |
-| `parrot-blue.png` | Ninja Adventure Asset Pack |
-| `supercar-blue.png` | TopDown Vehicles |
+| `heliodor.png` | Project Heliodor tileset by TheDeadHeroAlistair |
 
 All tilesets must be embedded in the map.
 
@@ -53,18 +50,19 @@ All tilesets must be embedded in the map.
 
 Layers in order (bottom to top):
 
-| Layer | Type | Purpose |
-|-------|------|---------|
-| Ground | Tile | Grass, paths, water -- fill the entire map |
-| Decorations | Tile | Flowers, signs, small objects |
-| Car | Tile | Vehicle tiles |
-| Kiwi | Tile | Animated parrot |
-| Buildings | Tile | Walls, roofs -- transparency shows Ground beneath |
-| Tree | Tile | Trees and foliage |
+| Layer | Type | Collision |
+|-------|------|-----------|
+| Ground | Tile | None |
+| BackBackTree | Tile | fromGroup |
+| BackTree | Tile | fromGroup |
+| Tile Rise | Tile | fromGroup |
+| BeachFun | Tile | fromGroup |
+| Tile Layer 8 | Tile | fromGroup |
+| Tile Layer 7 | Tile | fromGroup |
 
 ### Exporting
 
-File → Export As → save to `public/assets/maps/overworld-v2.json`. Make sure all tilesets are embedded.
+File → Export As → save to `public/assets/maps/overworld-3.json`. Make sure all tilesets are embedded.
 
 ## How It Works
 
@@ -73,3 +71,5 @@ The site renders at GBA resolution (480x320) and scales up to fill the browser w
 Scenes flow: **Boot** (press any key) → **Preload** (asset loading) → **Overworld** (explore and interact).
 
 Uses Matter.js physics for pixel-accurate tile collisions matching Tiled objectgroup polygon shapes. Controls are WASD/arrows on desktop and drag-from-origin with visual joystick on mobile.
+
+Nighttime lighting uses two RenderTexture layers (MULTIPLY for darkness + ADD for colored glow). Fixed light sources support cones (stage, lamp, headlight) and three animation types: flicker (lamps/headlights), pulse (building windows), and color-cycle (stage spotlights). Each light has a random phase offset so animations look organic.
