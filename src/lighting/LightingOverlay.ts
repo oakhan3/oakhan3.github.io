@@ -18,7 +18,7 @@ const BRUSH_BASE_RADIUS = 80
 const STAGE_CONE_WIDTH = 48
 const STAGE_CONE_HEIGHT = 40
 const LAMP_CONE_WIDTH = 32
-const LAMP_CONE_HEIGHT = 56
+const LAMP_CONE_HEIGHT = 40
 // NOTE: Headlight cone projects horizontally to the left from the car.
 const HEADLIGHT_CONE_LENGTH = 64
 const HEADLIGHT_CONE_SPREAD = 16
@@ -44,11 +44,8 @@ const FIXED_LIGHTS: FixedLight[] = [
 
   // Lamps — center of island. Pixel offsets nudge the cone to align with the
   // lamp head sprite (left lamp +3px right, right lamp +8px right).
-  { pixelX: 26 * TILE_SIZE + 3, pixelY: 9 * TILE_SIZE + 3, radius: 35, color: 0xffdd66, cone: 'lamp' },
-  { pixelX: 29 * TILE_SIZE + 12, pixelY: 9 * TILE_SIZE + 3, radius: 35, color: 0xffdd66, cone: 'lamp' },
-
-  // Campfire between trees
-  { pixelX: 14 * TILE_SIZE, pixelY: 13 * TILE_SIZE, radius: 60, color: 0xffaa44 },
+  { pixelX: 26 * TILE_SIZE + 3, pixelY: 9 * TILE_SIZE + 3, radius: 35, color: 0xffe8a0, cone: 'lamp' },
+  { pixelX: 29 * TILE_SIZE + 12, pixelY: 9 * TILE_SIZE + 3, radius: 35, color: 0xffe8a0, cone: 'lamp' },
 
   // Building windows — blue glow across the window area (33.5,16) to (37.5,19)
   { pixelX: 34.5 * TILE_SIZE, pixelY: 17 * TILE_SIZE, radius: 40, color: 0x6688ff },
@@ -62,20 +59,11 @@ const FIXED_LIGHTS: FixedLight[] = [
   { pixelX: 39 * TILE_SIZE + 1, pixelY: 21.5 * TILE_SIZE + 8, radius: 20, color: 0xffffff, cone: 'headlight' },
   { pixelX: 39 * TILE_SIZE + 1, pixelY: 22.5 * TILE_SIZE, radius: 20, color: 0xffffff, cone: 'headlight' },
 
-  // Beach umbrella (red/white)
-  { pixelX: 20 * TILE_SIZE, pixelY: 22 * TILE_SIZE, radius: 40, color: 0xffeedd },
-
-  // Beach umbrella (blue)
-  { pixelX: 18 * TILE_SIZE, pixelY: 25 * TILE_SIZE, radius: 40, color: 0xffeedd },
-
-  // Cave/mine entrance
-  { pixelX: 12 * TILE_SIZE, pixelY: 5 * TILE_SIZE, radius: 50, color: 0xcc8844 },
-
-  // Statues
-  { pixelX: 10 * TILE_SIZE, pixelY: 15 * TILE_SIZE, radius: 40, color: 0x8888ff },
-
-  // Beach sign
-  { pixelX: 14 * TILE_SIZE, pixelY: 22 * TILE_SIZE, radius: 30, color: 0xffeedd },
+  // Additional ambient lights
+  { pixelX: 39 * TILE_SIZE, pixelY: 9 * TILE_SIZE, radius: 96, color: 0xffeedd },
+  { pixelX: 17 * TILE_SIZE, pixelY: 12 * TILE_SIZE, radius: 96, color: 0xffeedd },
+  { pixelX: 20 * TILE_SIZE, pixelY: 22 * TILE_SIZE, radius: 48, color: 0xffeedd },
+  { pixelX: 16 * TILE_SIZE, pixelY: 4 * TILE_SIZE, radius: 64, color: 0xffeedd },
 ]
 
 export class LightingOverlay {
@@ -94,7 +82,7 @@ export class LightingOverlay {
     // NOTE: Lamp cone has a much narrower tip (0.42 inset) to match the small lamp heads.
     _createConeTexture(scene, 'lamp-cone', LAMP_CONE_WIDTH, LAMP_CONE_HEIGHT, 0.42)
     // NOTE: Headlight cone is horizontal — narrow on right (headlight), wide on left.
-    _createHorizontalConeTexture(scene, 'headlight-cone', HEADLIGHT_CONE_LENGTH, HEADLIGHT_CONE_SPREAD, 0.35)
+    _createHorizontalConeTexture(scene, 'headlight-cone', HEADLIGHT_CONE_LENGTH, HEADLIGHT_CONE_SPREAD, 0.25)
 
     this.lightBrush = scene.make.image({ key: 'light-gradient', add: false })
     this.stageConeBrush = scene.make.image({ key: 'stage-cone', add: false })
@@ -165,8 +153,9 @@ function _createLightTexture(scene: Phaser.Scene, key: string, radius: number) {
   // Color tinting is applied per-light via setTint().
   const gradient = context.createRadialGradient(radius, radius, 0, radius, radius, radius)
   gradient.addColorStop(0, 'rgba(255, 255, 255, 1)')
-  gradient.addColorStop(0.3, 'rgba(255, 255, 255, 1)')
-  gradient.addColorStop(0.6, 'rgba(255, 255, 255, 0.2)')
+  gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.7)')
+  gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.3)')
+  gradient.addColorStop(0.75, 'rgba(255, 255, 255, 0.1)')
   gradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
 
   context.fillStyle = gradient
@@ -230,12 +219,12 @@ function _createHorizontalConeTexture(
 
   // NOTE: Gradient runs right to left — bright at the headlight, fading out.
   const gradient = context.createLinearGradient(length, 0, 0, 0)
-  gradient.addColorStop(0, 'rgba(255, 255, 255, 0.6)')
-  gradient.addColorStop(0.4, 'rgba(255, 255, 255, 0.3)')
+  gradient.addColorStop(0, 'rgba(255, 255, 255, 0.5)')
+  gradient.addColorStop(0.3, 'rgba(255, 255, 255, 0.25)')
   gradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
 
-  context.shadowColor = 'rgba(255, 255, 255, 0.3)'
-  context.shadowBlur = 10
+  context.shadowColor = 'rgba(255, 255, 255, 0.4)'
+  context.shadowBlur = 16
 
   context.fillStyle = gradient
   context.fill()
