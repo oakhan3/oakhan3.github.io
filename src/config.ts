@@ -20,4 +20,6 @@ export const PLAYER_FRAME_HEIGHT = 48
 export const DEPTH_PLAYER = 5
 export const DEPTH_JOYSTICK_BASE = 90
 export const DEPTH_JOYSTICK_KNOB = 91
+// NOTE: Lighting overlay sits above game objects but below UI elements.
+export const DEPTH_LIGHTING = 50
 export const DEPTH_DIALOG = 100

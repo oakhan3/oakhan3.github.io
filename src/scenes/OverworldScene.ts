@@ -3,6 +3,8 @@ import { PlayerSprite, createPlayerAnimations } from '../player/PlayerSprite'
 import { PlayerController } from '../player/PlayerController'
 import { DialogBox } from '../dialog/DialogBox'
 import { TouchControls } from '../mobile/TouchControls'
+import { LightingOverlay } from '../lighting/LightingOverlay'
+import { SparkleOverlay } from '../lighting/SparkleOverlay'
 
 interface LayerConfig {
   name: string
@@ -13,12 +15,13 @@ interface LayerConfig {
 // 'allTiles' blocks every non-empty tile — used for Kiwi because its objectgroup shapes
 // weren't picked up by setCollisionFromCollisionGroup() despite being defined in Tiled.
 const LAYERS: LayerConfig[] = [
-  { name: 'Ground', collision: 'fromGroup' },
-  { name: 'Decorations', collision: 'fromGroup' },
-  { name: 'Car', collision: 'fromGroup' },
-  { name: 'Kiwi', collision: 'allTiles' },
-  { name: 'Buildings', collision: 'fromGroup' },
-  { name: 'Tree', collision: 'fromGroup' },
+  { name: 'Ground' },
+  { name: 'BackBackTree', collision: 'fromGroup' },
+  { name: 'BackTree', collision: 'fromGroup' },
+  { name: 'Tile Rise', collision: 'fromGroup' },
+  { name: 'BeachFun', collision: 'fromGroup' },
+  { name: 'Tile Layer 8', collision: 'fromGroup' },
+  { name: 'Tile Layer 7', collision: 'fromGroup' },
 ]
 
 interface TileAnimation {
@@ -33,6 +36,8 @@ interface TileAnimation {
 export class OverworldScene extends Phaser.Scene {
   private playerController!: PlayerController
   private tileAnimations: TileAnimation[] = []
+  private lightingOverlay!: LightingOverlay
+  private sparkleOverlay!: SparkleOverlay
 
   constructor() {
     super({ key: 'OverworldScene' })
@@ -42,15 +47,7 @@ export class OverworldScene extends Phaser.Scene {
     const map = this.make.tilemap({ key: 'overworld-map' })
     // NOTE: Tileset names in the Tiled JSON match the Phaser cache keys from
     // PreloadScene, so a single arg is sufficient.
-    const tilesets = [
-      map.addTilesetImage('tiny-realm')!,
-      map.addTilesetImage('grass')!,
-      map.addTilesetImage('cliff')!,
-      map.addTilesetImage('path')!,
-      map.addTilesetImage('water')!,
-      map.addTilesetImage('parrot-blue')!,
-      map.addTilesetImage('supercar-blue')!,
-    ]
+    const tilesets = [map.addTilesetImage('heliodor')!]
 
     const layers = _createLayers(map, tilesets)
 
@@ -72,6 +69,9 @@ export class OverworldScene extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
     this.matter.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
 
+    this.lightingOverlay = new LightingOverlay(this, map.widthInPixels, map.heightInPixels, player)
+    this.sparkleOverlay = new SparkleOverlay(this, map.widthInPixels, map.heightInPixels)
+
     const touchControls = new TouchControls(this)
     this.playerController = new PlayerController(this, player, touchControls)
 
@@ -82,6 +82,8 @@ export class OverworldScene extends Phaser.Scene {
 
   update(_time: number, delta: number) {
     this.playerController.update()
+    this.lightingOverlay.update()
+    this.sparkleOverlay.update()
     _updateTileAnimations(this.tileAnimations, delta)
   }
 }
