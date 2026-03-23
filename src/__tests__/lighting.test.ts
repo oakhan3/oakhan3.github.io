@@ -26,6 +26,7 @@ function findLightingTextures(scene: Phaser.Scene): {
   multiply: Phaser.GameObjects.RenderTexture
   add: Phaser.GameObjects.RenderTexture
   sparkle: Phaser.GameObjects.RenderTexture
+  lightning: Phaser.GameObjects.RenderTexture
 } {
   const renderTextures = scene.children.list.filter(
     (child) => child instanceof Phaser.GameObjects.RenderTexture,
@@ -34,6 +35,7 @@ function findLightingTextures(scene: Phaser.Scene): {
     multiply: renderTextures.find((texture) => texture.depth === DEPTH_LIGHTING)!,
     add: renderTextures.find((texture) => texture.depth === DEPTH_LIGHTING + 1)!,
     sparkle: renderTextures.find((texture) => texture.depth === DEPTH_LIGHTING + 2)!,
+    lightning: renderTextures.find((texture) => texture.depth === DEPTH_LIGHTING + 3)!,
   }
 }
 
@@ -229,4 +231,39 @@ describe('sparkle overlay', () => {
     const uniqueValues = new Set(samples)
     expect(uniqueValues.size).toBeGreaterThan(1)
   })
+})
+
+describe('lightning overlay', () => {
+  it('lightning overlay is visible on the scene', async () => {
+    game = createGame()
+    const scene = await bootToOverworld(game)
+    await delay(100)
+
+    const { lightning } = findLightingTextures(scene)
+    expect(lightning).toBeDefined()
+    expect(lightning.visible).toBe(true)
+  })
+
+  it('lightning bolt draws visible pixels when it strikes', async () => {
+    game = createGame()
+    const scene = await bootToOverworld(game)
+    await dismissDialog(game)
+
+    const { lightning } = findLightingTextures(scene)
+
+    // NOTE: Lightning fires at random intervals (3-8s) and lasts 120ms.
+    // Poll every 100ms for up to 10s to reliably catch a strike.
+    let sawBolt = false
+    for (let step = 0; step < 100; step++) {
+      const visible = countVisiblePixels(lightning, 4)
+      if (visible > 0) {
+        sawBolt = true
+        break
+      }
+      await delay(100)
+    }
+
+    expect(sawBolt).toBe(true)
+  }, // NOTE: Extended timeout because the bolt may not fire until 8s in.
+  15000)
 })
