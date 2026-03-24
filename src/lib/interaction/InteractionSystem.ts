@@ -36,6 +36,7 @@ export class InteractionSystem {
   private tapPending = false
   private touchStartX = 0
   private touchStartY = 0
+  private dialogOpenOnTouchStart = false
 
   constructor(
     scene: Phaser.Scene,
@@ -53,17 +54,17 @@ export class InteractionSystem {
     this.interactables = _parseInteractables(map)
     this.spaceKey = scene.input.keyboard!.addKey('SPACE')
     this.enterKey = scene.input.keyboard!.addKey('ENTER')
-    // NOTE: Record the start position on pointerdown. On pointerup, only set
-    // tapPending if the drag stayed within TOUCH_DEADZONE (i.e. a real tap, not
-    // a joystick drag). Ignore taps while the dialog is open — the dialog's own
-    // pointerdown listener handles those, and letting tapPending be set would
-    // re-trigger the interaction on close.
+    // NOTE: Snapshot dialog state on pointerdown. The dialog closes synchronously
+    // during pointerdown (via handleAdvance), so by the time pointerup fires
+    // isOpen() is already false — using the snapshot prevents the closing tap
+    // from setting tapPending and immediately re-triggering the interaction.
     scene.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
       this.touchStartX = pointer.x
       this.touchStartY = pointer.y
+      this.dialogOpenOnTouchStart = this.dialog.isOpen()
     })
     scene.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
-      if (this.dialog.isOpen()) return
+      if (this.dialogOpenOnTouchStart) return
       const dx = pointer.x - this.touchStartX
       const dy = pointer.y - this.touchStartY
       if (Math.abs(dx) < TOUCH_DEADZONE && Math.abs(dy) < TOUCH_DEADZONE) {

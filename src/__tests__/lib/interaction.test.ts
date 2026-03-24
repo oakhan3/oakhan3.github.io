@@ -105,6 +105,25 @@ describe('InteractionSystem', () => {
     expect(container.visible).toBe(false)
   })
 
+  it('tap to close dialog does not re-open it', async () => {
+    game = createMinimalGame([InteractionTestScene], { physics: true })
+    const scene = (await waitForScene(game, 'InteractionTestScene')) as InteractionTestScene
+
+    // NOTE: Open the dialog, then wait for the typewriter to finish before tapping
+    // to close. This ensures pointerdown triggers close() not rushText(), which is
+    // the scenario that previously caused the dialog to re-open on pointerup.
+    simulatePointerDown(game, INTERACTABLE_X, INTERACTABLE_Y)
+    simulatePointerUp(game, INTERACTABLE_X, INTERACTABLE_Y)
+    await delay(300)
+
+    const container = findDialogContainer(scene)
+    simulatePointerDown(game, INTERACTABLE_X, INTERACTABLE_Y)
+    simulatePointerUp(game, INTERACTABLE_X, INTERACTABLE_Y)
+    await delay(100)
+
+    expect(container.visible).toBe(false)
+  })
+
   it('tapping while dialog is open does not re-trigger interaction', async () => {
     game = createMinimalGame([InteractionTestScene], { physics: true })
     const scene = (await waitForScene(game, 'InteractionTestScene')) as InteractionTestScene
