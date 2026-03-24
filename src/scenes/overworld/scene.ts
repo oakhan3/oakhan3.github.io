@@ -92,7 +92,7 @@ export class OverworldScene extends Phaser.Scene {
 
     const dialog = new DialogBox(this)
 
-    if (window.innerWidth < 768 || /Mobi|Android/i.test(navigator.userAgent)) {
+    if (window.innerWidth < 768) {
       this.cameras.main.setZoom(2)
       // NOTE: A second camera at zoom 1 renders UI elements (dialog) so they
       // are not affected by the main camera's zoom. The main camera ignores
@@ -105,7 +105,7 @@ export class OverworldScene extends Phaser.Scene {
     this.interactionSystem = createInteractionSystem(this, map, player, this.playerController, dialog)
     this.playerController.freeze()
     dialog.show(
-      "Welcome, I'm Omar Ali Khan! Feel free to look around!\n\nTry tapping or hitting 'Enter' on the signs.",
+      "Welcome, I'm Omar Ali Khan!\n\nTry tapping or hitting 'Enter' on the signs.",
       undefined,
       undefined,
       () => this.playerController.unfreeze(),

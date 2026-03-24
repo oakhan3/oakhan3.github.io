@@ -34,9 +34,9 @@ export class DialogBox {
     const screenHeight = scene.scale.height
     const boxWidth = screenWidth - BOX_MARGIN * 2
     const boxY = screenHeight * 0.7
-    const isMobile = screenWidth < 768
-    const fontSize = isMobile ? '8px' : '12px'
-    const boxHeight = isMobile ? 56 : 76
+    const isMobile = window.innerWidth < 768
+    const fontSize = isMobile ? '9px' : '8px'
+    const boxHeight = isMobile ? 66 : 66
 
     const background = scene.add.graphics()
     background.fillStyle(BACKGROUND_COLOR, BACKGROUND_ALPHA)
