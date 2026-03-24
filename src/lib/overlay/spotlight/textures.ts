@@ -69,7 +69,7 @@ export function horizontalConeSpec(length: number, spread: number, tipInsetRatio
   }
 }
 
-export function _createLightTexture(scene: Phaser.Scene, key: string, radius: number) {
+export function createLightTexture(scene: Phaser.Scene, key: string, radius: number) {
   const diameter = radius * 2
   const canvasTexture = scene.textures.createCanvas(key, diameter, diameter)!
   const context = canvasTexture.getContext()
@@ -91,7 +91,7 @@ export function _createLightTexture(scene: Phaser.Scene, key: string, radius: nu
   canvasTexture.refresh()
 }
 
-export function _createConeTexture(scene: Phaser.Scene, key: string, spec: ConeSpec) {
+export function createConeTexture(scene: Phaser.Scene, key: string, spec: ConeSpec) {
   const canvasTexture = scene.textures.createCanvas(key, spec.width, spec.height)!
   const context = canvasTexture.getContext()
 

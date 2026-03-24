@@ -12,7 +12,7 @@ export function createObjectCollisions(scene: Phaser.Scene, map: Phaser.Tilemaps
 
 function _createBodiesFromLayer(scene: Phaser.Scene, map: Phaser.Tilemaps.Tilemap, layerName: string) {
   const objectLayer = map.getObjectLayer(layerName)
-  if (!objectLayer) return
+  if (!objectLayer) throw new Error(`Object layer '${layerName}' not found in the tilemap.`)
 
   for (const object of objectLayer.objects) {
     // NOTE: Tiled polygon vertices are relative to the object's (x, y).
@@ -28,7 +28,7 @@ function _createBodiesFromLayer(scene: Phaser.Scene, map: Phaser.Tilemaps.Tilema
 
     // NOTE: Matter's fromVertices() auto-centers the body on the centroid of
     // the vertex set, so the position argument must be the centroid.
-    const centroid = _computeCentroid(absoluteVertices)
+    const centroid = computeCentroid(absoluteVertices)
 
     // NOTE: Vertices passed to fromVertices are relative to the center position
     // internally, but we pass absolute coords and let Matter compute the offset.
@@ -38,7 +38,7 @@ function _createBodiesFromLayer(scene: Phaser.Scene, map: Phaser.Tilemaps.Tilema
   }
 }
 
-function _computeCentroid(vertices: { x: number; y: number }[]): { x: number; y: number } {
+export function computeCentroid(vertices: { x: number; y: number }[]): { x: number; y: number } {
   let sumX = 0
   let sumY = 0
   for (const vertex of vertices) {

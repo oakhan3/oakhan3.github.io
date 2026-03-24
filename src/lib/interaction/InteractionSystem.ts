@@ -1,4 +1,5 @@
 import Phaser from 'phaser'
+import { computeCentroid } from '../collision'
 import { PlayerController } from '../player/PlayerController'
 import { DialogBox } from '../dialog/DialogBox'
 
@@ -103,7 +104,7 @@ export class InteractionSystem {
 
 function _parseInteractables(map: Phaser.Tilemaps.Tilemap): Interactable[] {
   const objectLayer = map.getObjectLayer('Interactables')
-  if (!objectLayer) return []
+  if (!objectLayer) throw new Error("Object layer 'Interactables' not found in the tilemap.")
 
   const interactables: Interactable[] = []
 
@@ -117,14 +118,10 @@ function _parseInteractables(map: Phaser.Tilemaps.Tilemap): Interactable[] {
     let centerY: number
 
     if (polygon && polygon.length >= 3) {
-      let sumX = 0
-      let sumY = 0
-      for (const vertex of polygon) {
-        sumX += object.x! + vertex.x
-        sumY += object.y! + vertex.y
-      }
-      centerX = sumX / polygon.length
-      centerY = sumY / polygon.length
+      const absoluteVertices = polygon.map((vertex) => ({ x: object.x! + vertex.x, y: object.y! + vertex.y }))
+      const centroid = computeCentroid(absoluteVertices)
+      centerX = centroid.x
+      centerY = centroid.y
     } else {
       centerX = object.x!
       centerY = object.y!

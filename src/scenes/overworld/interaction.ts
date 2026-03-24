@@ -1,4 +1,8 @@
-import type { InteractionConfig } from '../../../lib/interaction'
+import Phaser from 'phaser'
+import { InteractionSystem } from '../../lib/interaction'
+import { PlayerController } from '../../lib/player'
+import { DialogBox } from '../../lib/dialog'
+import type { InteractionConfig } from '../../lib/interaction'
 
 // NOTE: Pixel radius around the player's position within which an interactable
 // is considered "in range". ~1.5 tiles gives comfortable trigger distance.
@@ -23,7 +27,17 @@ const MESSAGES: Record<string, string> = {
   stage: 'When are they coming on???',
 }
 
-export const INTERACTION_CONFIG: InteractionConfig = {
+const INTERACTION_CONFIG: InteractionConfig = {
   radius: INTERACTION_RADIUS,
   messages: MESSAGES,
+}
+
+export function createInteractionSystem(
+  scene: Phaser.Scene,
+  map: Phaser.Tilemaps.Tilemap,
+  player: Phaser.GameObjects.Sprite,
+  playerController: PlayerController,
+  dialog: DialogBox,
+): InteractionSystem {
+  return new InteractionSystem(scene, map, player, playerController, dialog, INTERACTION_CONFIG)
 }

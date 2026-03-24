@@ -1,2 +1,2 @@
-export { createObjectCollisions } from './ObjectCollisions'
+export { createObjectCollisions, computeCentroid } from './ObjectCollisions'
 export type { CollisionConfig } from './ObjectCollisions'

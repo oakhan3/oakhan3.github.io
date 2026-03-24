@@ -57,6 +57,11 @@ function readCanvasPixel(
   return { r: imageData.data[0], g: imageData.data[1], b: imageData.data[2], a: imageData.data[3] }
 }
 
+function getTextureCanvas(renderTexture: Phaser.GameObjects.RenderTexture): HTMLCanvasElement {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (renderTexture as any).texture.getSourceImage() as HTMLCanvasElement
+}
+
 // NOTE: Reads a pixel directly from a RenderTexture's internal canvas.
 // Uses world coords (no camera offset) since the texture covers the full map.
 // Needed because the game canvas getImageData doesn't reflect ADD blend mode.
@@ -65,8 +70,7 @@ function readTexturePixel(
   worldX: number,
   worldY: number,
 ): { r: number; g: number; b: number; a: number } {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const canvas = (renderTexture as any).texture.getSourceImage() as HTMLCanvasElement
+  const canvas = getTextureCanvas(renderTexture)
   if (!canvas) return { r: 0, g: 0, b: 0, a: 0 }
   const context = canvas.getContext('2d')
   if (!context) return { r: 0, g: 0, b: 0, a: 0 }
@@ -177,8 +181,7 @@ describe('spotlight overlay', () => {
 // NOTE: Counts non-transparent pixels on a RenderTexture's internal canvas.
 // Scans every Nth pixel (stride) to keep it fast on large textures.
 function countVisiblePixels(renderTexture: Phaser.GameObjects.RenderTexture, stride: number): number {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const canvas = (renderTexture as any).texture.getSourceImage() as HTMLCanvasElement
+  const canvas = getTextureCanvas(renderTexture)
   const context = canvas.getContext('2d')
   if (!context) return 0
   const imageData = context.getImageData(0, 0, canvas.width, canvas.height)

@@ -27,43 +27,6 @@ npm run check          # Format, lint, typecheck, and test in one go
 npm run clean          # Remove dist/
 ```
 
-## Editing the Map
-
-The overworld map is built in [Tiled](https://www.mapeditor.org/) and exported as JSON.
-
-### Setup
-
-1. Install [Tiled](https://www.mapeditor.org/)
-2. Open `public/assets/maps/overworld-v2.json` in Tiled
-
-### Tilesets
-
-All stored in `public/assets/tilesets/`, 16x16 tile size. Tileset names in the Tiled JSON match the Phaser cache keys, so `addTilesetImage()` only needs a single argument.
-
-| File | Source |
-|------|--------|
-| `heliodor.png` | Project Heliodor tileset by TheDeadHeroAlistair |
-
-All tilesets must be embedded in the map.
-
-### Layers
-
-Layers in order (bottom to top):
-
-| Layer | Type | Collision |
-|-------|------|-----------|
-| Ground | Tile | None |
-| BackBackTree | Tile | fromGroup |
-| BackTree | Tile | fromGroup |
-| Tile Rise | Tile | fromGroup |
-| BeachFun | Tile | fromGroup |
-| Tile Layer 8 | Tile | fromGroup |
-| Tile Layer 7 | Tile | fromGroup |
-
-### Exporting
-
-File → Export As → save to `public/assets/maps/overworld-3.json`. Make sure all tilesets are embedded.
-
 ## How It Works
 
 The site renders at GBA resolution (480x320) and scales up to fill the browser window with nearest-neighbor interpolation for a crisp pixel art look.

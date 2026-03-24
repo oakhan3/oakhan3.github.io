@@ -1,4 +1,6 @@
-import type { LightningConfig } from '../../../../lib/overlay'
+import Phaser from 'phaser'
+import { LightningOverlay } from '../../../lib/overlay'
+import type { LightningConfig } from '../../../lib/overlay'
 
 // NOTE: Target tile coordinates where the lightning bolt strikes.
 const TARGET_TILE_X = 39
@@ -43,7 +45,7 @@ const BOLT_COLOR = 'rgba(200, 220, 255, 1)'
 const GLOW_COLOR = 'rgba(100, 140, 255, 0.4)'
 const GLOW_WIDTH = 6
 
-export const LIGHTNING_CONFIG: LightningConfig = {
+const LIGHTNING_CONFIG: LightningConfig = {
   targetTileX: TARGET_TILE_X,
   targetTileY: TARGET_TILE_Y,
   minIntervalMs: MIN_INTERVAL_MS,
@@ -61,4 +63,8 @@ export const LIGHTNING_CONFIG: LightningConfig = {
   boltColor: BOLT_COLOR,
   glowColor: GLOW_COLOR,
   glowWidth: GLOW_WIDTH,
+}
+
+export function createLightningOverlay(scene: Phaser.Scene, mapWidth: number, mapHeight: number): LightningOverlay {
+  return new LightningOverlay(scene, mapWidth, mapHeight, LIGHTNING_CONFIG)
 }

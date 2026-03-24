@@ -55,7 +55,9 @@ export class OverworldScene extends Phaser.Scene {
     const map = this.make.tilemap({ key: 'overworld-map' })
     // NOTE: Tileset names in the Tiled JSON match the Phaser cache keys from
     // PreloadScene, so a single arg is sufficient.
-    const tilesets = [map.addTilesetImage('heliodor')!]
+    const heliodor = map.addTilesetImage('heliodor')
+    if (!heliodor) throw new Error("Tileset 'heliodor' not found in the tilemap.")
+    const tilesets = [heliodor]
 
     const layers = _createLayers(map, tilesets)
 
@@ -111,7 +113,8 @@ function _createLayers(
   const layers: Phaser.Tilemaps.TilemapLayer[] = []
 
   for (const config of LAYERS) {
-    const layer = map.createLayer(config.name, tilesets)!
+    const layer = map.createLayer(config.name, tilesets)
+    if (!layer) throw new Error(`Tile layer '${config.name}' not found in the tilemap.`)
 
     // NOTE: Collision flags must be set BEFORE convertTilemapLayer() — only
     // tiles marked as colliding get converted to Matter bodies.

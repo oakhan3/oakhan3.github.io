@@ -19,7 +19,7 @@ const PULSE_AMPLITUDE = 0.15
 // NOTE: Color-cycle constants. Full hue rotation period in milliseconds.
 const COLOR_CYCLE_PERIOD = 10000
 
-export function _computeAnimation(
+export function computeAnimation(
   light: FixedLight,
   time: number,
   seed: number,
@@ -61,7 +61,7 @@ export function _computeAnimation(
 
 // NOTE: Scales each RGB channel by a multiplier to brighten or dim a color
 // without changing the hue. Used for cone shimmer so shape stays constant.
-export function _modulateBrightness(color: number, multiplier: number): number {
+export function modulateBrightness(color: number, multiplier: number): number {
   const red = Math.min(255, Math.round(((color >> 16) & 0xff) * multiplier))
   const green = Math.min(255, Math.round(((color >> 8) & 0xff) * multiplier))
   const blue = Math.min(255, Math.round((color & 0xff) * multiplier))

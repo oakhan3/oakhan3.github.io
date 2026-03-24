@@ -1,6 +1,7 @@
-import { TILE_SIZE } from '../../../../config'
-import { verticalConeSpec, horizontalConeSpec } from '../../../../lib/overlay'
-import type { SpotlightConfig } from '../../../../lib/overlay'
+import Phaser from 'phaser'
+import { SpotlightOverlay, verticalConeSpec, horizontalConeSpec } from '../../../lib/overlay'
+import type { SpotlightConfig } from '../../../lib/overlay'
+import { TILE_SIZE } from '../../../config'
 
 // NOTE: Dark blue-black ambient color for nighttime. With MULTIPLY blend mode,
 // dark pixels darken the scene and bright pixels leave it unchanged. Drawing
@@ -22,7 +23,7 @@ const HEADLIGHT_CONE_SPREAD = 16
 
 // NOTE: Tile coords x TILE_SIZE = pixel coords. Spotlights are placed a few
 // tiles below the gem sources so the light pools onto the stage surface.
-export const SPOTLIGHT_CONFIG: SpotlightConfig = {
+const SPOTLIGHT_CONFIG: SpotlightConfig = {
   ambientColor: AMBIENT_COLOR,
   playerLightRadius: PLAYER_LIGHT_RADIUS,
   coneTypes: {
@@ -246,4 +247,13 @@ export const SPOTLIGHT_CONFIG: SpotlightConfig = {
     { pixelX: 17 * TILE_SIZE, pixelY: 12 * TILE_SIZE, radius: 96, color: 0xffeedd },
     { pixelX: 20 * TILE_SIZE, pixelY: 22 * TILE_SIZE, radius: 48, color: 0xffeedd },
   ],
+}
+
+export function createSpotlightOverlay(
+  scene: Phaser.Scene,
+  mapWidth: number,
+  mapHeight: number,
+  player: Phaser.GameObjects.Sprite,
+): SpotlightOverlay {
+  return new SpotlightOverlay(scene, mapWidth, mapHeight, player, SPOTLIGHT_CONFIG)
 }

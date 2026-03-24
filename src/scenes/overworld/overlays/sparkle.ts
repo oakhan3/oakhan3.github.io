@@ -1,4 +1,6 @@
-import type { SparkleConfig } from '../../../../lib/overlay'
+import Phaser from 'phaser'
+import { SparkleOverlay } from '../../../lib/overlay'
+import type { SparkleConfig } from '../../../lib/overlay'
 
 // NOTE: Total number of sparkles scattered across the map.
 const SPARKLE_COUNT = 60
@@ -20,7 +22,7 @@ const FALL_SPEED = 0.008
 const SWAY_AMPLITUDE = 0.3
 const SWAY_SPEED = 0.001
 
-export const SPARKLE_CONFIG: SparkleConfig = {
+const SPARKLE_CONFIG: SparkleConfig = {
   count: SPARKLE_COUNT,
   radius: SPARKLE_RADIUS,
   minCycleMs: MIN_CYCLE_MS,
@@ -29,4 +31,8 @@ export const SPARKLE_CONFIG: SparkleConfig = {
   fallSpeed: FALL_SPEED,
   swayAmplitude: SWAY_AMPLITUDE,
   swaySpeed: SWAY_SPEED,
+}
+
+export function createSparkleOverlay(scene: Phaser.Scene, mapWidth: number, mapHeight: number): SparkleOverlay {
+  return new SparkleOverlay(scene, mapWidth, mapHeight, SPARKLE_CONFIG)
 }

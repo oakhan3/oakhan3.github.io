@@ -1,7 +1,7 @@
 import Phaser from 'phaser'
 import { DEPTH_LIGHTING } from '../../../config'
-import { BRUSH_BASE_RADIUS, ConeSpec, _createLightTexture, _createConeTexture } from './textures'
-import { _computeAnimation, _modulateBrightness } from './animation'
+import { BRUSH_BASE_RADIUS, ConeSpec, createLightTexture, createConeTexture } from './textures'
+import { computeAnimation, modulateBrightness } from './animation'
 
 export interface FixedLight {
   pixelX: number
@@ -66,10 +66,10 @@ export class SpotlightOverlay {
     this.config = config
     this.lightSeeds = config.fixedLights.map(() => Math.random() * 10000)
 
-    _createLightTexture(scene, 'light-gradient', BRUSH_BASE_RADIUS)
+    createLightTexture(scene, 'light-gradient', BRUSH_BASE_RADIUS)
 
     for (const [key, coneConfig] of Object.entries(config.coneTypes)) {
-      _createConeTexture(scene, `cone-${key}`, coneConfig.spec)
+      createConeTexture(scene, `cone-${key}`, coneConfig.spec)
       const brush = scene.make.image({ key: `cone-${key}`, add: false })
       brush.setOrigin(coneConfig.origin.x, coneConfig.origin.y)
       this.coneBrushes.set(key, brush)
@@ -109,7 +109,7 @@ export class SpotlightOverlay {
       const light = fixedLights[index]
       const seed = this.lightSeeds[index]
 
-      const { radiusScale, color } = _computeAnimation(light, time, seed, index)
+      const { radiusScale, color } = computeAnimation(light, time, seed, index)
 
       // NOTE: For cone lights, the circular pool sits at the end of the cone
       // (where the beam hits the ground/surface), not at the source.
@@ -151,7 +151,7 @@ export class SpotlightOverlay {
           coneBrush.setScale(1)
         } else {
           // NOTE: Modulate-style cones keep the beam shape rigid while intensity wavers.
-          coneBrush.setTint(_modulateBrightness(color, radiusScale))
+          coneBrush.setTint(modulateBrightness(color, radiusScale))
           this.renderTexture.draw(coneBrush, coneX, coneY)
         }
       }
