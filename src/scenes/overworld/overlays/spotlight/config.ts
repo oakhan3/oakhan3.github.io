@@ -1,5 +1,6 @@
 import { TILE_SIZE } from '../../../../config'
-import type { LightingConfig } from '../../../../lib/overlay'
+import { verticalConeSpec, horizontalConeSpec } from '../../../../lib/overlay'
+import type { SpotlightConfig } from '../../../../lib/overlay'
 
 // NOTE: Dark blue-black ambient color for nighttime. With MULTIPLY blend mode,
 // dark pixels darken the scene and bright pixels leave it unchanged. Drawing
@@ -21,12 +22,35 @@ const HEADLIGHT_CONE_SPREAD = 16
 
 // NOTE: Tile coords x TILE_SIZE = pixel coords. Spotlights are placed a few
 // tiles below the gem sources so the light pools onto the stage surface.
-export const LIGHTING_CONFIG: LightingConfig = {
+export const SPOTLIGHT_CONFIG: SpotlightConfig = {
   ambientColor: AMBIENT_COLOR,
   playerLightRadius: PLAYER_LIGHT_RADIUS,
-  stageCone: { width: STAGE_CONE_WIDTH, height: STAGE_CONE_HEIGHT, topInsetRatio: 0.3 },
-  lampCone: { width: LAMP_CONE_WIDTH, height: LAMP_CONE_HEIGHT, topInsetRatio: 0.42 },
-  headlightCone: { length: HEADLIGHT_CONE_LENGTH, spread: HEADLIGHT_CONE_SPREAD, tipInsetRatio: 0.25 },
+  coneTypes: {
+    // NOTE: Stage cones are wider at the tip (big stage lights).
+    stage: {
+      spec: verticalConeSpec(STAGE_CONE_WIDTH, STAGE_CONE_HEIGHT, 0.3),
+      origin: { x: 0.5, y: 0 },
+      sourceOffset: { x: 0, y: TILE_SIZE / 2 },
+      poolOffset: { x: 0, y: STAGE_CONE_HEIGHT },
+      animationStyle: 'scale',
+    },
+    // NOTE: Lamp cones have a narrow tip (small lamp heads) that flares out more.
+    lamp: {
+      spec: verticalConeSpec(LAMP_CONE_WIDTH, LAMP_CONE_HEIGHT, 0.42),
+      origin: { x: 0.5, y: 0 },
+      sourceOffset: { x: 0, y: TILE_SIZE / 2 },
+      poolOffset: { x: 0, y: LAMP_CONE_HEIGHT },
+      animationStyle: 'scale',
+    },
+    // NOTE: Headlight cone projects horizontally to the left from the car.
+    headlight: {
+      spec: horizontalConeSpec(HEADLIGHT_CONE_LENGTH, HEADLIGHT_CONE_SPREAD, 0.25),
+      origin: { x: 1, y: 0.5 },
+      sourceOffset: { x: 0, y: 0 },
+      poolOffset: { x: -HEADLIGHT_CONE_LENGTH, y: 0 },
+      animationStyle: 'modulate',
+    },
+  },
   fixedLights: [
     // Stage spotlights — gems along row 0, beams project down onto stage
     {

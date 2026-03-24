@@ -22,7 +22,7 @@ const LAMP_EDGE_Y = LAMP_POOL_CENTER_Y
 const WINDOW_EDGE_X = WINDOW_GLOW_CENTER_X + 36
 const WINDOW_EDGE_Y = WINDOW_GLOW_CENTER_Y
 
-function findLightingTextures(scene: Phaser.Scene): {
+function findOverlayTextures(scene: Phaser.Scene): {
   multiply: Phaser.GameObjects.RenderTexture
   add: Phaser.GameObjects.RenderTexture
   sparkle: Phaser.GameObjects.RenderTexture
@@ -83,13 +83,13 @@ afterEach(() => {
   }
 })
 
-describe('lighting overlay', () => {
+describe('spotlight overlay', () => {
   it('lighting overlay is visible on the scene', async () => {
     game = createGame()
     const scene = await bootToOverworld(game)
     await delay(100)
 
-    const { multiply, add } = findLightingTextures(scene)
+    const { multiply, add } = findOverlayTextures(scene)
     expect(multiply).toBeDefined()
     expect(add).toBeDefined()
     expect(multiply.visible).toBe(true)
@@ -103,7 +103,7 @@ describe('lighting overlay', () => {
 
     await delay(500)
 
-    const { multiply, add } = findLightingTextures(scene)
+    const { multiply, add } = findOverlayTextures(scene)
     expect(multiply.visible).toBe(true)
     expect(add.visible).toBe(true)
   })
@@ -134,7 +134,7 @@ describe('lighting overlay', () => {
     // NOTE: Read from the ADD layer's internal canvas directly. The game
     // canvas getImageData doesn't reflect ADD blend mode compositing, so
     // readCanvasPixel returns all-white for glow positions.
-    const { add } = findLightingTextures(scene)
+    const { add } = findOverlayTextures(scene)
 
     // NOTE: Sample 8 times over 4s. The pulse animation is slow (~3s cycle)
     // so a longer window is needed to reliably catch sine variation across
@@ -155,7 +155,7 @@ describe('lighting overlay', () => {
     const scene = await bootToOverworld(game)
     await dismissDialog(game)
 
-    const { add } = findLightingTextures(scene)
+    const { add } = findOverlayTextures(scene)
     const pixel = readTexturePixel(add, WINDOW_GLOW_CENTER_X, WINDOW_GLOW_CENTER_Y)
 
     const hasColor = pixel.r > 0 || pixel.g > 0 || pixel.b > 0
@@ -195,7 +195,7 @@ describe('sparkle overlay', () => {
     const scene = await bootToOverworld(game)
     await delay(100)
 
-    const { sparkle } = findLightingTextures(scene)
+    const { sparkle } = findOverlayTextures(scene)
     expect(sparkle).toBeDefined()
     expect(sparkle.visible).toBe(true)
   })
@@ -209,7 +209,7 @@ describe('sparkle overlay', () => {
     // so some may be in the invisible half of their sine cycle initially.
     await delay(1000)
 
-    const { sparkle } = findLightingTextures(scene)
+    const { sparkle } = findOverlayTextures(scene)
     const visible = countVisiblePixels(sparkle, 4)
     expect(visible).toBeGreaterThan(0)
   })
@@ -219,7 +219,7 @@ describe('sparkle overlay', () => {
     const scene = await bootToOverworld(game)
     await dismissDialog(game)
 
-    const { sparkle } = findLightingTextures(scene)
+    const { sparkle } = findOverlayTextures(scene)
 
     // NOTE: Sample 5 times over 2.5s. Sparkles drift downward and sway, so
     // the pixel pattern on the texture should differ across readings.
@@ -240,7 +240,7 @@ describe('lightning overlay', () => {
     const scene = await bootToOverworld(game)
     await delay(100)
 
-    const { lightning } = findLightingTextures(scene)
+    const { lightning } = findOverlayTextures(scene)
     expect(lightning).toBeDefined()
     expect(lightning.visible).toBe(true)
   })
@@ -250,7 +250,7 @@ describe('lightning overlay', () => {
     const scene = await bootToOverworld(game)
     await dismissDialog(game)
 
-    const { lightning } = findLightingTextures(scene)
+    const { lightning } = findOverlayTextures(scene)
 
     // NOTE: Lightning fires at random intervals (3-8s) and lasts 120ms.
     // Poll every 100ms for up to 10s to reliably catch a strike.

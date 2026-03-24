@@ -1,5 +1,6 @@
-export { LightingOverlay } from './LightingOverlay'
-export type { FixedLight, LightingConfig } from './LightingOverlay'
+export { SpotlightOverlay } from './spotlight'
+export type { FixedLight, ConeTypeConfig, SpotlightConfig, ConeSpec } from './spotlight'
+export { verticalConeSpec, horizontalConeSpec } from './spotlight'
 export { LightningOverlay } from './LightningOverlay'
 export type { LightningConfig } from './LightningOverlay'
 export { SparkleOverlay } from './SparkleOverlay'

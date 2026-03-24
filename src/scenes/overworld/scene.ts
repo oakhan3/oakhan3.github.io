@@ -3,8 +3,8 @@ import { PlayerSprite } from '../../lib/player'
 import { PlayerController } from '../../lib/player'
 import { DialogBox } from '../../lib/dialog'
 import { TouchControls } from '../../lib/mobile'
-import { LightingOverlay, LightningOverlay, SparkleOverlay } from '../../lib/overlay'
-import { createLightingOverlay } from './overlays/lighting'
+import { SpotlightOverlay, LightningOverlay, SparkleOverlay } from '../../lib/overlay'
+import { createSpotlightOverlay } from './overlays/spotlight'
 import { createLightningOverlay } from './overlays/lightning'
 import { createSparkleOverlay } from './overlays/sparkle'
 import { createCollisions } from './collision'
@@ -42,7 +42,7 @@ interface TileAnimation {
 export class OverworldScene extends Phaser.Scene {
   private playerController!: PlayerController
   private tileAnimations: TileAnimation[] = []
-  private lightingOverlay!: LightingOverlay
+  private spotlightOverlay!: SpotlightOverlay
   private sparkleOverlay!: SparkleOverlay
   private lightningOverlay!: LightningOverlay
   private interactionSystem!: InteractionSystem
@@ -81,7 +81,7 @@ export class OverworldScene extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
     this.matter.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
 
-    this.lightingOverlay = createLightingOverlay(this, map.widthInPixels, map.heightInPixels, player)
+    this.spotlightOverlay = createSpotlightOverlay(this, map.widthInPixels, map.heightInPixels, player)
     this.sparkleOverlay = createSparkleOverlay(this, map.widthInPixels, map.heightInPixels)
     this.lightningOverlay = createLightningOverlay(this, map.widthInPixels, map.heightInPixels)
 
@@ -97,7 +97,7 @@ export class OverworldScene extends Phaser.Scene {
   update(_time: number, delta: number) {
     this.playerController.update()
     this.interactionSystem.update()
-    this.lightingOverlay.update()
+    this.spotlightOverlay.update()
     this.sparkleOverlay.update()
     this.lightningOverlay.update()
     _updateTileAnimations(this.tileAnimations, delta)
