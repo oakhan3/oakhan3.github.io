@@ -1,5 +1,5 @@
 import Phaser from 'phaser'
-import { Direction, GBA_HEIGHT, DEPTH_JOYSTICK_BASE, DEPTH_JOYSTICK_KNOB } from '../config'
+import { Direction, GBA_HEIGHT, DEPTH_JOYSTICK_BASE, DEPTH_JOYSTICK_KNOB } from '../../config'
 
 // NOTE: Minimum drag distance (in game pixels) before registering a direction.
 // Prevents accidental movement from tapping.

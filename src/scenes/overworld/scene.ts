@@ -1,14 +1,16 @@
 import Phaser from 'phaser'
-import { PlayerSprite, createPlayerAnimations } from '../../player/PlayerSprite'
-import { PlayerController } from '../../player/PlayerController'
-import { DialogBox } from '../../dialog/DialogBox'
-import { TouchControls } from '../../mobile/TouchControls'
+import { PlayerSprite } from '../../lib/player'
+import { PlayerController } from '../../lib/player'
+import { DialogBox } from '../../lib/dialog'
+import { TouchControls } from '../../lib/mobile'
 import { LightingOverlay, LightningOverlay, SparkleOverlay } from '../../lib/overlay'
 import { createLightingOverlay } from './overlays/lighting'
 import { createLightningOverlay } from './overlays/lightning'
 import { createSparkleOverlay } from './overlays/sparkle'
-import { createObjectCollisions } from '../../collision/ObjectCollisions'
-import { InteractionSystem } from '../../interaction/InteractionSystem'
+import { createCollisions } from './collision'
+import { createInteractionSystem } from './interaction'
+import { setupPlayerAnimations } from './player'
+import { InteractionSystem } from '../../lib/interaction'
 
 interface LayerConfig {
   name: string
@@ -59,7 +61,7 @@ export class OverworldScene extends Phaser.Scene {
 
     this.tileAnimations = _buildTileAnimations(map, layers)
 
-    createPlayerAnimations(this)
+    setupPlayerAnimations(this)
 
     const spawnX = Math.floor(map.widthInPixels / 2)
     const spawnY = Math.floor(map.heightInPixels / 2)
@@ -73,7 +75,7 @@ export class OverworldScene extends Phaser.Scene {
 
     // NOTE: Object layer collisions — reads Collisions and Interactables layers
     // from the Tiled JSON and creates static Matter polygon bodies.
-    createObjectCollisions(this, map)
+    createCollisions(this, map)
 
     this.cameras.main.startFollow(player, true)
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
@@ -87,7 +89,7 @@ export class OverworldScene extends Phaser.Scene {
     this.playerController = new PlayerController(this, player, touchControls)
 
     const dialog = new DialogBox(this)
-    this.interactionSystem = new InteractionSystem(this, map, player, this.playerController, dialog)
+    this.interactionSystem = createInteractionSystem(this, map, player, this.playerController, dialog)
     this.playerController.freeze()
     dialog.show("Hi, I'm Omar Ali Khan! Welcome to my page.", () => this.playerController.unfreeze())
   }

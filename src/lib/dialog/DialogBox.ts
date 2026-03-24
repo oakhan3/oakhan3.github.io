@@ -1,5 +1,5 @@
 import Phaser from 'phaser'
-import { GBA_WIDTH, GBA_HEIGHT, DEPTH_DIALOG } from '../config'
+import { GBA_WIDTH, GBA_HEIGHT, DEPTH_DIALOG } from '../../config'
 
 const BOX_MARGIN = 8
 const BOX_PADDING = 10

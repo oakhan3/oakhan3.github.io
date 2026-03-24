@@ -1,6 +1,6 @@
 import Phaser from 'phaser'
 import { PlayerSprite } from './PlayerSprite'
-import { PLAYER_SPEED, Direction } from '../config'
+import { PLAYER_SPEED, Direction } from '../../config'
 import { TouchControls } from '../mobile/TouchControls'
 
 export class PlayerController {

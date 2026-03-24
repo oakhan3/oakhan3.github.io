@@ -1,13 +1,13 @@
 import Phaser from 'phaser'
 
-// NOTE: Names of the Tiled object layers to read. Both layers produce static
-// Matter bodies so the player can't walk through them.
-const COLLISION_LAYER = 'Collisions'
-const INTERACTABLES_LAYER = 'Interactables'
+export interface CollisionConfig {
+  collisionLayer: string
+  interactablesLayer: string
+}
 
-export function createObjectCollisions(scene: Phaser.Scene, map: Phaser.Tilemaps.Tilemap) {
-  _createBodiesFromLayer(scene, map, COLLISION_LAYER)
-  _createBodiesFromLayer(scene, map, INTERACTABLES_LAYER)
+export function createObjectCollisions(scene: Phaser.Scene, map: Phaser.Tilemaps.Tilemap, config: CollisionConfig) {
+  _createBodiesFromLayer(scene, map, config.collisionLayer)
+  _createBodiesFromLayer(scene, map, config.interactablesLayer)
 }
 
 function _createBodiesFromLayer(scene: Phaser.Scene, map: Phaser.Tilemaps.Tilemap, layerName: string) {

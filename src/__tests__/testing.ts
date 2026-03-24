@@ -1,4 +1,4 @@
-import { PlayerController } from '../player/PlayerController'
+import { PlayerController } from '../lib/player'
 
 export function waitForScene(game: Phaser.Game, sceneKey: string): Promise<Phaser.Scene> {
   return new Promise((resolve) => {
