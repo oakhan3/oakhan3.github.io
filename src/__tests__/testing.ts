@@ -1,4 +1,5 @@
 import { PlayerController } from '../lib/player'
+import { GBA_WIDTH, GBA_HEIGHT } from '../config'
 
 export function waitForScene(game: Phaser.Game, sceneKey: string): Promise<Phaser.Scene> {
   return new Promise((resolve) => {
@@ -91,4 +92,78 @@ export function findPlayer(scene: Phaser.Scene): Phaser.Physics.Matter.Sprite {
   return scene.children.list.find(
     (child) => child instanceof Phaser.Physics.Matter.Sprite && child.texture.key === 'player',
   ) as Phaser.Physics.Matter.Sprite
+}
+
+export function createMinimalGame(
+  scenes: Phaser.Types.Core.GameConfig['scene'],
+  opts: { physics?: boolean } = {},
+): Phaser.Game {
+  return new Phaser.Game({
+    type: Phaser.CANVAS,
+    parent: 'game-container',
+    scale: {
+      mode: Phaser.Scale.FIT,
+      autoCenter: Phaser.Scale.CENTER_BOTH,
+      width: GBA_WIDTH,
+      height: GBA_HEIGHT,
+    },
+    physics: opts.physics ? { default: 'matter', matter: { gravity: { x: 0, y: 0 }, debug: false } } : undefined,
+    fps: { smoothStep: false },
+    scene: scenes,
+  })
+}
+
+// NOTE: Reads a pixel from the final composited game canvas. Converts world
+// coords to screen coords using the camera scroll offset.
+export function readCanvasPixel(
+  game: Phaser.Game,
+  scene: Phaser.Scene,
+  worldX: number,
+  worldY: number,
+): { r: number; g: number; b: number; a: number } {
+  const camera = scene.cameras.main
+  const screenX = Math.floor(worldX - camera.scrollX)
+  const screenY = Math.floor(worldY - camera.scrollY)
+  const context = game.canvas.getContext('2d')
+  if (!context) return { r: 0, g: 0, b: 0, a: 0 }
+  const imageData = context.getImageData(screenX, screenY, 1, 1)
+  return { r: imageData.data[0], g: imageData.data[1], b: imageData.data[2], a: imageData.data[3] }
+}
+
+// NOTE: Accesses the internal canvas of a RenderTexture for pixel inspection.
+// Needed because ADD-blended layers don't show up via game canvas getImageData.
+export function getTextureCanvas(renderTexture: Phaser.GameObjects.RenderTexture): HTMLCanvasElement {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (renderTexture as any).texture.getSourceImage() as HTMLCanvasElement
+}
+
+export function readTexturePixel(
+  renderTexture: Phaser.GameObjects.RenderTexture,
+  worldX: number,
+  worldY: number,
+): { r: number; g: number; b: number; a: number } {
+  const canvas = getTextureCanvas(renderTexture)
+  if (!canvas) return { r: 0, g: 0, b: 0, a: 0 }
+  const context = canvas.getContext('2d')
+  if (!context) return { r: 0, g: 0, b: 0, a: 0 }
+  const imageData = context.getImageData(Math.floor(worldX), Math.floor(worldY), 1, 1)
+  return { r: imageData.data[0], g: imageData.data[1], b: imageData.data[2], a: imageData.data[3] }
+}
+
+export function countVisiblePixels(renderTexture: Phaser.GameObjects.RenderTexture, stride: number): number {
+  const canvas = getTextureCanvas(renderTexture)
+  const context = canvas.getContext('2d')
+  if (!context) return 0
+  const imageData = context.getImageData(0, 0, canvas.width, canvas.height)
+  let count = 0
+  for (let index = 3; index < imageData.data.length; index += 4 * stride) {
+    if (imageData.data[index] > 0) count++
+  }
+  return count
+}
+
+export function findRenderTextureByDepth(scene: Phaser.Scene, depth: number): Phaser.GameObjects.RenderTexture {
+  return scene.children.list.find(
+    (child) => child instanceof Phaser.GameObjects.RenderTexture && child.depth === depth,
+  ) as Phaser.GameObjects.RenderTexture
 }

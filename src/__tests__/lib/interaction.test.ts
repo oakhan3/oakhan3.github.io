@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { InteractionSystem } from '../lib/interaction'
-import type { PlayerController } from '../lib/player'
-import type { DialogBox } from '../lib/dialog'
+import { InteractionSystem } from '../../lib/interaction'
+import type { PlayerController } from '../../lib/player'
+import type { DialogBox } from '../../lib/dialog'
 
 describe('InteractionSystem', () => {
   it('throws when the Interactables layer is missing', () => {
