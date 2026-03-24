@@ -3,7 +3,6 @@ import { DEPTH_DIALOG } from '../../config'
 
 const BOX_MARGIN = 8
 const BOX_PADDING = 10
-const BOX_HEIGHT = 56
 const TYPEWRITER_DELAY = 35
 const BORDER_COLOR = 0xe2e8f0
 const BACKGROUND_COLOR = 0x1a1b2e
@@ -35,14 +34,15 @@ export class DialogBox {
     const screenHeight = scene.scale.height
     const boxWidth = screenWidth - BOX_MARGIN * 2
     const boxY = screenHeight * 0.7
-    const isMobile = screenWidth < 768 || /Mobi|Android/i.test(navigator.userAgent)
-    const fontSize = isMobile ? '10px' : '5px'
+    const isMobile = screenWidth < 768
+    const fontSize = isMobile ? '8px' : '12px'
+    const boxHeight = isMobile ? 56 : 76
 
     const background = scene.add.graphics()
     background.fillStyle(BACKGROUND_COLOR, BACKGROUND_ALPHA)
-    background.fillRoundedRect(0, 0, boxWidth, BOX_HEIGHT, 4)
+    background.fillRoundedRect(0, 0, boxWidth, boxHeight, 4)
     background.lineStyle(2, BORDER_COLOR, 1)
-    background.strokeRoundedRect(0, 0, boxWidth, BOX_HEIGHT, 4)
+    background.strokeRoundedRect(0, 0, boxWidth, boxHeight, 4)
 
     this.textObject = scene.add.text(BOX_PADDING, BOX_PADDING, '', {
       fontFamily: '"Press Start 2P"',
@@ -56,7 +56,7 @@ export class DialogBox {
     this.indicator = scene.add.graphics()
     this.indicator.fillStyle(BORDER_COLOR, 1)
     this.indicator.fillTriangle(0, 0, INDICATOR_SIZE * 2, 0, INDICATOR_SIZE, INDICATOR_SIZE)
-    this.indicator.setPosition(boxWidth - BOX_PADDING - INDICATOR_SIZE * 2, BOX_HEIGHT - BOX_PADDING - INDICATOR_SIZE)
+    this.indicator.setPosition(boxWidth - BOX_PADDING - INDICATOR_SIZE * 2, boxHeight - BOX_PADDING - INDICATOR_SIZE)
     this.indicator.setVisible(false)
 
     this.container = scene.add.container(BOX_MARGIN, boxY, [background, this.textObject, this.indicator])
@@ -68,7 +68,7 @@ export class DialogBox {
 
     // NOTE: Link button sits outside the container so its interactive hit area is
     // computed in screen space, matching its scrollFactor(0) visual position.
-    this.linkButton = scene.add.text(BOX_MARGIN + BOX_PADDING, boxY + BOX_HEIGHT - BOX_PADDING - 11, '[ open link ]', {
+    this.linkButton = scene.add.text(BOX_MARGIN + BOX_PADDING, boxY + boxHeight - BOX_PADDING - 11, '[ open link ]', {
       fontFamily: '"Press Start 2P"',
       fontSize,
       color: '#60a5fa',
