@@ -1,9 +1,5 @@
 import Phaser from 'phaser'
-import { Direction, GBA_HEIGHT, DEPTH_JOYSTICK_BASE, DEPTH_JOYSTICK_KNOB } from '../../config'
-
-// NOTE: Minimum drag distance (in game pixels) before registering a direction.
-// Prevents accidental movement from tapping.
-const DEADZONE = 4
+import { Direction, GBA_HEIGHT, DEPTH_JOYSTICK_BASE, DEPTH_JOYSTICK_KNOB, TOUCH_DEADZONE } from '../../config'
 
 // NOTE: Sized relative to the shorter game dimension (320px). Phaser's Scale.FIT
 // stretches the canvas to fill the screen, so these scale up on all devices.
@@ -81,7 +77,7 @@ export class TouchControls {
 }
 
 function _directionFromDelta(deltaX: number, deltaY: number): Direction {
-  if (Math.abs(deltaX) < DEADZONE && Math.abs(deltaY) < DEADZONE) return 'none'
+  if (Math.abs(deltaX) < TOUCH_DEADZONE && Math.abs(deltaY) < TOUCH_DEADZONE) return 'none'
 
   if (Math.abs(deltaX) > Math.abs(deltaY)) {
     return deltaX < 0 ? 'left' : 'right'

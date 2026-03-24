@@ -1,7 +1,67 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, afterEach } from 'vitest'
+import Phaser from 'phaser'
 import { InteractionSystem } from '../../lib/interaction'
-import type { PlayerController } from '../../lib/player'
-import type { DialogBox } from '../../lib/dialog'
+import { PlayerSprite } from '../../lib/player/PlayerSprite'
+import { PlayerController } from '../../lib/player/PlayerController'
+import { TouchControls } from '../../lib/mobile/TouchControls'
+import { DialogBox } from '../../lib/dialog/DialogBox'
+import { GBA_WIDTH, GBA_HEIGHT } from '../../config'
+import type { PlayerController as PlayerControllerType } from '../../lib/player'
+import type { DialogBox as DialogBoxType } from '../../lib/dialog'
+import {
+  createMinimalGame,
+  waitForScene,
+  delay,
+  simulatePointerDown,
+  simulatePointerUp,
+  createStubPlayerAnimations,
+  findDialogContainer,
+} from '../testing'
+
+const INTERACTABLE_X = GBA_WIDTH / 2
+const INTERACTABLE_Y = GBA_HEIGHT / 2
+
+class InteractionTestScene extends Phaser.Scene {
+  interactionSystem!: InteractionSystem
+
+  constructor() {
+    super({ key: 'InteractionTestScene' })
+  }
+
+  preload() {
+    this.textures.generate('player', { data: ['1'], pixelWidth: 48 })
+  }
+
+  create() {
+    createStubPlayerAnimations(this)
+    const player = new PlayerSprite(this, INTERACTABLE_X, INTERACTABLE_Y)
+    const touchControls = new TouchControls(this)
+    const controller = new PlayerController(this, player, touchControls)
+    const dialog = new DialogBox(this)
+    const map = {
+      getObjectLayer: () => ({
+        objects: [{ name: 'sign', x: INTERACTABLE_X, y: INTERACTABLE_Y }],
+      }),
+    } as unknown as Phaser.Tilemaps.Tilemap
+    this.interactionSystem = new InteractionSystem(this, map, player, controller, dialog, {
+      radius: 32,
+      messages: { sign: 'Hello!' },
+    })
+  }
+
+  update() {
+    this.interactionSystem.update()
+  }
+}
+
+let game: Phaser.Game | null = null
+
+afterEach(() => {
+  if (game) {
+    game.destroy(true)
+    game = null
+  }
+})
 
 describe('InteractionSystem', () => {
   it('throws when the Interactables layer is missing', () => {
@@ -10,10 +70,58 @@ describe('InteractionSystem', () => {
 
     expect(
       () =>
-        new InteractionSystem(scene, map, {} as Phaser.GameObjects.Sprite, {} as PlayerController, {} as DialogBox, {
-          radius: 24,
-          messages: {},
-        }),
+        new InteractionSystem(
+          scene,
+          map,
+          {} as Phaser.GameObjects.Sprite,
+          {} as PlayerControllerType,
+          {} as DialogBoxType,
+          { radius: 24, messages: {} },
+        ),
     ).toThrow("Object layer 'Interactables' not found in the tilemap.")
+  })
+
+  it('tap near interactable opens dialog', async () => {
+    game = createMinimalGame([InteractionTestScene], { physics: true })
+    const scene = (await waitForScene(game, 'InteractionTestScene')) as InteractionTestScene
+
+    simulatePointerDown(game, INTERACTABLE_X, INTERACTABLE_Y)
+    simulatePointerUp(game, INTERACTABLE_X, INTERACTABLE_Y)
+    await delay(100)
+
+    const container = findDialogContainer(scene)
+    expect(container.visible).toBe(true)
+  })
+
+  it('drag near interactable does not open dialog', async () => {
+    game = createMinimalGame([InteractionTestScene], { physics: true })
+    const scene = (await waitForScene(game, 'InteractionTestScene')) as InteractionTestScene
+
+    simulatePointerDown(game, INTERACTABLE_X, INTERACTABLE_Y)
+    simulatePointerUp(game, INTERACTABLE_X + 20, INTERACTABLE_Y)
+    await delay(100)
+
+    const container = findDialogContainer(scene)
+    expect(container.visible).toBe(false)
+  })
+
+  it('tapping while dialog is open does not re-trigger interaction', async () => {
+    game = createMinimalGame([InteractionTestScene], { physics: true })
+    const scene = (await waitForScene(game, 'InteractionTestScene')) as InteractionTestScene
+
+    // NOTE: Open the dialog with a first tap.
+    simulatePointerDown(game, INTERACTABLE_X, INTERACTABLE_Y)
+    simulatePointerUp(game, INTERACTABLE_X, INTERACTABLE_Y)
+    await delay(100)
+
+    const container = findDialogContainer(scene)
+    expect(container.visible).toBe(true)
+
+    // NOTE: Tap again while dialog is open — should not close and re-open (dialog stays open).
+    simulatePointerDown(game, INTERACTABLE_X, INTERACTABLE_Y)
+    simulatePointerUp(game, INTERACTABLE_X, INTERACTABLE_Y)
+    await delay(100)
+
+    expect(container.visible).toBe(true)
   })
 })

@@ -1,5 +1,5 @@
 import { PlayerController } from '../lib/player'
-import { GBA_WIDTH, GBA_HEIGHT } from '../config'
+import { GBA_WIDTH, GBA_HEIGHT, DEPTH_DIALOG } from '../config'
 
 export function waitForScene(game: Phaser.Game, sceneKey: string): Promise<Phaser.Scene> {
   return new Promise((resolve) => {
@@ -168,6 +168,12 @@ export function countVisiblePixels(renderTexture: Phaser.GameObjects.RenderTextu
     if (imageData.data[index] > 0) count++
   }
   return count
+}
+
+export function findDialogContainer(scene: Phaser.Scene): Phaser.GameObjects.Container {
+  return scene.children.list.find(
+    (child) => child instanceof Phaser.GameObjects.Container && child.depth === DEPTH_DIALOG,
+  ) as Phaser.GameObjects.Container
 }
 
 export function findRenderTextureByDepth(scene: Phaser.Scene, depth: number): Phaser.GameObjects.RenderTexture {

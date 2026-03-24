@@ -1,4 +1,5 @@
 import Phaser from 'phaser'
+import { TOUCH_DEADZONE } from '../../config'
 import { computeCentroid } from '../collision'
 import { PlayerController } from '../player/PlayerController'
 import { DialogBox } from '../dialog/DialogBox'
@@ -23,10 +24,12 @@ export class InteractionSystem {
   private interactables: Interactable[]
   private spaceKey: Phaser.Input.Keyboard.Key
   private enterKey: Phaser.Input.Keyboard.Key
-  // NOTE: Tap flag set on pointerdown and consumed in update(). Lets touch
-  // trigger an interaction without interfering with dialog's own tap handling
-  // (which runs before update() sees it).
+  // NOTE: Tap flag set on pointerup (if no drag) and consumed in update(). Lets
+  // touch trigger an interaction without interfering with dialog's own tap
+  // handling (which runs before update() sees it).
   private tapPending = false
+  private touchStartX = 0
+  private touchStartY = 0
 
   constructor(
     scene: Phaser.Scene,
@@ -44,12 +47,22 @@ export class InteractionSystem {
     this.interactables = _parseInteractables(map)
     this.spaceKey = scene.input.keyboard!.addKey('SPACE')
     this.enterKey = scene.input.keyboard!.addKey('ENTER')
-    // NOTE: pointerdown sets a flag rather than triggering directly so we
-    // can check it in update() after the frozen guard. Ignore taps while the
-    // dialog is open — the dialog's own pointerdown listener handles those,
-    // and letting tapPending be set would re-trigger the interaction on close.
-    scene.input.on('pointerdown', () => {
-      if (!this.dialog.isOpen()) this.tapPending = true
+    // NOTE: Record the start position on pointerdown. On pointerup, only set
+    // tapPending if the drag stayed within TOUCH_DEADZONE (i.e. a real tap, not
+    // a joystick drag). Ignore taps while the dialog is open — the dialog's own
+    // pointerdown listener handles those, and letting tapPending be set would
+    // re-trigger the interaction on close.
+    scene.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      this.touchStartX = pointer.x
+      this.touchStartY = pointer.y
+    })
+    scene.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
+      if (this.dialog.isOpen()) return
+      const dx = pointer.x - this.touchStartX
+      const dy = pointer.y - this.touchStartY
+      if (Math.abs(dx) < TOUCH_DEADZONE && Math.abs(dy) < TOUCH_DEADZONE) {
+        this.tapPending = true
+      }
     })
   }
 
