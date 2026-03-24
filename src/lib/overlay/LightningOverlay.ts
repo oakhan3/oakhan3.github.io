@@ -1,51 +1,5 @@
 import Phaser from 'phaser'
-import { DEPTH_LIGHTING, TILE_SIZE } from '../config'
-
-// NOTE: Target tile coordinates where the lightning bolt strikes.
-const TARGET_TILE_X = 39
-const TARGET_TILE_Y = 8
-
-// NOTE: Bolt originates from the very top of the map (Y = 0) and strikes
-// downward to the target tile.
-
-// NOTE: Random interval range between strikes (milliseconds). The bolt fires
-// at a random time within this window, creating unpredictable timing.
-const MIN_INTERVAL_MS = 1000
-const MAX_INTERVAL_MS = 3000
-
-// NOTE: How long the bolt stays visible (milliseconds). Short duration
-// creates a fast, snappy flash.
-const BOLT_DURATION_MS = 120
-
-// NOTE: Fade-out portion of the bolt duration. The bolt is fully bright for
-// (BOLT_DURATION_MS - FADE_MS), then fades linearly to zero over FADE_MS.
-const FADE_MS = 80
-
-// NOTE: Midpoint displacement parameters. Each recursion halves the segment
-// and reduces the max displacement by this decay factor.
-const DISPLACEMENT_INITIAL = 18
-const DISPLACEMENT_DECAY = 0.55
-// NOTE: Number of recursive subdivisions. 5 levels = 32 segments, plenty
-// of jaggedness for a 96px bolt.
-const SUBDIVISION_DEPTH = 5
-
-// NOTE: Probability that a segment spawns a branch (0-1). Kept low so
-// branches are occasional, not every segment.
-const BRANCH_PROBABILITY = 0.12
-// NOTE: Branch length as a fraction of remaining bolt length at that point.
-const BRANCH_LENGTH_RATIO = 0.4
-// NOTE: Branches use fewer subdivisions since they're shorter.
-const BRANCH_SUBDIVISION_DEPTH = 3
-
-// NOTE: Bolt line thickness in pixels. Main bolt is thicker, branches thinner.
-const MAIN_BOLT_WIDTH = 2
-const BRANCH_BOLT_WIDTH = 1
-
-// NOTE: Lightning bolt color - bright white-blue.
-const BOLT_COLOR = 'rgba(200, 220, 255, 1)'
-// NOTE: Glow around the bolt for a bloom-like effect, drawn wider and dimmer.
-const GLOW_COLOR = 'rgba(100, 140, 255, 0.4)'
-const GLOW_WIDTH = 6
+import { DEPTH_LIGHTING, TILE_SIZE } from '../../config'
 
 interface BoltSegment {
   x1: number
@@ -60,8 +14,29 @@ interface ActiveBolt {
   startTime: number
 }
 
+export interface LightningConfig {
+  targetTileX: number
+  targetTileY: number
+  minIntervalMs: number
+  maxIntervalMs: number
+  boltDurationMs: number
+  fadeMs: number
+  displacementInitial: number
+  displacementDecay: number
+  subdivisionDepth: number
+  branchProbability: number
+  branchLengthRatio: number
+  branchSubdivisionDepth: number
+  mainBoltWidth: number
+  branchBoltWidth: number
+  boltColor: string
+  glowColor: string
+  glowWidth: number
+}
+
 export class LightningOverlay {
   private scene: Phaser.Scene
+  private config: LightningConfig
   private renderTexture: Phaser.GameObjects.RenderTexture
   private canvasTexture: Phaser.Textures.CanvasTexture
   // NOTE: Reusable stamp image — created once, drawn each frame the bolt is
@@ -70,8 +45,9 @@ export class LightningOverlay {
   private activeBolt: ActiveBolt | null = null
   private nextStrikeTime: number
 
-  constructor(scene: Phaser.Scene, mapWidth: number, mapHeight: number) {
+  constructor(scene: Phaser.Scene, mapWidth: number, mapHeight: number, config: LightningConfig) {
     this.scene = scene
+    this.config = config
 
     this.renderTexture = scene.add.renderTexture(0, 0, mapWidth, mapHeight)
     this.renderTexture.setOrigin(0, 0)
@@ -84,16 +60,17 @@ export class LightningOverlay {
     this.stamp = scene.make.image({ key: 'lightning-canvas', add: false })
     this.stamp.setOrigin(0, 0)
 
-    this.nextStrikeTime = scene.time.now + _randomInterval()
+    this.nextStrikeTime = scene.time.now + _randomInterval(config.minIntervalMs, config.maxIntervalMs)
   }
 
   update() {
     const time = this.scene.time.now
+    const config = this.config
 
     // NOTE: Check if it's time to trigger a new bolt.
     if (!this.activeBolt && time >= this.nextStrikeTime) {
-      this.activeBolt = _generateBolt(time)
-      this.nextStrikeTime = time + _randomInterval()
+      this.activeBolt = _generateBolt(time, config)
+      this.nextStrikeTime = time + _randomInterval(config.minIntervalMs, config.maxIntervalMs)
     }
 
     this.renderTexture.clear()
@@ -101,33 +78,33 @@ export class LightningOverlay {
     if (!this.activeBolt) return
 
     const elapsed = time - this.activeBolt.startTime
-    if (elapsed > BOLT_DURATION_MS) {
+    if (elapsed > config.boltDurationMs) {
       this.activeBolt = null
       return
     }
 
     // NOTE: Full brightness for most of the duration, then linear fade.
-    const fadeStart = BOLT_DURATION_MS - FADE_MS
-    const alpha = elapsed < fadeStart ? 1 : 1 - (elapsed - fadeStart) / FADE_MS
+    const fadeStart = config.boltDurationMs - config.fadeMs
+    const alpha = elapsed < fadeStart ? 1 : 1 - (elapsed - fadeStart) / config.fadeMs
 
     // NOTE: Draw bolt segments onto the canvas texture, then stamp it onto
     // the RenderTexture for compositing with the scene.
     const context = this.canvasTexture.getContext()
-    _drawBolt(context, this.canvasTexture.width, this.canvasTexture.height, this.activeBolt, alpha)
+    _drawBolt(context, this.canvasTexture.width, this.canvasTexture.height, this.activeBolt, alpha, config)
     this.canvasTexture.refresh()
 
     this.renderTexture.draw(this.stamp, 0, 0)
   }
 }
 
-function _randomInterval(): number {
-  return MIN_INTERVAL_MS + Math.random() * (MAX_INTERVAL_MS - MIN_INTERVAL_MS)
+function _randomInterval(minMs: number, maxMs: number): number {
+  return minMs + Math.random() * (maxMs - minMs)
 }
 
-function _generateBolt(time: number): ActiveBolt {
+function _generateBolt(time: number, config: LightningConfig): ActiveBolt {
   // NOTE: Target is the center of the strike tile. Bolt comes from above.
-  const targetX = TARGET_TILE_X * TILE_SIZE + TILE_SIZE / 2
-  const targetY = TARGET_TILE_Y * TILE_SIZE + TILE_SIZE / 2
+  const targetX = config.targetTileX * TILE_SIZE + TILE_SIZE / 2
+  const targetY = config.targetTileY * TILE_SIZE + TILE_SIZE / 2
 
   // NOTE: Source starts at the very top of the map (Y = 0) with slight
   // horizontal wander so each strike enters from a slightly different angle.
@@ -135,16 +112,24 @@ function _generateBolt(time: number): ActiveBolt {
   const sourceY = 0
   const boltLength = targetY
 
-  const segments = _midpointDisplacement(sourceX, sourceY, targetX, targetY, DISPLACEMENT_INITIAL, SUBDIVISION_DEPTH)
+  const segments = _midpointDisplacement(
+    sourceX,
+    sourceY,
+    targetX,
+    targetY,
+    config.displacementInitial,
+    config.subdivisionDepth,
+    config.displacementDecay,
+  )
 
   // NOTE: Generate branches from random segments along the main bolt.
   const branches: BoltSegment[][] = []
   for (let index = 1; index < segments.length - 1; index++) {
-    if (Math.random() < BRANCH_PROBABILITY) {
+    if (Math.random() < config.branchProbability) {
       const segment = segments[index]
       // NOTE: Branch angles off to the side, biased away from center.
       const branchAngle = (Math.random() > 0.5 ? 1 : -1) * (Math.PI / 6 + (Math.random() * Math.PI) / 6)
-      const branchLength = boltLength * BRANCH_LENGTH_RATIO * (1 - index / segments.length)
+      const branchLength = boltLength * config.branchLengthRatio * (1 - index / segments.length)
       const branchEndX = segment.x2 + Math.sin(branchAngle) * branchLength
       const branchEndY = segment.y2 + Math.cos(branchAngle) * branchLength * 0.7
 
@@ -154,8 +139,9 @@ function _generateBolt(time: number): ActiveBolt {
           segment.y2,
           branchEndX,
           branchEndY,
-          DISPLACEMENT_INITIAL * 0.5,
-          BRANCH_SUBDIVISION_DEPTH,
+          config.displacementInitial * 0.5,
+          config.branchSubdivisionDepth,
+          config.displacementDecay,
         ),
       )
     }
@@ -171,6 +157,7 @@ function _midpointDisplacement(
   y2: number,
   displacement: number,
   depth: number,
+  decayFactor: number,
 ): BoltSegment[] {
   // NOTE: Base case - return a single segment between the two points.
   if (depth === 0) {
@@ -193,26 +180,33 @@ function _midpointDisplacement(
   const displacedMidX = midX + perpX * offset
   const displacedMidY = midY + perpY * offset
 
-  const reducedDisplacement = displacement * DISPLACEMENT_DECAY
+  const reducedDisplacement = displacement * decayFactor
 
   // NOTE: Recurse on each half with reduced displacement range.
-  const left = _midpointDisplacement(x1, y1, displacedMidX, displacedMidY, reducedDisplacement, depth - 1)
-  const right = _midpointDisplacement(displacedMidX, displacedMidY, x2, y2, reducedDisplacement, depth - 1)
+  const left = _midpointDisplacement(x1, y1, displacedMidX, displacedMidY, reducedDisplacement, depth - 1, decayFactor)
+  const right = _midpointDisplacement(displacedMidX, displacedMidY, x2, y2, reducedDisplacement, depth - 1, decayFactor)
 
   return [...left, ...right]
 }
 
-function _drawBolt(context: CanvasRenderingContext2D, width: number, height: number, bolt: ActiveBolt, alpha: number) {
+function _drawBolt(
+  context: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  bolt: ActiveBolt,
+  alpha: number,
+  config: LightningConfig,
+) {
   context.clearRect(0, 0, width, height)
 
   // NOTE: Draw glow layer first (wider, dimmer) then the sharp bolt on top.
   // This creates a bloom-like effect around the lightning.
-  _drawSegments(context, bolt.segments, GLOW_COLOR, GLOW_WIDTH, alpha)
-  _drawSegments(context, bolt.segments, BOLT_COLOR, MAIN_BOLT_WIDTH, alpha)
+  _drawSegments(context, bolt.segments, config.glowColor, config.glowWidth, alpha)
+  _drawSegments(context, bolt.segments, config.boltColor, config.mainBoltWidth, alpha)
 
   for (const branch of bolt.branches) {
-    _drawSegments(context, branch, GLOW_COLOR, GLOW_WIDTH * 0.6, alpha * 0.6)
-    _drawSegments(context, branch, BOLT_COLOR, BRANCH_BOLT_WIDTH, alpha * 0.7)
+    _drawSegments(context, branch, config.glowColor, config.glowWidth * 0.6, alpha * 0.6)
+    _drawSegments(context, branch, config.boltColor, config.branchBoltWidth, alpha * 0.7)
   }
 }
 

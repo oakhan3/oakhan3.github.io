@@ -1,7 +1,7 @@
 import Phaser from 'phaser'
 import { BootScene } from './scenes/BootScene'
 import { PreloadScene } from './scenes/PreloadScene'
-import { OverworldScene } from './scenes/OverworldScene'
+import { OverworldScene } from './scenes/overworld'
 import { GBA_WIDTH, GBA_HEIGHT } from './config'
 
 export const GAME_CONFIG: Phaser.Types.Core.GameConfig = {

@@ -1,13 +1,14 @@
 import Phaser from 'phaser'
-import { PlayerSprite, createPlayerAnimations } from '../player/PlayerSprite'
-import { PlayerController } from '../player/PlayerController'
-import { DialogBox } from '../dialog/DialogBox'
-import { TouchControls } from '../mobile/TouchControls'
-import { LightingOverlay } from '../lighting/LightingOverlay'
-import { SparkleOverlay } from '../lighting/SparkleOverlay'
-import { LightningOverlay } from '../lighting/LightningOverlay'
-import { createObjectCollisions } from '../collision/ObjectCollisions'
-import { InteractionSystem } from '../interaction/InteractionSystem'
+import { PlayerSprite, createPlayerAnimations } from '../../player/PlayerSprite'
+import { PlayerController } from '../../player/PlayerController'
+import { DialogBox } from '../../dialog/DialogBox'
+import { TouchControls } from '../../mobile/TouchControls'
+import { LightingOverlay, LightningOverlay, SparkleOverlay } from '../../lib/overlay'
+import { createLightingOverlay } from './overlays/lighting'
+import { createLightningOverlay } from './overlays/lightning'
+import { createSparkleOverlay } from './overlays/sparkle'
+import { createObjectCollisions } from '../../collision/ObjectCollisions'
+import { InteractionSystem } from '../../interaction/InteractionSystem'
 
 interface LayerConfig {
   name: string
@@ -78,9 +79,9 @@ export class OverworldScene extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
     this.matter.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
 
-    this.lightingOverlay = new LightingOverlay(this, map.widthInPixels, map.heightInPixels, player)
-    this.sparkleOverlay = new SparkleOverlay(this, map.widthInPixels, map.heightInPixels)
-    this.lightningOverlay = new LightningOverlay(this, map.widthInPixels, map.heightInPixels)
+    this.lightingOverlay = createLightingOverlay(this, map.widthInPixels, map.heightInPixels, player)
+    this.sparkleOverlay = createSparkleOverlay(this, map.widthInPixels, map.heightInPixels)
+    this.lightningOverlay = createLightningOverlay(this, map.widthInPixels, map.heightInPixels)
 
     const touchControls = new TouchControls(this)
     this.playerController = new PlayerController(this, player, touchControls)

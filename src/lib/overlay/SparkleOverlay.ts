@@ -1,25 +1,5 @@
 import Phaser from 'phaser'
-import { DEPTH_LIGHTING } from '../config'
-
-// NOTE: Total number of sparkles scattered across the map.
-const SPARKLE_COUNT = 60
-
-// NOTE: Sparkle dot radius in pixels. Kept tiny for a subtle star-like effect.
-const SPARKLE_RADIUS = 1.5
-
-// NOTE: Each sparkle completes a full fade-in/fade-out cycle over a random
-// period in this range (milliseconds). Variation prevents synchronized blinking.
-const MIN_CYCLE_MS = 2000
-const MAX_CYCLE_MS = 5000
-
-// NOTE: Peak alpha for the brightest moment of a sparkle's cycle.
-const MAX_ALPHA = 0.7
-
-// NOTE: Sparkles drift downward slowly to simulate falling. Speed in pixels
-// per millisecond. Slight horizontal sway adds organic movement.
-const FALL_SPEED = 0.008
-const SWAY_AMPLITUDE = 0.3
-const SWAY_SPEED = 0.001
+import { DEPTH_LIGHTING } from '../../config'
 
 interface Sparkle {
   pixelX: number
@@ -32,8 +12,20 @@ interface Sparkle {
   swayPhase: number
 }
 
+export interface SparkleConfig {
+  count: number
+  radius: number
+  minCycleMs: number
+  maxCycleMs: number
+  maxAlpha: number
+  fallSpeed: number
+  swayAmplitude: number
+  swaySpeed: number
+}
+
 export class SparkleOverlay {
   private scene: Phaser.Scene
+  private config: SparkleConfig
   private renderTexture: Phaser.GameObjects.RenderTexture
   private sparkles: Sparkle[]
   private brush: Phaser.GameObjects.Image
@@ -41,12 +33,13 @@ export class SparkleOverlay {
   private mapWidth: number
   private mapHeight: number
 
-  constructor(scene: Phaser.Scene, mapWidth: number, mapHeight: number) {
+  constructor(scene: Phaser.Scene, mapWidth: number, mapHeight: number, config: SparkleConfig) {
     this.scene = scene
+    this.config = config
     this.mapWidth = mapWidth
     this.mapHeight = mapHeight
 
-    _createSparkleTexture(scene, 'sparkle-dot', SPARKLE_RADIUS)
+    _createSparkleTexture(scene, 'sparkle-dot', config.radius)
 
     this.brush = scene.make.image({ key: 'sparkle-dot', add: false })
 
@@ -57,8 +50,8 @@ export class SparkleOverlay {
     this.renderTexture.setDepth(DEPTH_LIGHTING + 2)
 
     this.sparkles = []
-    for (let index = 0; index < SPARKLE_COUNT; index++) {
-      this.sparkles.push(_createSparkle(mapWidth, mapHeight))
+    for (let index = 0; index < config.count; index++) {
+      this.sparkles.push(_createSparkle(mapWidth, mapHeight, config.minCycleMs, config.maxCycleMs))
     }
 
     this.update()
@@ -67,19 +60,20 @@ export class SparkleOverlay {
   update() {
     const time = this.scene.time.now
     const delta = this.scene.game.loop.delta
+    const { maxAlpha, fallSpeed, swayAmplitude, swaySpeed, minCycleMs, maxCycleMs } = this.config
     this.renderTexture.clear()
 
     for (let index = 0; index < this.sparkles.length; index++) {
       const sparkle = this.sparkles[index]
 
       // NOTE: Drift downward each frame with a gentle horizontal sway.
-      sparkle.pixelY += FALL_SPEED * delta
-      sparkle.pixelX += Math.sin(time * SWAY_SPEED + sparkle.swayPhase) * SWAY_AMPLITUDE
+      sparkle.pixelY += fallSpeed * delta
+      sparkle.pixelX += Math.sin(time * swaySpeed + sparkle.swayPhase) * swayAmplitude
 
       // NOTE: When a sparkle falls off the bottom or drifts off the sides,
       // respawn it at the top at a random X position.
       if (sparkle.pixelY > this.mapHeight || sparkle.pixelX < 0 || sparkle.pixelX > this.mapWidth) {
-        this.sparkles[index] = _createSparkle(this.mapWidth, this.mapHeight)
+        this.sparkles[index] = _createSparkle(this.mapWidth, this.mapHeight, minCycleMs, maxCycleMs)
         this.sparkles[index].pixelY = 0
         continue
       }
@@ -87,7 +81,7 @@ export class SparkleOverlay {
       // NOTE: Sine wave produces smooth 0-to-1-to-0 breathing. Clamped to
       // zero on the negative half so sparkles spend time fully off.
       const wave = Math.sin(time * sparkle.speed + sparkle.phase)
-      const alpha = Math.max(0, wave) * MAX_ALPHA
+      const alpha = Math.max(0, wave) * maxAlpha
 
       if (alpha < 0.01) continue
 
@@ -97,8 +91,8 @@ export class SparkleOverlay {
   }
 }
 
-function _createSparkle(mapWidth: number, mapHeight: number): Sparkle {
-  const period = MIN_CYCLE_MS + Math.random() * (MAX_CYCLE_MS - MIN_CYCLE_MS)
+function _createSparkle(mapWidth: number, mapHeight: number, minCycleMs: number, maxCycleMs: number): Sparkle {
+  const period = minCycleMs + Math.random() * (maxCycleMs - minCycleMs)
   return {
     pixelX: Math.random() * mapWidth,
     pixelY: Math.random() * mapHeight,

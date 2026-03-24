@@ -1,13 +1,5 @@
 import Phaser from 'phaser'
-import { DEPTH_LIGHTING, TILE_SIZE } from '../config'
-
-// NOTE: Dark blue-black ambient color for nighttime. With MULTIPLY blend mode,
-// dark pixels darken the scene and bright pixels leave it unchanged. Drawing
-// colored circles onto this dark fill creates tinted light effects.
-const AMBIENT_COLOR = 0x334466
-
-// NOTE: Player light radius in pixels.
-const PLAYER_LIGHT_RADIUS = 80
+import { DEPTH_LIGHTING, TILE_SIZE } from '../../config'
 
 // NOTE: Shared light brush texture radius. All lights use the same gradient
 // texture, scaled via setScale on the brush image before drawing.
@@ -32,17 +24,7 @@ const PULSE_AMPLITUDE = 0.15
 // NOTE: Color-cycle constants. Full hue rotation period in milliseconds.
 const COLOR_CYCLE_PERIOD = 10000
 
-// NOTE: Stage cones are wider at the tip (big stage lights). Lamp cones have a
-// narrow tip (small lamp heads) that flares out more.
-const STAGE_CONE_WIDTH = 48
-const STAGE_CONE_HEIGHT = 40
-const LAMP_CONE_WIDTH = 32
-const LAMP_CONE_HEIGHT = 40
-// NOTE: Headlight cone projects horizontally to the left from the car.
-const HEADLIGHT_CONE_LENGTH = 40
-const HEADLIGHT_CONE_SPREAD = 16
-
-interface FixedLight {
+export interface FixedLight {
   pixelX: number
   pixelY: number
   radius: number
@@ -60,150 +42,18 @@ interface FixedLight {
   animation?: 'flicker' | 'pulse' | 'color-cycle'
 }
 
-// NOTE: Tile coords x TILE_SIZE = pixel coords. Spotlights are placed a few
-// tiles below the gem sources so the light pools onto the stage surface.
-const FIXED_LIGHTS: FixedLight[] = [
-  // Stage spotlights — gems along row 0, beams project down onto stage
-  {
-    pixelX: 25 * TILE_SIZE,
-    pixelY: 0 * TILE_SIZE,
-    radius: 30,
-    color: 0xff4444,
-    cone: 'stage',
-    animation: 'color-cycle',
-  },
-  {
-    pixelX: 26 * TILE_SIZE,
-    pixelY: 0 * TILE_SIZE,
-    radius: 30,
-    color: 0xffff44,
-    cone: 'stage',
-    animation: 'color-cycle',
-  },
-  {
-    pixelX: 27 * TILE_SIZE,
-    pixelY: 0 * TILE_SIZE,
-    radius: 30,
-    color: 0x44ff44,
-    cone: 'stage',
-    animation: 'color-cycle',
-  },
-  {
-    pixelX: 28 * TILE_SIZE,
-    pixelY: 0 * TILE_SIZE,
-    radius: 30,
-    color: 0x4444ff,
-    cone: 'stage',
-    animation: 'color-cycle',
-  },
-  {
-    pixelX: 29 * TILE_SIZE,
-    pixelY: 0 * TILE_SIZE,
-    radius: 30,
-    color: 0xaa44ff,
-    cone: 'stage',
-    animation: 'color-cycle',
-  },
-  {
-    pixelX: 30 * TILE_SIZE,
-    pixelY: 0 * TILE_SIZE,
-    radius: 30,
-    color: 0xff44aa,
-    cone: 'stage',
-    animation: 'color-cycle',
-  },
-
-  // Lamps — center of island. Pixel offsets nudge the cone to align with the
-  // lamp head sprite. Cones tilt 12 degrees inward.
-  // Small glow at the lamp head so the cone doesn't emerge from darkness.
-  { pixelX: 26 * TILE_SIZE + 3, pixelY: 9 * TILE_SIZE + 5, radius: 10, color: 0x998866 },
-  { pixelX: 29 * TILE_SIZE + 12, pixelY: 9 * TILE_SIZE + 5, radius: 10, color: 0x998866 },
-  {
-    pixelX: 26 * TILE_SIZE + 3,
-    pixelY: 9 * TILE_SIZE + 3,
-    radius: 51,
-    color: 0xffe8a0,
-    cone: 'lamp',
-    coneAngle: -12,
-    animation: 'flicker',
-  },
-  {
-    pixelX: 29 * TILE_SIZE + 12,
-    pixelY: 9 * TILE_SIZE + 3,
-    radius: 51,
-    color: 0xffe8a0,
-    cone: 'lamp',
-    coneAngle: 12,
-    animation: 'flicker',
-  },
-
-  // Building windows — vibrant blue glow via ADD blend layer
-  { pixelX: 34.5 * TILE_SIZE, pixelY: 17 * TILE_SIZE, radius: 40, color: 0x0e3388, glow: true, animation: 'pulse' },
-  { pixelX: 36.5 * TILE_SIZE, pixelY: 17 * TILE_SIZE, radius: 40, color: 0x0e3388, glow: true, animation: 'pulse' },
-  { pixelX: 34.5 * TILE_SIZE, pixelY: 18.5 * TILE_SIZE, radius: 40, color: 0x0e3388, glow: true, animation: 'pulse' },
-  { pixelX: 36.5 * TILE_SIZE, pixelY: 18.5 * TILE_SIZE, radius: 40, color: 0x0e3388, glow: true, animation: 'pulse' },
-  // Building glass door
-  { pixelX: 35.5 * TILE_SIZE, pixelY: 20 * TILE_SIZE, radius: 30, color: 0x0e3388, glow: true, animation: 'pulse' },
-
-  // Car headlights — beams project left from tile 39. Start 5% into the tile.
-  // Small glow at the headlight source so the cone doesn't emerge from darkness.
-  { pixelX: 39 * TILE_SIZE + 1, pixelY: 21.5 * TILE_SIZE + 8, radius: 10, color: 0x665533 },
-  { pixelX: 39 * TILE_SIZE + 1, pixelY: 22.5 * TILE_SIZE, radius: 10, color: 0x665533 },
-  {
-    pixelX: 39 * TILE_SIZE + 1,
-    pixelY: 21.5 * TILE_SIZE + 8,
-    radius: 20,
-    color: 0xffeecc,
-    cone: 'headlight',
-    animation: 'flicker',
-  },
-  {
-    pixelX: 39 * TILE_SIZE + 1,
-    pixelY: 22.5 * TILE_SIZE,
-    radius: 20,
-    color: 0xffeecc,
-    cone: 'headlight',
-    animation: 'flicker',
-  },
-
-  // Car tail lights — small red glow at the right edge of tiles 41,21 and 41,22.
-  // NOTE: Top light (21) is lowered by 50% of a tile (8px) to align with the sprite.
-  {
-    pixelX: 42 * TILE_SIZE - 5,
-    pixelY: 21.5 * TILE_SIZE + 8,
-    radius: 12,
-    color: 0xdd1111,
-    glow: true,
-    animation: 'flicker',
-  },
-  {
-    pixelX: 42 * TILE_SIZE - 5,
-    pixelY: 22.5 * TILE_SIZE,
-    radius: 12,
-    color: 0xdd1111,
-    glow: true,
-    animation: 'flicker',
-  },
-
-  // Red glow dot at tile 16,3.
-  { pixelX: 16.5 * TILE_SIZE, pixelY: 3.5 * TILE_SIZE, radius: 10, color: 0xff0000, glow: true, animation: 'flicker' },
-
-  // Fairy lights — bright concentrated glows with lamp-style flicker.
-  // NOTE: Radius 4 (70% smaller than initial 14) for a tight, focused point.
-  { pixelX: 15.5 * TILE_SIZE, pixelY: 11.5 * TILE_SIZE, radius: 4, color: 0xffffff, glow: true, animation: 'flicker' },
-  { pixelX: 19.5 * TILE_SIZE, pixelY: 11.5 * TILE_SIZE, radius: 4, color: 0xffffff, glow: true, animation: 'flicker' },
-  { pixelX: 22.5 * TILE_SIZE, pixelY: 24.5 * TILE_SIZE, radius: 4, color: 0xffffff, glow: true, animation: 'flicker' },
-  { pixelX: 18.5 * TILE_SIZE, pixelY: 21.5 * TILE_SIZE, radius: 4, color: 0xffffff, glow: true, animation: 'flicker' },
-  { pixelX: 13.5 * TILE_SIZE, pixelY: 23.5 * TILE_SIZE, radius: 4, color: 0xffffff, glow: true, animation: 'flicker' },
-
-  // Additional ambient lights
-  { pixelX: 39 * TILE_SIZE, pixelY: 9 * TILE_SIZE, radius: 96, color: 0xffeedd },
-  { pixelX: 17 * TILE_SIZE, pixelY: 12 * TILE_SIZE, radius: 96, color: 0xffeedd },
-  { pixelX: 20 * TILE_SIZE, pixelY: 22 * TILE_SIZE, radius: 48, color: 0xffeedd },
-]
+export interface LightingConfig {
+  ambientColor: number
+  playerLightRadius: number
+  stageCone: { width: number; height: number; topInsetRatio: number }
+  lampCone: { width: number; height: number; topInsetRatio: number }
+  headlightCone: { length: number; spread: number; tipInsetRatio: number }
+  fixedLights: FixedLight[]
+}
 
 export class LightingOverlay {
   private scene: Phaser.Scene
+  private config: LightingConfig
   private renderTexture: Phaser.GameObjects.RenderTexture
   // NOTE: Second layer with ADD blend for vibrant colored glows. MULTIPLY can
   // only darken, so colored lights look dim. ADD composites color on top of the
@@ -218,17 +68,36 @@ export class LightingOverlay {
   // flicker/pulse in lockstep. Seeded once at construction time.
   private lightSeeds: number[]
 
-  constructor(scene: Phaser.Scene, mapWidth: number, mapHeight: number, player: Phaser.GameObjects.Sprite) {
+  constructor(
+    scene: Phaser.Scene,
+    mapWidth: number,
+    mapHeight: number,
+    player: Phaser.GameObjects.Sprite,
+    config: LightingConfig,
+  ) {
     this.scene = scene
     this.player = player
-    this.lightSeeds = FIXED_LIGHTS.map(() => Math.random() * 10000)
+    this.config = config
+    this.lightSeeds = config.fixedLights.map(() => Math.random() * 10000)
 
     _createLightTexture(scene, 'light-gradient', BRUSH_BASE_RADIUS)
-    _createConeTexture(scene, 'stage-cone', _verticalConeSpec(STAGE_CONE_WIDTH, STAGE_CONE_HEIGHT, 0.3))
+    _createConeTexture(
+      scene,
+      'stage-cone',
+      _verticalConeSpec(config.stageCone.width, config.stageCone.height, config.stageCone.topInsetRatio),
+    )
     // NOTE: Lamp cone has a much narrower tip (0.42 inset) to match the small lamp heads.
-    _createConeTexture(scene, 'lamp-cone', _verticalConeSpec(LAMP_CONE_WIDTH, LAMP_CONE_HEIGHT, 0.42))
+    _createConeTexture(
+      scene,
+      'lamp-cone',
+      _verticalConeSpec(config.lampCone.width, config.lampCone.height, config.lampCone.topInsetRatio),
+    )
     // NOTE: Headlight cone is horizontal — narrow on right (headlight), wide on left.
-    _createConeTexture(scene, 'headlight-cone', _horizontalConeSpec(HEADLIGHT_CONE_LENGTH, HEADLIGHT_CONE_SPREAD, 0.25))
+    _createConeTexture(
+      scene,
+      'headlight-cone',
+      _horizontalConeSpec(config.headlightCone.length, config.headlightCone.spread, config.headlightCone.tipInsetRatio),
+    )
 
     this.lightBrush = scene.make.image({ key: 'light-gradient', add: false })
     this.stageConeBrush = scene.make.image({ key: 'stage-cone', add: false })
@@ -256,19 +125,20 @@ export class LightingOverlay {
 
   update() {
     const time = this.scene.time.now
+    const { ambientColor, playerLightRadius, fixedLights, stageCone, lampCone, headlightCone } = this.config
 
     this.renderTexture.clear()
-    this.renderTexture.fill(AMBIENT_COLOR)
+    this.renderTexture.fill(ambientColor)
 
     // NOTE: Player light — white so it reveals the scene at full color.
     this.lightBrush.setTint(0xffffff)
-    this.lightBrush.setScale(PLAYER_LIGHT_RADIUS / BRUSH_BASE_RADIUS)
+    this.lightBrush.setScale(playerLightRadius / BRUSH_BASE_RADIUS)
     this.renderTexture.draw(this.lightBrush, this.player.x, this.player.y)
 
     this.glowTexture.clear()
 
-    for (let index = 0; index < FIXED_LIGHTS.length; index++) {
-      const light = FIXED_LIGHTS[index]
+    for (let index = 0; index < fixedLights.length; index++) {
+      const light = fixedLights[index]
       const seed = this.lightSeeds[index]
 
       const { radiusScale, color } = _computeAnimation(light, time, seed, index)
@@ -278,11 +148,11 @@ export class LightingOverlay {
       let poolX = light.pixelX
       let poolY = light.pixelY
       if (light.cone === 'headlight') {
-        poolX -= HEADLIGHT_CONE_LENGTH
+        poolX -= headlightCone.length
       } else if (light.cone === 'lamp') {
-        poolY += LAMP_CONE_HEIGHT
+        poolY += lampCone.height
       } else if (light.cone === 'stage') {
-        poolY += STAGE_CONE_HEIGHT
+        poolY += stageCone.height
       }
 
       const animatedRadius = light.radius * radiusScale
