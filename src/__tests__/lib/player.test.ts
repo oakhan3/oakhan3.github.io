@@ -8,6 +8,7 @@ import {
   createMinimalGame,
   waitForScene,
   delay,
+  waitFor,
   simulateKeyDown,
   simulateKeyUp,
   createStubPlayerAnimations,
@@ -119,7 +120,7 @@ describe('player controller', () => {
     const startX = scene.player.x
 
     simulateKeyDown(game, 'd', 68)
-    await delay(200)
+    await waitFor(() => scene.player.x > startX)
     simulateKeyUp(game, 'd', 68)
 
     expect(scene.player.x).toBeGreaterThan(startX)

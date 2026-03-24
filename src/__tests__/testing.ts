@@ -1,12 +1,15 @@
 import { PlayerController } from '../lib/player'
 import { GBA_WIDTH, GBA_HEIGHT, DEPTH_DIALOG } from '../config'
 
-export function waitForScene(game: Phaser.Game, sceneKey: string): Promise<Phaser.Scene> {
-  return new Promise((resolve) => {
+export function waitForScene(game: Phaser.Game, sceneKey: string, timeout = 10000): Promise<Phaser.Scene> {
+  return new Promise((resolve, reject) => {
+    const start = Date.now()
     const check = () => {
       const scene = game.scene.getScene(sceneKey)
       if (scene && game.scene.isActive(sceneKey)) {
         resolve(scene)
+      } else if (Date.now() - start > timeout) {
+        reject(new Error(`waitForScene('${sceneKey}') timed out after ${timeout}ms`))
       } else {
         setTimeout(check, 50)
       }
@@ -17,6 +20,14 @@ export function waitForScene(game: Phaser.Game, sceneKey: string): Promise<Phase
 
 export function delay(milliseconds: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, milliseconds))
+}
+
+export async function waitFor(condition: () => boolean, timeout = 2000): Promise<void> {
+  const start = Date.now()
+  while (!condition()) {
+    if (Date.now() - start > timeout) throw new Error('waitFor timed out')
+    await delay(16)
+  }
 }
 
 export function simulateKeyDown(game: Phaser.Game, key: string, keyCode: number): void {

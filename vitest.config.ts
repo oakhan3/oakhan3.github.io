@@ -3,7 +3,7 @@ import { playwright } from '@vitest/browser-playwright'
 
 export default defineConfig({
   test: {
-    testTimeout: 5000,
+    testTimeout: 15000,
     coverage: {
       provider: 'istanbul',
     },

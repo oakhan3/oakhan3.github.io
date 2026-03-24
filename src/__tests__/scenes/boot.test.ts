@@ -10,6 +10,7 @@ import {
   simulatePointerDown,
   simulatePointerMove,
   simulatePointerUp,
+  waitFor,
   waitForScene,
 } from '../testing'
 
@@ -111,7 +112,7 @@ describe('touch integration', () => {
 
     simulatePointerDown(game, GBA_WIDTH / 2, GBA_HEIGHT / 2)
     simulatePointerMove(game, GBA_WIDTH / 2 + 20, GBA_HEIGHT / 2)
-    await delay(200)
+    await waitFor(() => player.x > startX)
 
     expect(player.x).toBeGreaterThan(startX)
 
