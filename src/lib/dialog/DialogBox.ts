@@ -3,7 +3,7 @@ import { DEPTH_DIALOG } from '../../config'
 
 const BOX_MARGIN = 8
 const BOX_PADDING = 10
-const TYPEWRITER_DELAY = 35
+const TYPEWRITER_DELAY = 15
 const BORDER_COLOR = 0xe2e8f0
 const BACKGROUND_COLOR = 0x1a1b2e
 const BACKGROUND_ALPHA = 0.92
@@ -35,8 +35,8 @@ export class DialogBox {
     const boxWidth = screenWidth - BOX_MARGIN * 2
     const boxY = screenHeight * 0.7
     const isMobile = window.innerWidth < 768
-    const fontSize = isMobile ? '9px' : '8px'
-    const boxHeight = isMobile ? 66 : 66
+    const fontSize = isMobile ? '12px' : '8px'
+    const boxHeight = isMobile ? 80 : 66
 
     const background = scene.add.graphics()
     background.fillStyle(BACKGROUND_COLOR, BACKGROUND_ALPHA)
