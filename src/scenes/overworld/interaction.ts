@@ -32,7 +32,7 @@ const MESSAGES: Record<string, Message> = {
   'github-computer': { text: "Something's cooking..." },
   'github-stash': { text: 'This stash is embarrassing...' },
   'stage-sign': {
-    text: 'Look out for the Electric OAKS!',
+    text: 'Tune in to the Electric OAKS!',
     url: 'https://www.instagram.com/electricoaksband/',
     display_link: 'Instagram',
   },

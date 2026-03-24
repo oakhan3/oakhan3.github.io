@@ -56,7 +56,10 @@ export class DialogBox {
     this.indicator = scene.add.graphics()
     this.indicator.fillStyle(BORDER_COLOR, 1)
     this.indicator.fillTriangle(0, 0, INDICATOR_SIZE * 2, 0, INDICATOR_SIZE, INDICATOR_SIZE)
-    this.indicator.setPosition(boxWidth - BOX_PADDING - INDICATOR_SIZE * 2, boxHeight - BOX_PADDING - INDICATOR_SIZE)
+    this.indicator.setPosition(
+      boxWidth - BOX_PADDING - INDICATOR_SIZE * 2,
+      boxHeight - BOX_PADDING - INDICATOR_SIZE * 2,
+    )
     this.indicator.setVisible(false)
 
     this.container = scene.add.container(BOX_MARGIN, boxY, [background, this.textObject, this.indicator])
@@ -68,11 +71,17 @@ export class DialogBox {
 
     // NOTE: Link button sits outside the container so its interactive hit area is
     // computed in screen space, matching its scrollFactor(0) visual position.
-    this.linkButton = scene.add.text(BOX_MARGIN + BOX_PADDING, boxY + boxHeight - BOX_PADDING - 11, '[ open link ]', {
-      fontFamily: '"Press Start 2P"',
-      fontSize,
-      color: '#60a5fa',
-    })
+    this.linkButton = scene.add.text(
+      screenWidth - BOX_MARGIN - BOX_PADDING - INDICATOR_SIZE * 4,
+      boxY + boxHeight - BOX_PADDING - 11,
+      '[ open link ]',
+      {
+        fontFamily: '"Press Start 2P"',
+        fontSize,
+        color: '#60a5fa',
+      },
+    )
+    this.linkButton.setOrigin(1, 0)
     this.linkButton.setScrollFactor(0)
     this.linkButton.setDepth(DEPTH_DIALOG + 1)
     this.linkButton.setVisible(false)

@@ -104,8 +104,11 @@ export class OverworldScene extends Phaser.Scene {
     }
     this.interactionSystem = createInteractionSystem(this, map, player, this.playerController, dialog)
     this.playerController.freeze()
-    dialog.show("Hi, I'm Omar Ali Khan! Welcome to my page.", undefined, undefined, () =>
-      this.playerController.unfreeze(),
+    dialog.show(
+      "Welcome, I'm Omar Ali Khan! Feel free to look around!\n\nTry tapping or hitting 'Enter' on the signs.",
+      undefined,
+      undefined,
+      () => this.playerController.unfreeze(),
     )
   }
 
