@@ -4,7 +4,14 @@ import { PlayerSprite } from '../../lib/player/PlayerSprite'
 import { PlayerController } from '../../lib/player/PlayerController'
 import { TouchControls } from '../../lib/mobile/TouchControls'
 import { GBA_WIDTH, GBA_HEIGHT } from '../../config'
-import { createMinimalGame, waitForScene, delay, simulateKeyDown, simulateKeyUp } from '../testing'
+import {
+  createMinimalGame,
+  waitForScene,
+  delay,
+  simulateKeyDown,
+  simulateKeyUp,
+  createStubPlayerAnimations,
+} from '../testing'
 
 class PlayerTestScene extends Phaser.Scene {
   player!: PlayerSprite
@@ -21,10 +28,7 @@ class PlayerTestScene extends Phaser.Scene {
   }
 
   create() {
-    // NOTE: Stub animations so PlayerController's anims.play() calls don't warn or throw.
-    for (const key of ['walk-right', 'walk-up', 'walk-down']) {
-      this.anims.create({ key, frames: [{ key: 'player', frame: 0 }], frameRate: 8, repeat: -1 })
-    }
+    createStubPlayerAnimations(this)
     const touchControls = new TouchControls(this)
     this.player = new PlayerSprite(this, GBA_WIDTH / 2, GBA_HEIGHT / 2)
     this.controller = new PlayerController(this, this.player, touchControls)

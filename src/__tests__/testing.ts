@@ -83,6 +83,14 @@ export function simulatePointerMove(game: Phaser.Game, gameX: number, gameY: num
   game.canvas.dispatchEvent(new MouseEvent('mousemove', { clientX: pageX, clientY: pageY, button: 0, bubbles: true }))
 }
 
+// NOTE: Test scenes that create a PlayerController need stub animations registered,
+// otherwise PlayerController.update() warns on every frame when it calls anims.play().
+export function createStubPlayerAnimations(scene: Phaser.Scene): void {
+  for (const key of ['walk-right', 'walk-up', 'walk-down']) {
+    scene.anims.create({ key, frames: [{ key: 'player', frame: 0 }], frameRate: 8, repeat: -1 })
+  }
+}
+
 export function findPlayerController(scene: Phaser.Scene): PlayerController {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (scene as any).playerController

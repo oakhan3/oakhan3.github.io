@@ -5,7 +5,14 @@ import { PlayerSprite } from '../../lib/player/PlayerSprite'
 import { PlayerController } from '../../lib/player/PlayerController'
 import { TouchControls } from '../../lib/mobile/TouchControls'
 import { GBA_HEIGHT } from '../../config'
-import { createMinimalGame, waitForScene, delay, simulateKeyDown, simulateKeyUp } from '../testing'
+import {
+  createMinimalGame,
+  waitForScene,
+  delay,
+  simulateKeyDown,
+  simulateKeyUp,
+  createStubPlayerAnimations,
+} from '../testing'
 import collisionMapData from '../fixtures/collision-map.json'
 
 // NOTE: The fixture places a 32px-wide wall at x=200 spanning the full map height.
@@ -28,6 +35,8 @@ class CollisionTestScene extends Phaser.Scene {
   }
 
   create() {
+    createStubPlayerAnimations(this)
+
     const map = this.make.tilemap({ key: 'collision-map' })
     createObjectCollisions(this, map, { collisionLayer: 'Collisions', interactablesLayer: 'Interactables' })
 
