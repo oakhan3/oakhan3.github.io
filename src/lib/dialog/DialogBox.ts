@@ -1,21 +1,15 @@
 import Phaser from 'phaser'
-import { GBA_WIDTH, GBA_HEIGHT, DEPTH_DIALOG } from '../../config'
+import { DEPTH_DIALOG } from '../../config'
 
 const BOX_MARGIN = 8
 const BOX_PADDING = 10
 const BOX_HEIGHT = 56
-const BOX_Y = GBA_HEIGHT - BOX_HEIGHT - BOX_MARGIN
-const BOX_WIDTH = GBA_WIDTH - BOX_MARGIN * 2
 const TYPEWRITER_DELAY = 35
 const BORDER_COLOR = 0xe2e8f0
 const BACKGROUND_COLOR = 0x1a1b2e
 const BACKGROUND_ALPHA = 0.92
 const INDICATOR_SIZE = 5
 const INDICATOR_BLINK_DURATION = 400
-// NOTE: Link button is positioned in screen space at bottom-left of the dialog box.
-// Lives outside the container so setInteractive() hit-tests correctly with scrollFactor(0).
-const LINK_BUTTON_X = BOX_MARGIN + BOX_PADDING
-const LINK_BUTTON_Y = BOX_Y + BOX_HEIGHT - BOX_PADDING - 11
 
 export class DialogBox {
   private scene: Phaser.Scene
@@ -35,17 +29,26 @@ export class DialogBox {
   constructor(scene: Phaser.Scene) {
     this.scene = scene
 
+    // NOTE: Computed from actual canvas size so the dialog sits 20% from the
+    // bottom on any screen, including expanded mobile viewports.
+    const screenWidth = scene.scale.width
+    const screenHeight = scene.scale.height
+    const boxWidth = screenWidth - BOX_MARGIN * 2
+    const boxY = screenHeight * 0.7
+    const isMobile = screenWidth < 768 || /Mobi|Android/i.test(navigator.userAgent)
+    const fontSize = isMobile ? '10px' : '5px'
+
     const background = scene.add.graphics()
     background.fillStyle(BACKGROUND_COLOR, BACKGROUND_ALPHA)
-    background.fillRoundedRect(0, 0, BOX_WIDTH, BOX_HEIGHT, 4)
+    background.fillRoundedRect(0, 0, boxWidth, BOX_HEIGHT, 4)
     background.lineStyle(2, BORDER_COLOR, 1)
-    background.strokeRoundedRect(0, 0, BOX_WIDTH, BOX_HEIGHT, 4)
+    background.strokeRoundedRect(0, 0, boxWidth, BOX_HEIGHT, 4)
 
     this.textObject = scene.add.text(BOX_PADDING, BOX_PADDING, '', {
       fontFamily: '"Press Start 2P"',
-      fontSize: '7px',
+      fontSize,
       color: '#e2e8f0',
-      wordWrap: { width: BOX_WIDTH - BOX_PADDING * 2 },
+      wordWrap: { width: boxWidth - BOX_PADDING * 2 },
       lineSpacing: 6,
     })
 
@@ -53,10 +56,10 @@ export class DialogBox {
     this.indicator = scene.add.graphics()
     this.indicator.fillStyle(BORDER_COLOR, 1)
     this.indicator.fillTriangle(0, 0, INDICATOR_SIZE * 2, 0, INDICATOR_SIZE, INDICATOR_SIZE)
-    this.indicator.setPosition(BOX_WIDTH - BOX_PADDING - INDICATOR_SIZE * 2, BOX_HEIGHT - BOX_PADDING - INDICATOR_SIZE)
+    this.indicator.setPosition(boxWidth - BOX_PADDING - INDICATOR_SIZE * 2, BOX_HEIGHT - BOX_PADDING - INDICATOR_SIZE)
     this.indicator.setVisible(false)
 
-    this.container = scene.add.container(BOX_MARGIN, BOX_Y, [background, this.textObject, this.indicator])
+    this.container = scene.add.container(BOX_MARGIN, boxY, [background, this.textObject, this.indicator])
     // NOTE: scrollFactor(0) pins the dialog to the screen, not the world — it stays
     // at the bottom of the viewport regardless of camera position.
     this.container.setScrollFactor(0)
@@ -65,9 +68,9 @@ export class DialogBox {
 
     // NOTE: Link button sits outside the container so its interactive hit area is
     // computed in screen space, matching its scrollFactor(0) visual position.
-    this.linkButton = scene.add.text(LINK_BUTTON_X, LINK_BUTTON_Y, '[ open link ]', {
+    this.linkButton = scene.add.text(BOX_MARGIN + BOX_PADDING, boxY + BOX_HEIGHT - BOX_PADDING - 11, '[ open link ]', {
       fontFamily: '"Press Start 2P"',
-      fontSize: '6px',
+      fontSize,
       color: '#60a5fa',
     })
     this.linkButton.setScrollFactor(0)
@@ -79,6 +82,10 @@ export class DialogBox {
     })
 
     this.advanceKeys = [scene.input.keyboard!.addKey('SPACE'), scene.input.keyboard!.addKey('ENTER')]
+  }
+
+  getGameObjects(): Phaser.GameObjects.GameObject[] {
+    return [this.container, this.linkButton]
   }
 
   isOpen(): boolean {

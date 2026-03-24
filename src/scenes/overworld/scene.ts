@@ -91,6 +91,17 @@ export class OverworldScene extends Phaser.Scene {
     this.playerController = new PlayerController(this, player, touchControls)
 
     const dialog = new DialogBox(this)
+
+    if (window.innerWidth < 768 || /Mobi|Android/i.test(navigator.userAgent)) {
+      this.cameras.main.setZoom(2)
+      // NOTE: A second camera at zoom 1 renders UI elements (dialog) so they
+      // are not affected by the main camera's zoom. The main camera ignores
+      // dialog objects; the UI camera ignores everything else.
+      const uiCamera = this.cameras.add(0, 0, this.scale.width, this.scale.height)
+      this.cameras.main.ignore(dialog.getGameObjects())
+      const dialogSet = new Set(dialog.getGameObjects())
+      uiCamera.ignore(this.children.list.filter((obj) => !dialogSet.has(obj)))
+    }
     this.interactionSystem = createInteractionSystem(this, map, player, this.playerController, dialog)
     this.playerController.freeze()
     dialog.show("Hi, I'm Omar Ali Khan! Welcome to my page.", undefined, undefined, () =>

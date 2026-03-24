@@ -11,7 +11,7 @@ export const GAME_CONFIG: Phaser.Types.Core.GameConfig = {
   pixelArt: true,
   roundPixels: true,
   scale: {
-    mode: Phaser.Scale.FIT,
+    mode: Phaser.Scale.EXPAND,
     autoCenter: Phaser.Scale.CENTER_BOTH,
     width: GBA_WIDTH,
     height: GBA_HEIGHT,
