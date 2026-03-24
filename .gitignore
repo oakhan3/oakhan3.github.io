@@ -4,3 +4,4 @@ dist/
 *.tiled-project
 *.tiled-session
 .claude
+coverage/
