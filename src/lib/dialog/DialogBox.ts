@@ -30,6 +30,7 @@ export class DialogBox {
   private indicatorTween: Phaser.Tweens.Tween | null = null
   private linkButton: Phaser.GameObjects.Text
   private currentUrl: string | null = null
+  private _displayLink: string | null = null
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene
@@ -84,12 +85,10 @@ export class DialogBox {
     return this.container.visible
   }
 
-  show(text: string, onClose?: () => void): void {
-    // NOTE: Extract a URL from the message so it can be shown as an interactive link
-    // button. The URL is stripped from the typewriter text to keep the display clean.
-    const urlMatch = text.match(/https?:\/\/\S+/)
-    this.currentUrl = urlMatch ? urlMatch[0] : null
-    this.fullText = this.currentUrl ? text.replace(this.currentUrl, '').trim() : text
+  show(text: string, url?: string, displayLink?: string, onClose?: () => void): void {
+    this.currentUrl = url ?? null
+    this.fullText = text
+    this._displayLink = displayLink ?? null
 
     this.displayedLength = 0
     this.onClose = onClose ?? null
@@ -152,7 +151,10 @@ export class DialogBox {
     })
     // NOTE: Only show the link button once typing is done so the player can read
     // the message before the link becomes clickable.
-    if (this.currentUrl) this.linkButton.setVisible(true)
+    if (this.currentUrl) {
+      this.linkButton.setText(`[ ${this._displayLink ?? 'open link'} ]`)
+      this.linkButton.setVisible(true)
+    }
   }
 
   private hideIndicator(): void {
@@ -177,6 +179,7 @@ export class DialogBox {
       this.typewriterTimer = null
     }
     this.currentUrl = null
+    this._displayLink = null
     if (this.onClose) {
       this.onClose()
     }

@@ -45,7 +45,7 @@ class InteractionTestScene extends Phaser.Scene {
     } as unknown as Phaser.Tilemaps.Tilemap
     this.interactionSystem = new InteractionSystem(this, map, player, controller, dialog, {
       radius: 32,
-      messages: { sign: 'Hello!' },
+      messages: { sign: { text: 'Hello!' } },
     })
   }
 

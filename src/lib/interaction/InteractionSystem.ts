@@ -4,9 +4,15 @@ import { computeCentroid } from '../collision'
 import { PlayerController } from '../player/PlayerController'
 import { DialogBox } from '../dialog/DialogBox'
 
+export interface Message {
+  text: string
+  url?: string
+  display_link?: string
+}
+
 export interface InteractionConfig {
   radius: number
-  messages: Record<string, string>
+  messages: Record<string, Message>
 }
 
 interface Interactable {
@@ -92,7 +98,7 @@ export class InteractionSystem {
     if (!message) return
 
     this.playerController.freeze()
-    this.dialog.show(message, () => {
+    this.dialog.show(message.text, message.url, message.display_link, () => {
       this.playerController.unfreeze()
       // NOTE: Clear all key states so the key that dismissed the dialog
       // cannot immediately re-trigger an interaction in the same frame.

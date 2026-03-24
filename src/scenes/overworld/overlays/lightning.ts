@@ -8,8 +8,8 @@ const TARGET_TILE_Y = 8
 
 // NOTE: Random interval range between strikes (milliseconds). The bolt fires
 // at a random time within this window, creating unpredictable timing.
-const MIN_INTERVAL_MS = 1000
-const MAX_INTERVAL_MS = 3000
+const MIN_INTERVAL_MS = 500
+const MAX_INTERVAL_MS = 1500
 
 // NOTE: How long the bolt stays visible (milliseconds). Short duration
 // creates a fast, snappy flash.

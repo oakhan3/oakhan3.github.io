@@ -146,7 +146,7 @@ describe('dialog box', () => {
     const scene = (await waitForScene(game, 'DialogTestScene')) as DialogTestScene
 
     let closed = false
-    scene.dialogBox.show('Hello world', () => {
+    scene.dialogBox.show('Hello world', undefined, undefined, () => {
       closed = true
     })
 
