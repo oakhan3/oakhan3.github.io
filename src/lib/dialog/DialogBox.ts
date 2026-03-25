@@ -1,7 +1,9 @@
 import Phaser from 'phaser'
 import {
   DEPTH_DIALOG,
+  DIALOG_LINK_BTN_ROW_HEIGHT,
   isMobile,
+  UI_BORDER_COLOR,
   UI_CHROME_ALPHA,
   UI_CHROME_PADDING,
   UI_FONT_FAMILY,
@@ -60,7 +62,7 @@ export class DialogBox {
 
     // NOTE: Small downward triangle at bottom-right of the box, classic GBA "press to continue" cue.
     this.indicator = scene.add.graphics()
-    this.indicator.fillStyle(0xe2e8f0, 1)
+    this.indicator.fillStyle(UI_BORDER_COLOR, 1)
     this.indicator.fillTriangle(0, 0, INDICATOR_SIZE * 2, 0, INDICATOR_SIZE, INDICATOR_SIZE)
     this.indicator.setPosition(
       boxWidth - UI_CHROME_PADDING - INDICATOR_SIZE * 2,
@@ -79,7 +81,7 @@ export class DialogBox {
     // computed in screen space, matching its scrollFactor(0) visual position.
     this.linkButton = scene.add.text(
       screenWidth - BOX_MARGIN - UI_CHROME_PADDING - INDICATOR_SIZE * 4,
-      boxY + boxHeight - UI_CHROME_PADDING - 27,
+      boxY + boxHeight - UI_CHROME_PADDING - DIALOG_LINK_BTN_ROW_HEIGHT,
       '[ open link ]',
       {
         fontFamily: UI_FONT_FAMILY,

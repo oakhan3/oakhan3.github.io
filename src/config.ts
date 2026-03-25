@@ -67,6 +67,16 @@ export const UI_TEXT_LINE_SPACING = 6
 export const QUEST_BTN_BACKGROUND_COLOR = 0x1e3a5f
 export const QUEST_BTN_BORDER_COLOR = 0xf97316
 export const QUEST_BTN_MARGIN = 8
+// NOTE: Extra hit-area padding applied on mobile so the small button is easy to tap.
+// Applied via setPadding(), which enlarges the text canvas — the label position is
+// offset by the same amount so the text stays visually centered.
+export const QUEST_BTN_HIT_PADDING_X = 28
+export const QUEST_BTN_HIT_PADDING_Y = 20
+
+// NOTE: Approximate rendered height of one text row in the dialog box (font height +
+// vertical buffer). Used to vertically position the link button inside the box.
+// Tuned visually for "Press Start 2P" at the dialog font sizes.
+export const DIALOG_LINK_BTN_ROW_HEIGHT = 27
 
 // NOTE: Returns true when the viewport is phone-width. Use this everywhere
 // instead of inlining the threshold, so the breakpoint is defined once.

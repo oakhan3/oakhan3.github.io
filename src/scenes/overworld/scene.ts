@@ -18,6 +18,8 @@ import {
   DEPTH_ABOVE_PLAYER,
   QUEST_BTN_BACKGROUND_COLOR,
   QUEST_BTN_BORDER_COLOR,
+  QUEST_BTN_HIT_PADDING_X,
+  QUEST_BTN_HIT_PADDING_Y,
   QUEST_BTN_MARGIN,
   UI_CHROME_ALPHA,
   UI_FONT_FAMILY,
@@ -187,7 +189,7 @@ function _createQuestButton(
   // beyond the visible text — same technique used for the dialog link button.
   // The label position is offset by the padding amount so the text stays
   // visually centered within the button background.
-  const hitPadding = mobile ? { x: 28, y: 20 } : { x: 0, y: 0 }
+  const hitPadding = mobile ? { x: QUEST_BTN_HIT_PADDING_X, y: QUEST_BTN_HIT_PADDING_Y } : { x: 0, y: 0 }
   const label = scene.add.text(btnPadding - hitPadding.x, btnPadding - hitPadding.y, 'Quests', {
     fontFamily: UI_FONT_FAMILY,
     fontSize: btnFontSize,
