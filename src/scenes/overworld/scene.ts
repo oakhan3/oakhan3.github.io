@@ -175,6 +175,24 @@ export class OverworldScene extends Phaser.Scene {
         const quest = questSystem.complete(name)
         if (quest) completionBanner.show(quest.label)
       },
+      (() => {
+        let shown = false
+        return (name: string) => {
+          // NOTE: Show congratulations after the interaction dialog closes so it
+          // does not get overwritten by the interaction dialog itself.
+          // Guard with a flag so it only fires once.
+          if (!shown && questSystem.isComplete(name) && questSystem.isAllComplete()) {
+            shown = true
+            this.playerController.freeze()
+            dialog.show(
+              'Thanks for stopping by! This started as a small experiment and turned into a fun way to explore map building, try game dev with Phaser, and get more familiar with frontend ecosystems. Hope you enjoyed it. Check back later, I might sneak in a few more updates!',
+              undefined,
+              undefined,
+              () => this.playerController.unfreeze(),
+            )
+          }
+        }
+      })(),
     )
     this.playerController.freeze()
     const signHint = window.innerWidth < 768 ? 'Tapping' : "Hitting 'Enter'"

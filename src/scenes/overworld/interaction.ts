@@ -59,11 +59,13 @@ export function createInteractionSystem(
   playerController: PlayerController,
   dialog: DialogBox,
   onInteract?: (name: string) => void,
+  onDialogClose?: (name: string) => void,
 ): InteractionSystem {
   const config: InteractionConfig = {
     radius: INTERACTION_RADIUS,
     messages: MESSAGES,
     onInteract,
+    onDialogClose,
   }
   return new InteractionSystem(scene, map, player, playerController, dialog, config)
 }

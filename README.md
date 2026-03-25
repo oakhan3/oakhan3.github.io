@@ -70,4 +70,4 @@ src/
 
 ## Known Issues
 
-- **Phaser bug: MatterTileBody crashes on flipped tiles** — `convertTilemapLayer` crashes with `TypeError: Cannot read properties of null (reading 'inertia')` when a colliding tile has `flipX` or `flipY` set. Workaround applied in `scene.ts`: collision is cleared on flipped tiles before conversion. Filed as [phaserjs/phaser#7247](https://github.com/phaserjs/phaser/issues/7247).
+- **Phaser bug: MatterTileBody crashes on flipped tiles** — `convertTilemapLayer` crashes with `TypeError: Cannot read properties of null (reading 'inertia')` when a colliding tile has `flipX` or `flipY` set. Workaround applied in `scene.ts`: collision is cleared on flipped tiles before conversion. Filed as [phaserjs/phaser#7247](https://github.com/phaserjs/phaser/issues/7267).

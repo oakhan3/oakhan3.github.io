@@ -25,6 +25,11 @@ export class QuestSystem {
     return this.completed.has(name)
   }
 
+  // Returns true when all quests with a real name (non-'???') are completed.
+  isAllComplete(): boolean {
+    return this.quests.filter((quest) => quest.name !== '???').every((quest) => this.completed.has(quest.name))
+  }
+
   getAll(): Array<Quest & { completed: boolean }> {
     return this.quests.map((quest) => ({ ...quest, completed: this.completed.has(quest.name) }))
   }

@@ -14,6 +14,9 @@ export interface InteractionConfig {
   radius: number
   messages: Record<string, Message>
   onInteract?: (name: string) => void
+  // NOTE: Called after the interaction dialog closes, with the name of the
+  // interactable. Useful for chaining a follow-up dialog after the interaction.
+  onDialogClose?: (name: string) => void
 }
 
 interface Interactable {
@@ -100,12 +103,14 @@ export class InteractionSystem {
     if (!message) return
 
     this.playerController.freeze()
-    this.config.onInteract?.(nearby.name)
+    const interactableName = nearby.name
+    this.config.onInteract?.(interactableName)
     this.dialog.show(message.text, message.url, message.display_link, () => {
       this.playerController.unfreeze()
       // NOTE: Clear all key states so the key that dismissed the dialog
       // cannot immediately re-trigger an interaction in the same frame.
       this.scene.input.keyboard!.resetKeys()
+      this.config.onDialogClose?.(interactableName)
     })
   }
 
