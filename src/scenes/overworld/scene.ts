@@ -10,7 +10,7 @@ import { createSparkleOverlay } from './overlays/sparkle'
 import { createInteractionSystem, QUEST_DEFINITIONS } from './interaction'
 import { setupPlayerAnimations } from './player'
 import { InteractionSystem } from '../../lib/interaction'
-import { QuestSystem, CompletionBanner, QuestOverlay } from '../../lib/quests'
+import { QuestSystem, CompletionBanner, QuestOverlay, CongratulatoryOverlay } from '../../lib/quests'
 import { DEPTH_QUEST_UI, MOBILE_UI_TOP_OFFSET, DEPTH_ABOVE_PLAYER } from '../../config'
 
 interface LayerConfig {
@@ -94,6 +94,7 @@ export class OverworldScene extends Phaser.Scene {
     const questSystem = new QuestSystem(QUEST_DEFINITIONS)
     const completionBanner = new CompletionBanner(this)
     const questOverlay = new QuestOverlay(this)
+    const congratulatoryOverlay = new CongratulatoryOverlay(this)
 
     // NOTE: Quest button in the top-right corner — styled like the dialog box.
     const isMobile = window.innerWidth < 768
@@ -157,6 +158,7 @@ export class OverworldScene extends Phaser.Scene {
         ...dialog.getGameObjects(),
         ...completionBanner.getGameObjects(),
         ...questOverlay.getGameObjects(),
+        ...congratulatoryOverlay.getGameObjects(),
         questIcon,
         questZone,
       ]
@@ -183,12 +185,12 @@ export class OverworldScene extends Phaser.Scene {
           // Guard with a flag so it only fires once.
           if (!shown && questSystem.isComplete(name) && questSystem.isAllComplete()) {
             shown = true
-            this.playerController.freeze()
-            dialog.show(
-              'Thanks for stopping by! This started as a small experiment and turned into a fun way to explore map building, try game dev with Phaser, and get more familiar with frontend ecosystems. Hope you enjoyed it. Check back later, I might sneak in a few more updates!',
-              undefined,
-              undefined,
-              () => this.playerController.unfreeze(),
+            congratulatoryOverlay.show(
+              `Thanks for stopping by!
+
+This started as a small experiment and turned into a fun way to explore map building, try game dev with Phaser, and get more familiar with frontend ecosystems.
+
+Hope you enjoyed it. Check back later, I might sneak in a few more updates!`,
             )
           }
         }
