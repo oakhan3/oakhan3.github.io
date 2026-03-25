@@ -39,3 +39,27 @@ export const MOBILE_UI_TOP_OFFSET = 70
 export const UI_BACKGROUND_COLOR = 0x1a1b2e
 export const UI_BORDER_COLOR = 0xe2e8f0
 export const UI_FONT_FAMILY = '"Press Start 2P"'
+
+// NOTE: Text colors used across UI components.
+export const UI_TEXT_COLOR = '#e2e8f0'
+export const UI_SUCCESS_COLOR = '#86efac'
+export const UI_MUTED_COLOR = '#94a3b8'
+export const UI_HINT_COLOR = '#64748b'
+export const UI_LINK_COLOR = '#60a5fa'
+
+// NOTE: Alpha and padding for compact chrome UI (dialog box, completion banner).
+// These intentionally differ from BACKGROUND_ALPHA / BOX_PADDING in quests/constants.ts,
+// which are for full-screen overlays.
+export const UI_CHROME_ALPHA = 0.92
+export const UI_CHROME_PADDING = 10
+
+// NOTE: Text line spacing used in dialog and banner label text objects.
+export const UI_TEXT_LINE_SPACING = 6
+
+// NOTE: Quest button colors — distinct from the general UI palette.
+export const QUEST_BTN_BACKGROUND_COLOR = 0x1e3a5f
+export const QUEST_BTN_BORDER_COLOR = 0xf97316
+
+// NOTE: Returns true when the viewport is phone-width. Use this everywhere
+// instead of inlining the threshold, so the breakpoint is defined once.
+export const isMobile = (): boolean => window.innerWidth < 768

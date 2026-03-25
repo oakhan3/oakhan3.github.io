@@ -1,17 +1,23 @@
 import Phaser from 'phaser'
 import {
   DEPTH_QUEST_UI,
+  isMobile,
   MOBILE_UI_TOP_OFFSET,
-  UI_BACKGROUND_COLOR,
-  UI_BORDER_COLOR,
+  UI_CHROME_ALPHA,
+  UI_CHROME_PADDING,
   UI_FONT_FAMILY,
+  UI_TEXT_COLOR,
+  UI_TEXT_LINE_SPACING,
 } from '../../config'
+import { createRoundedBackground } from '../ui'
 
-const BOX_PADDING = 10
 // NOTE: Banner is narrower than the full screen so it doesn't cover the quest icon in the top-right.
 const BANNER_MAX_WIDTH = 300
 const BANNER_MARGIN_TOP = 8
-const BACKGROUND_ALPHA = 0.92
+const BANNER_FONT_MOBILE = '10px'
+const BANNER_FONT_DESKTOP = '8px'
+const BANNER_HEIGHT_MOBILE = 45
+const BANNER_HEIGHT_DESKTOP = 38
 const HOLD_DURATION = 2000
 const SLIDE_DURATION = 300
 
@@ -24,25 +30,21 @@ export class CompletionBanner {
   constructor(scene: Phaser.Scene) {
     this.scene = scene
 
-    const isMobile = window.innerWidth < 768
-    const fontSize = isMobile ? '10px' : '8px'
-    const boxHeight = isMobile ? 45 : 38
+    const mobile = isMobile()
+    const fontSize = mobile ? BANNER_FONT_MOBILE : BANNER_FONT_DESKTOP
+    const boxHeight = mobile ? BANNER_HEIGHT_MOBILE : BANNER_HEIGHT_DESKTOP
     // NOTE: Centered narrow banner — leaves the top-right corner free for the quest icon.
-    const boxWidth = Math.min(BANNER_MAX_WIDTH, scene.scale.width - BOX_PADDING * 4)
+    const boxWidth = Math.min(BANNER_MAX_WIDTH, scene.scale.width - UI_CHROME_PADDING * 4)
     const boxX = Math.floor((scene.scale.width - boxWidth) / 2)
 
-    const background = scene.add.graphics()
-    background.fillStyle(UI_BACKGROUND_COLOR, BACKGROUND_ALPHA)
-    background.fillRoundedRect(0, 0, boxWidth, boxHeight, 4)
-    background.lineStyle(2, UI_BORDER_COLOR, 1)
-    background.strokeRoundedRect(0, 0, boxWidth, boxHeight, 4)
+    const background = createRoundedBackground(scene, boxWidth, boxHeight, UI_CHROME_ALPHA)
 
-    this.label = scene.add.text(BOX_PADDING, BOX_PADDING, '', {
+    this.label = scene.add.text(UI_CHROME_PADDING, UI_CHROME_PADDING, '', {
       fontFamily: UI_FONT_FAMILY,
       fontSize,
-      color: '#e2e8f0',
-      wordWrap: { width: boxWidth - BOX_PADDING * 2 },
-      lineSpacing: 6,
+      color: UI_TEXT_COLOR,
+      wordWrap: { width: boxWidth - UI_CHROME_PADDING * 2 },
+      lineSpacing: UI_TEXT_LINE_SPACING,
     })
 
     this.container = scene.add.container(boxX, -boxHeight, [background, this.label])
@@ -69,7 +71,7 @@ export class CompletionBanner {
       targets: this.container,
       tweens: [
         {
-          y: window.innerWidth < 768 ? MOBILE_UI_TOP_OFFSET : BANNER_MARGIN_TOP,
+          y: isMobile() ? MOBILE_UI_TOP_OFFSET : BANNER_MARGIN_TOP,
           duration: SLIDE_DURATION,
           ease: 'Power2',
         },

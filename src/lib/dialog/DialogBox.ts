@@ -1,10 +1,22 @@
 import Phaser from 'phaser'
-import { DEPTH_DIALOG, UI_BACKGROUND_COLOR, UI_BORDER_COLOR, UI_FONT_FAMILY } from '../../config'
+import {
+  DEPTH_DIALOG,
+  isMobile,
+  UI_CHROME_ALPHA,
+  UI_CHROME_PADDING,
+  UI_FONT_FAMILY,
+  UI_LINK_COLOR,
+  UI_TEXT_COLOR,
+  UI_TEXT_LINE_SPACING,
+} from '../../config'
+import { createRoundedBackground } from '../ui'
 
 const BOX_MARGIN = 8
-const BOX_PADDING = 10
+const DIALOG_FONT_MOBILE = '12px'
+const DIALOG_FONT_DESKTOP = '8px'
+const DIALOG_HEIGHT_MOBILE = 80
+const DIALOG_HEIGHT_DESKTOP = 66
 const TYPEWRITER_DELAY = 15
-const BACKGROUND_ALPHA = 0.92
 const INDICATOR_SIZE = 5
 const INDICATOR_BLINK_DURATION = 400
 
@@ -32,31 +44,27 @@ export class DialogBox {
     const screenHeight = scene.scale.height
     const boxWidth = screenWidth - BOX_MARGIN * 2
     const boxY = screenHeight * 0.7
-    const isMobile = window.innerWidth < 768
-    const fontSize = isMobile ? '12px' : '8px'
-    const boxHeight = isMobile ? 80 : 66
+    const mobile = isMobile()
+    const fontSize = mobile ? DIALOG_FONT_MOBILE : DIALOG_FONT_DESKTOP
+    const boxHeight = mobile ? DIALOG_HEIGHT_MOBILE : DIALOG_HEIGHT_DESKTOP
 
-    const background = scene.add.graphics()
-    background.fillStyle(UI_BACKGROUND_COLOR, BACKGROUND_ALPHA)
-    background.fillRoundedRect(0, 0, boxWidth, boxHeight, 4)
-    background.lineStyle(2, UI_BORDER_COLOR, 1)
-    background.strokeRoundedRect(0, 0, boxWidth, boxHeight, 4)
+    const background = createRoundedBackground(scene, boxWidth, boxHeight, UI_CHROME_ALPHA)
 
-    this.textObject = scene.add.text(BOX_PADDING, BOX_PADDING, '', {
+    this.textObject = scene.add.text(UI_CHROME_PADDING, UI_CHROME_PADDING, '', {
       fontFamily: UI_FONT_FAMILY,
       fontSize,
-      color: '#e2e8f0',
-      wordWrap: { width: boxWidth - BOX_PADDING * 2 },
-      lineSpacing: 6,
+      color: UI_TEXT_COLOR,
+      wordWrap: { width: boxWidth - UI_CHROME_PADDING * 2 },
+      lineSpacing: UI_TEXT_LINE_SPACING,
     })
 
     // NOTE: Small downward triangle at bottom-right of the box, classic GBA "press to continue" cue.
     this.indicator = scene.add.graphics()
-    this.indicator.fillStyle(UI_BORDER_COLOR, 1)
+    this.indicator.fillStyle(0xe2e8f0, 1)
     this.indicator.fillTriangle(0, 0, INDICATOR_SIZE * 2, 0, INDICATOR_SIZE, INDICATOR_SIZE)
     this.indicator.setPosition(
-      boxWidth - BOX_PADDING - INDICATOR_SIZE * 2,
-      boxHeight - BOX_PADDING - INDICATOR_SIZE * 2,
+      boxWidth - UI_CHROME_PADDING - INDICATOR_SIZE * 2,
+      boxHeight - UI_CHROME_PADDING - INDICATOR_SIZE * 2,
     )
     this.indicator.setVisible(false)
 
@@ -70,13 +78,13 @@ export class DialogBox {
     // NOTE: Link button sits outside the container so its interactive hit area is
     // computed in screen space, matching its scrollFactor(0) visual position.
     this.linkButton = scene.add.text(
-      screenWidth - BOX_MARGIN - BOX_PADDING - INDICATOR_SIZE * 4,
-      boxY + boxHeight - BOX_PADDING - 27,
+      screenWidth - BOX_MARGIN - UI_CHROME_PADDING - INDICATOR_SIZE * 4,
+      boxY + boxHeight - UI_CHROME_PADDING - 27,
       '[ open link ]',
       {
         fontFamily: UI_FONT_FAMILY,
         fontSize,
-        color: '#60a5fa',
+        color: UI_LINK_COLOR,
       },
     )
     this.linkButton.setOrigin(1, 0)

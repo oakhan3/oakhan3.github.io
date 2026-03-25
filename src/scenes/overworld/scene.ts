@@ -11,7 +11,17 @@ import { createInteractionSystem, QUEST_DEFINITIONS } from './interaction'
 import { setupPlayerAnimations } from './player'
 import { InteractionSystem } from '../../lib/interaction'
 import { QuestSystem, CompletionBanner, QuestOverlay, CongratulatoryOverlay } from '../../lib/quests'
-import { DEPTH_QUEST_UI, MOBILE_UI_TOP_OFFSET, DEPTH_ABOVE_PLAYER } from '../../config'
+import {
+  DEPTH_QUEST_UI,
+  isMobile,
+  MOBILE_UI_TOP_OFFSET,
+  DEPTH_ABOVE_PLAYER,
+  QUEST_BTN_BACKGROUND_COLOR,
+  QUEST_BTN_BORDER_COLOR,
+  UI_CHROME_ALPHA,
+  UI_FONT_FAMILY,
+  UI_TEXT_COLOR,
+} from '../../config'
 
 interface LayerConfig {
   name: string
@@ -97,31 +107,37 @@ export class OverworldScene extends Phaser.Scene {
     const congratulatoryOverlay = new CongratulatoryOverlay(this)
 
     // NOTE: Quest button in the top-right corner — styled like the dialog box.
-    const isMobile = window.innerWidth < 768
-    const btnFontSize = isMobile ? '8px' : '6px'
+    const mobile = isMobile()
+    const BTN_FONT_MOBILE = '8px'
+    const BTN_FONT_DESKTOP = '6px'
+    const BTN_HEIGHT_MOBILE = 22
+    const BTN_HEIGHT_DESKTOP = 18
+    const BTN_WIDTH_MOBILE = 72
+    const BTN_WIDTH_DESKTOP = 60
+    const btnFontSize = mobile ? BTN_FONT_MOBILE : BTN_FONT_DESKTOP
     const btnPadding = 6
-    const btnHeight = isMobile ? 22 : 18
-    const btnWidth = isMobile ? 72 : 60
+    const btnHeight = mobile ? BTN_HEIGHT_MOBILE : BTN_HEIGHT_DESKTOP
+    const btnWidth = mobile ? BTN_WIDTH_MOBILE : BTN_WIDTH_DESKTOP
     const btnX = this.scale.width - 8
-    const btnY = isMobile ? MOBILE_UI_TOP_OFFSET : 8
+    const btnY = mobile ? MOBILE_UI_TOP_OFFSET : 8
 
     const questBtnBg = this.add.graphics()
-    questBtnBg.fillStyle(0x1e3a5f, 0.92)
+    questBtnBg.fillStyle(QUEST_BTN_BACKGROUND_COLOR, UI_CHROME_ALPHA)
     questBtnBg.fillRoundedRect(0, 0, btnWidth, btnHeight, 3)
-    questBtnBg.lineStyle(2, 0xf97316, 1)
+    questBtnBg.lineStyle(2, QUEST_BTN_BORDER_COLOR, 1)
     questBtnBg.strokeRoundedRect(0, 0, btnWidth, btnHeight, 3)
 
     // NOTE: setPadding enlarges the text canvas so the hit area extends well
     // beyond the visible text — same technique used for the dialog link button.
     // The label position is offset by the padding amount so the text stays
     // visually centered within the button background.
-    const hitPadding = isMobile ? { x: 28, y: 20 } : { x: 0, y: 0 }
+    const hitPadding = mobile ? { x: 28, y: 20 } : { x: 0, y: 0 }
     const questBtnLabel = this.add.text(btnPadding - hitPadding.x, btnPadding - hitPadding.y, 'Quests', {
-      fontFamily: '"Press Start 2P"',
+      fontFamily: UI_FONT_FAMILY,
       fontSize: btnFontSize,
-      color: '#e2e8f0',
+      color: UI_TEXT_COLOR,
     })
-    if (isMobile) questBtnLabel.setPadding(hitPadding.x, hitPadding.y, hitPadding.x, hitPadding.y)
+    if (mobile) questBtnLabel.setPadding(hitPadding.x, hitPadding.y, hitPadding.x, hitPadding.y)
     questBtnLabel.setInteractive({ useHandCursor: true })
     questBtnLabel.on(
       'pointerdown',
@@ -148,7 +164,7 @@ export class OverworldScene extends Phaser.Scene {
       },
     )
 
-    if (window.innerWidth < 768) {
+    if (mobile) {
       this.cameras.main.setZoom(2)
       // NOTE: A second camera at zoom 1 renders UI elements (dialog, quest UI) so they
       // are not affected by the main camera's zoom. The main camera ignores
@@ -197,7 +213,7 @@ Hope you enjoyed it. Check back later, I might sneak in a few more updates!`,
       })(),
     )
     this.playerController.freeze()
-    const signHint = window.innerWidth < 768 ? 'Tapping' : "Hitting 'Enter'"
+    const signHint = mobile ? 'Tapping' : "Hitting 'Enter'"
     dialog.show(`Welcome, I'm Omar Ali Khan!\n\nTry ${signHint} on the signs!`, undefined, undefined, () => {
       this.playerController.unfreeze()
       questOverlay.show(questSystem.getAll())

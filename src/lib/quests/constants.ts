@@ -3,3 +3,17 @@ export const BOX_PADDING = 16
 export const LINE_SPACING = 10
 export const DISMISS_HINT_MOBILE = 'Tap to close'
 export const DISMISS_HINT_DESKTOP = "Press 'Enter' to close"
+
+// NOTE: Font sizes for full-screen overlay titles, body text, and hint text.
+export const OVERLAY_TITLE_FONT_MOBILE = '14px'
+export const OVERLAY_TITLE_FONT_DESKTOP = '10px'
+export const OVERLAY_ITEM_FONT_MOBILE = '10px'
+export const OVERLAY_ITEM_FONT_DESKTOP = '8px'
+export const OVERLAY_BODY_FONT_MOBILE = '9px'
+export const OVERLAY_BODY_FONT_DESKTOP = '7px'
+export const OVERLAY_HINT_FONT_MOBILE = '8px'
+export const OVERLAY_HINT_FONT_DESKTOP = '6px'
+export const OVERLAY_BODY_LINE_SPACING = 8
+
+// NOTE: Vertical gap between the bottom of the title and the separator line.
+export const OVERLAY_SEPARATOR_OFFSET = 6

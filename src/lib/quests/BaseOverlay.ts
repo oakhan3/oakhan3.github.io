@@ -1,6 +1,12 @@
 import Phaser from 'phaser'
 import { DEPTH_QUEST_UI, UI_BACKGROUND_COLOR, UI_BORDER_COLOR } from '../../config'
-import { BACKGROUND_ALPHA, DISMISS_HINT_DESKTOP, DISMISS_HINT_MOBILE } from './constants'
+import {
+  BACKGROUND_ALPHA,
+  BOX_PADDING,
+  DISMISS_HINT_DESKTOP,
+  DISMISS_HINT_MOBILE,
+  OVERLAY_SEPARATOR_OFFSET,
+} from './constants'
 
 export abstract class BaseOverlay {
   protected scene: Phaser.Scene
@@ -39,6 +45,37 @@ export abstract class BaseOverlay {
 
   protected get dismissHint(): string {
     return window.innerWidth < 768 ? DISMISS_HINT_MOBILE : DISMISS_HINT_DESKTOP
+  }
+
+  protected _addText(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    text: string,
+    style: Phaser.Types.GameObjects.Text.TextStyle,
+  ): Phaser.GameObjects.Text {
+    const textObj = scene.add.text(x, y, text, style)
+    textObj.setScrollFactor(0)
+    this.contents.push(textObj)
+    return textObj
+  }
+
+  protected _addGraphics(scene: Phaser.Scene): Phaser.GameObjects.Graphics {
+    const graphics = scene.add.graphics()
+    graphics.setScrollFactor(0)
+    this.contents.push(graphics)
+    return graphics
+  }
+
+  // NOTE: Draws a horizontal separator below the given title and returns the
+  // Y position of the separator so callers can position content beneath it.
+  protected _addSeparator(scene: Phaser.Scene, topOffset: number, title: Phaser.GameObjects.Text): number {
+    const screenWidth = scene.scale.width
+    const separatorY = topOffset + title.height + OVERLAY_SEPARATOR_OFFSET
+    const separator = this._addGraphics(scene)
+    separator.lineStyle(1, this.borderColor, 0.5)
+    separator.lineBetween(BOX_PADDING, separatorY, screenWidth - BOX_PADDING, separatorY)
+    return separatorY
   }
 
   protected _show(onDismiss?: () => void): void {
