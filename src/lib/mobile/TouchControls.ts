@@ -41,6 +41,10 @@ export class TouchControls {
     return this.activeDirection
   }
 
+  getGameObjects(): Phaser.GameObjects.Graphics[] {
+    return [this.base, this.knob]
+  }
+
   private handlePointerDown(pointer: Phaser.Input.Pointer): void {
     this.originX = pointer.x
     this.originY = pointer.y

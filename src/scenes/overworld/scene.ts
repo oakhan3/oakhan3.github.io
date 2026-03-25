@@ -111,7 +111,16 @@ export class OverworldScene extends Phaser.Scene {
 
     const { questIcon, questZone } = _createQuestButton(this, questOverlay, questSystem)
 
-    _setupCameras(this, dialog, completionBanner, questOverlay, congratulatoryOverlay, questIcon, questZone)
+    _setupCameras(
+      this,
+      touchControls,
+      dialog,
+      completionBanner,
+      questOverlay,
+      congratulatoryOverlay,
+      questIcon,
+      questZone,
+    )
 
     this.interactionSystem = createInteractionSystem(
       this,
@@ -228,6 +237,7 @@ function _createQuestButton(
 
 function _setupCameras(
   scene: Phaser.Scene,
+  touchControls: TouchControls,
   dialog: DialogBox,
   completionBanner: CompletionBanner,
   questOverlay: QuestOverlay,
@@ -243,6 +253,7 @@ function _setupCameras(
   // UI objects; the UI camera ignores everything else.
   const uiCamera = scene.cameras.add(0, 0, scene.scale.width, scene.scale.height)
   const uiObjects = [
+    ...touchControls.getGameObjects(),
     ...dialog.getGameObjects(),
     ...completionBanner.getGameObjects(),
     ...questOverlay.getGameObjects(),
