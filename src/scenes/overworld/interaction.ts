@@ -3,6 +3,7 @@ import { InteractionSystem } from '../../lib/interaction'
 import { PlayerController } from '../../lib/player'
 import { DialogBox } from '../../lib/dialog'
 import type { InteractionConfig, Message } from '../../lib/interaction'
+import type { Quest } from '../../lib/quests'
 
 // NOTE: Pixel radius around the player's position within which an interactable
 // is considered "in range". ~1.5 tiles gives comfortable trigger distance.
@@ -39,10 +40,16 @@ const MESSAGES: Record<string, Message> = {
   stage: { text: 'When are they coming on???' },
 }
 
-const INTERACTION_CONFIG: InteractionConfig = {
-  radius: INTERACTION_RADIUS,
-  messages: MESSAGES,
-}
+export const QUEST_DEFINITIONS: Quest[] = [
+  { name: 'kiwi-sign', label: "Find Kiwi's Home" },
+  { name: 'office-sign', label: 'Find Omar at work' },
+  { name: 'github-sign', label: "Find Omar's GitHub" },
+  { name: 'stage-sign', label: 'Find the Electric OAKS' },
+  { name: 'kiwi', label: 'Meet Kiwi' },
+  { name: 'car', label: 'Check out the car' },
+  { name: 'github-computer', label: "See what's cooking" },
+  { name: 'secret-lab', label: 'Discover the secret lab' },
+]
 
 export function createInteractionSystem(
   scene: Phaser.Scene,
@@ -50,6 +57,12 @@ export function createInteractionSystem(
   player: Phaser.GameObjects.Sprite,
   playerController: PlayerController,
   dialog: DialogBox,
+  onInteract?: (name: string) => void,
 ): InteractionSystem {
-  return new InteractionSystem(scene, map, player, playerController, dialog, INTERACTION_CONFIG)
+  const config: InteractionConfig = {
+    radius: INTERACTION_RADIUS,
+    messages: MESSAGES,
+    onInteract,
+  }
+  return new InteractionSystem(scene, map, player, playerController, dialog, config)
 }

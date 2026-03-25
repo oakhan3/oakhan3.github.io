@@ -23,6 +23,8 @@ export const DEPTH_JOYSTICK_KNOB = 91
 // NOTE: Lighting overlay sits above game objects but below UI elements.
 export const DEPTH_LIGHTING = 50
 export const DEPTH_DIALOG = 100
+// NOTE: Quest UI (banner, overlay, icon) renders above all other UI.
+export const DEPTH_QUEST_UI = 110
 
 // NOTE: Minimum drag distance (in game pixels) before a touch is treated as
 // a drag rather than a tap. Used by both TouchControls and InteractionSystem.

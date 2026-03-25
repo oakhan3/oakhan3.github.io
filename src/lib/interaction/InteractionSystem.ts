@@ -13,6 +13,7 @@ export interface Message {
 export interface InteractionConfig {
   radius: number
   messages: Record<string, Message>
+  onInteract?: (name: string) => void
 }
 
 interface Interactable {
@@ -99,6 +100,7 @@ export class InteractionSystem {
     if (!message) return
 
     this.playerController.freeze()
+    this.config.onInteract?.(nearby.name)
     this.dialog.show(message.text, message.url, message.display_link, () => {
       this.playerController.unfreeze()
       // NOTE: Clear all key states so the key that dismissed the dialog

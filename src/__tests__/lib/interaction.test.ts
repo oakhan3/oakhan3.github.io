@@ -124,6 +124,47 @@ describe('InteractionSystem', () => {
     expect(container.visible).toBe(false)
   })
 
+  it('onInteract callback fires with the interactable name', async () => {
+    let interactedName: string | null = null
+    const scene = new (class extends Phaser.Scene {
+      constructor() {
+        super({ key: 'OnInteractTestScene' })
+      }
+      preload() {
+        this.textures.generate('player', { data: ['1'], pixelWidth: 48 })
+      }
+      create() {
+        createStubPlayerAnimations(this)
+        const player = new PlayerSprite(this, INTERACTABLE_X, INTERACTABLE_Y)
+        const touchControls = new TouchControls(this)
+        const controller = new PlayerController(this, player, touchControls)
+        const dialog = new DialogBox(this)
+        const map = {
+          getObjectLayer: () => ({
+            objects: [{ name: 'sign', x: INTERACTABLE_X, y: INTERACTABLE_Y }],
+          }),
+        } as unknown as Phaser.Tilemaps.Tilemap
+        const system = new InteractionSystem(this, map, player, controller, dialog, {
+          radius: 32,
+          messages: { sign: { text: 'Hello!' } },
+          onInteract: (name) => {
+            interactedName = name
+          },
+        })
+        this.events.on('update', () => system.update())
+      }
+    })()
+
+    game = createMinimalGame([scene], { physics: true })
+    await waitForScene(game, 'OnInteractTestScene')
+
+    simulatePointerDown(game, INTERACTABLE_X, INTERACTABLE_Y)
+    simulatePointerUp(game, INTERACTABLE_X, INTERACTABLE_Y)
+    await delay(100)
+
+    expect(interactedName).toBe('sign')
+  })
+
   it('tapping while dialog is open does not re-trigger interaction', async () => {
     game = createMinimalGame([InteractionTestScene], { physics: true })
     const scene = (await waitForScene(game, 'InteractionTestScene')) as InteractionTestScene

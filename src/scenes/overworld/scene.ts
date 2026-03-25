@@ -8,9 +8,11 @@ import { createSpotlightOverlay } from './overlays/spotlight'
 import { createLightningOverlay } from './overlays/lightning'
 import { createSparkleOverlay } from './overlays/sparkle'
 import { createCollisions } from './collision'
-import { createInteractionSystem } from './interaction'
+import { createInteractionSystem, QUEST_DEFINITIONS } from './interaction'
 import { setupPlayerAnimations } from './player'
 import { InteractionSystem } from '../../lib/interaction'
+import { QuestSystem, CompletionBanner, QuestOverlay } from '../../lib/quests'
+import { DEPTH_QUEST_UI } from '../../config'
 
 interface LayerConfig {
   name: string
@@ -92,22 +94,84 @@ export class OverworldScene extends Phaser.Scene {
 
     const dialog = new DialogBox(this)
 
+    const questSystem = new QuestSystem(QUEST_DEFINITIONS)
+    const completionBanner = new CompletionBanner(this)
+    const questOverlay = new QuestOverlay(this)
+
+    // NOTE: Quest button in the top-right corner — styled like the dialog box.
+    const isMobile = window.innerWidth < 768
+    const btnFontSize = isMobile ? '8px' : '6px'
+    const btnPadding = 6
+    const btnHeight = isMobile ? 22 : 18
+    const btnWidth = isMobile ? 72 : 60
+    const btnX = this.scale.width - 8
+    const btnY = 8
+
+    const questBtnBg = this.add.graphics()
+    questBtnBg.fillStyle(0x1e3a5f, 0.92)
+    questBtnBg.fillRoundedRect(0, 0, btnWidth, btnHeight, 3)
+    questBtnBg.lineStyle(2, 0xf97316, 1)
+    questBtnBg.strokeRoundedRect(0, 0, btnWidth, btnHeight, 3)
+
+    const questBtnLabel = this.add.text(btnPadding, btnPadding, 'Quests', {
+      fontFamily: '"Press Start 2P"',
+      fontSize: btnFontSize,
+      color: '#e2e8f0',
+    })
+
+    const questIcon = this.add.container(btnX - btnWidth, btnY, [questBtnBg, questBtnLabel])
+    questIcon.setScrollFactor(0)
+    questIcon.setDepth(DEPTH_QUEST_UI)
+    // NOTE: Zone provides a reliable hit area independent of font loading.
+    const questZone = this.add.zone(btnX - btnWidth, btnY, btnWidth, btnHeight).setOrigin(0, 0)
+    questZone.setScrollFactor(0)
+    questZone.setDepth(DEPTH_QUEST_UI)
+    questZone.setInteractive({ useHandCursor: true })
+    questZone.on(
+      'pointerdown',
+      (_pointer: Phaser.Input.Pointer, _localX: number, _localY: number, event: Phaser.Types.Input.EventData) => {
+        // NOTE: Stop propagation so the scene-level 'pointerdown' dismiss listener on
+        // QuestOverlay does not fire for this same click and immediately hide the overlay.
+        event.stopPropagation()
+        questOverlay.show(questSystem.getAll())
+      },
+    )
+
     if (window.innerWidth < 768) {
       this.cameras.main.setZoom(2)
-      // NOTE: A second camera at zoom 1 renders UI elements (dialog) so they
+      // NOTE: A second camera at zoom 1 renders UI elements (dialog, quest UI) so they
       // are not affected by the main camera's zoom. The main camera ignores
-      // dialog objects; the UI camera ignores everything else.
+      // UI objects; the UI camera ignores everything else.
       const uiCamera = this.cameras.add(0, 0, this.scale.width, this.scale.height)
-      this.cameras.main.ignore(dialog.getGameObjects())
-      const dialogSet = new Set(dialog.getGameObjects())
-      uiCamera.ignore(this.children.list.filter((obj) => !dialogSet.has(obj)))
+      const uiObjects = [
+        ...dialog.getGameObjects(),
+        ...completionBanner.getGameObjects(),
+        ...questOverlay.getGameObjects(),
+        questIcon,
+        questZone,
+      ]
+      this.cameras.main.ignore(uiObjects)
+      const uiSet = new Set(uiObjects)
+      uiCamera.ignore(this.children.list.filter((obj) => !uiSet.has(obj)))
     }
-    this.interactionSystem = createInteractionSystem(this, map, player, this.playerController, dialog)
+
+    this.interactionSystem = createInteractionSystem(
+      this,
+      map,
+      player,
+      this.playerController,
+      dialog,
+      (name: string) => {
+        const quest = questSystem.complete(name)
+        if (quest) completionBanner.show(quest.label)
+      },
+    )
     this.playerController.freeze()
     const signHint = window.innerWidth < 768 ? 'Tapping' : "Hitting 'Enter'"
-    dialog.show(`Welcome, I'm Omar Ali Khan!\n\nTry ${signHint} on the signs!`, undefined, undefined, () =>
-      this.playerController.unfreeze(),
-    )
+    dialog.show(`Welcome, I'm Omar Ali Khan!\n\nTry ${signHint} on the signs!`, undefined, undefined, () => {
+      this.playerController.unfreeze()
+      questOverlay.show(questSystem.getAll())
+    })
   }
 
   update(_time: number, delta: number) {
