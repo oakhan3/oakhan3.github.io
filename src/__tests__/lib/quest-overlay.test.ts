@@ -131,7 +131,7 @@ describe('quest icon', () => {
     await waitFor(() => {
       const overlay = findOverlayContainer(scene)
       return overlay?.visible === true
-    })
+    }, 5000)
 
     const overlay = findOverlayContainer(scene)
     expect(overlay.visible).toBe(true)

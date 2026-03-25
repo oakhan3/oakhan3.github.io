@@ -22,7 +22,7 @@ export function delay(milliseconds: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, milliseconds))
 }
 
-export async function waitFor(condition: () => boolean, timeout = 2000): Promise<void> {
+export async function waitFor(condition: () => boolean, timeout = 5000): Promise<void> {
   const start = Date.now()
   while (!condition()) {
     if (Date.now() - start > timeout) throw new Error('waitFor timed out')

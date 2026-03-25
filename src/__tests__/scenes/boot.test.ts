@@ -59,19 +59,25 @@ describe('dialog integration', () => {
   it('dialog is visible on overworld start', async () => {
     game = createGame()
     const scene = await bootToOverworld(game)
-    await delay(100)
 
-    const container = scene.children.list.find(
-      (child) => child instanceof Phaser.GameObjects.Container && child.depth === DEPTH_DIALOG,
-    ) as Phaser.GameObjects.Container
+    const findDialog = () =>
+      scene.children.list.find(
+        (child) => child instanceof Phaser.GameObjects.Container && child.depth === DEPTH_DIALOG,
+      ) as Phaser.GameObjects.Container | undefined
 
-    expect(container.visible).toBe(true)
+    await waitFor(() => findDialog()?.visible === true)
+    expect(findDialog()!.visible).toBe(true)
   })
 
   it('dialog freezes player while open', async () => {
     game = createGame()
     const scene = await bootToOverworld(game)
-    await delay(100)
+    await waitFor(() => {
+      const c = scene.children.list.find(
+        (child) => child instanceof Phaser.GameObjects.Container && child.depth === DEPTH_DIALOG,
+      ) as Phaser.GameObjects.Container | undefined
+      return c?.visible === true
+    })
 
     const player = findPlayer(scene)
     const startX = player.x
@@ -94,8 +100,7 @@ describe('dialog integration', () => {
     const startX = player.x
 
     simulateKeyDown(game, 'd', 68)
-    await delay(200)
-    simulateKeyDown(game, 'd', 68)
+    await waitFor(() => player.x > startX)
 
     expect(player.x).toBeGreaterThan(startX)
   })

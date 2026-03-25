@@ -57,7 +57,7 @@ describe('player controller', () => {
     const startX = scene.player.x
 
     simulateKeyDown(game, 'd', 68)
-    await delay(200)
+    await waitFor(() => scene.player.x > startX)
     simulateKeyUp(game, 'd', 68)
 
     expect(scene.player.x).toBeGreaterThan(startX)
@@ -71,7 +71,7 @@ describe('player controller', () => {
     const startX = scene.player.x
 
     simulateKeyDown(game, 'a', 65)
-    await delay(200)
+    await waitFor(() => scene.player.x < startX)
     simulateKeyUp(game, 'a', 65)
 
     expect(scene.player.x).toBeLessThan(startX)
@@ -84,9 +84,8 @@ describe('player controller', () => {
     const scene = (await waitForScene(game, 'PlayerTestScene')) as PlayerTestScene
 
     simulateKeyDown(game, 'd', 68)
-    await delay(200)
+    await waitFor(() => scene.controller.facing === 'right')
     simulateKeyUp(game, 'd', 68)
-    await delay(100)
 
     expect(scene.controller.facing).toBe('right')
   })
