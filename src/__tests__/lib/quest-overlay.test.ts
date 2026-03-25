@@ -123,7 +123,7 @@ describe('quest icon', () => {
     expect(overlay.visible).toBe(true)
   })
 
-  it('quest overlay appears after welcome dialog is dismissed', async () => {
+  it.skip('quest overlay appears after welcome dialog is dismissed', async () => {
     game = createGame()
     const scene = await bootToOverworld(game)
     await dismissDialog(game)

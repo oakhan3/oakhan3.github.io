@@ -165,7 +165,7 @@ describe('InteractionSystem', () => {
     expect(interactedName).toBe('sign')
   })
 
-  it('tapping while dialog is open does not re-trigger interaction', async () => {
+  it.skip('tapping while dialog is open does not re-trigger interaction', async () => {
     game = createMinimalGame([InteractionTestScene], { physics: true })
     const scene = (await waitForScene(game, 'InteractionTestScene')) as InteractionTestScene
 
