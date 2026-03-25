@@ -1,12 +1,10 @@
 import Phaser from 'phaser'
 
 export interface CollisionConfig {
-  collisionLayer: string
   interactablesLayer: string
 }
 
 export function createObjectCollisions(scene: Phaser.Scene, map: Phaser.Tilemaps.Tilemap, config: CollisionConfig) {
-  _createBodiesFromLayer(scene, map, config.collisionLayer)
   _createBodiesFromLayer(scene, map, config.interactablesLayer)
 }
 

@@ -18,7 +18,7 @@ const MESSAGES: Record<string, Message> = {
   'kiwi-sign': { text: 'Find Kiwi here!', url: 'https://www.tiktok.com/@kingkiwifi', display_link: 'TikTok' },
   'beach-sign': { text: 'Coming soon!' },
   'office-sign': {
-    text: 'Find me at work here!',
+    text: "Omar's Office!",
     url: 'https://www.linkedin.com/in/omarkhan01/',
     display_link: 'LinkedIn',
   },
@@ -42,12 +42,14 @@ const MESSAGES: Record<string, Message> = {
 
 export const QUEST_DEFINITIONS: Quest[] = [
   { name: 'kiwi-sign', label: "Find Kiwi's Home" },
+  { name: 'kiwi', label: 'Meet Kiwi' },
   { name: 'office-sign', label: "Find Omar's Office" },
   { name: 'github-computer', label: "Find Omar's Computer" },
   { name: 'stage-sign', label: 'Find the Electric OAKS' },
-  { name: 'kiwi', label: 'Meet Kiwi' },
   { name: 'car', label: 'Check out the car' },
-  { name: 'secret-lab', label: 'Try to enter the secret lab' },
+  { name: 'secret-lab', label: 'Try to enter the Secret Lab' },
+  // { name: '???', label: '???' },
+  // { name: '???', label: '???' },
 ]
 
 export function createInteractionSystem(

@@ -7,16 +7,16 @@ import { SpotlightOverlay, LightningOverlay, SparkleOverlay } from '../../lib/ov
 import { createSpotlightOverlay } from './overlays/spotlight'
 import { createLightningOverlay } from './overlays/lightning'
 import { createSparkleOverlay } from './overlays/sparkle'
-import { createCollisions } from './collision'
 import { createInteractionSystem, QUEST_DEFINITIONS } from './interaction'
 import { setupPlayerAnimations } from './player'
 import { InteractionSystem } from '../../lib/interaction'
 import { QuestSystem, CompletionBanner, QuestOverlay } from '../../lib/quests'
-import { DEPTH_QUEST_UI, MOBILE_UI_TOP_OFFSET } from '../../config'
+import { DEPTH_QUEST_UI, MOBILE_UI_TOP_OFFSET, DEPTH_ABOVE_PLAYER } from '../../config'
 
 interface LayerConfig {
   name: string
   collision?: 'fromGroup' | 'allTiles'
+  depth?: number
 }
 
 // NOTE: 'fromGroup' reads per-tile objectgroup collision shapes from the tileset in Tiled.
@@ -30,6 +30,7 @@ const LAYERS: LayerConfig[] = [
   { name: 'BeachFun', collision: 'fromGroup' },
   { name: 'MiscOverlays', collision: 'fromGroup' },
   { name: 'StageLights', collision: 'fromGroup' },
+  { name: 'AbovePlayer', depth: DEPTH_ABOVE_PLAYER },
 ]
 
 interface TileAnimation {
@@ -61,9 +62,9 @@ export class OverworldScene extends Phaser.Scene {
     if (!heliodor) throw new Error("Tileset 'heliodor' not found in the tilemap.")
     const tilesets = [heliodor]
 
-    const layers = _createLayers(map, tilesets)
+    const { allLayers, collisionLayers } = _createLayers(map, tilesets)
 
-    this.tileAnimations = _buildTileAnimations(map, layers)
+    this.tileAnimations = _buildTileAnimations(map, allLayers)
 
     setupPlayerAnimations(this)
 
@@ -71,15 +72,11 @@ export class OverworldScene extends Phaser.Scene {
     const spawnY = Math.floor(map.heightInPixels / 2)
     const player = new PlayerSprite(this, spawnX, spawnY)
 
-    // NOTE: convertTilemapLayer reads Tiled objectgroup polygon shapes and creates
-    // accurate Matter bodies instead of full-tile rectangles.
-    for (const layer of layers) {
+    // NOTE: Only convert layers that have collision defined — layers without
+    // collision shapes (e.g. AbovePlayer) cause a null body crash in Matter.
+    for (const layer of collisionLayers) {
       this.matter.world.convertTilemapLayer(layer)
     }
-
-    // NOTE: Object layer collisions — reads Collisions and Interactables layers
-    // from the Tiled JSON and creates static Matter polygon bodies.
-    createCollisions(this, map)
 
     this.cameras.main.startFollow(player, true)
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
@@ -200,8 +197,9 @@ export class OverworldScene extends Phaser.Scene {
 function _createLayers(
   map: Phaser.Tilemaps.Tilemap,
   tilesets: Phaser.Tilemaps.Tileset[],
-): Phaser.Tilemaps.TilemapLayer[] {
-  const layers: Phaser.Tilemaps.TilemapLayer[] = []
+): { allLayers: Phaser.Tilemaps.TilemapLayer[]; collisionLayers: Phaser.Tilemaps.TilemapLayer[] } {
+  const allLayers: Phaser.Tilemaps.TilemapLayer[] = []
+  const collisionLayers: Phaser.Tilemaps.TilemapLayer[] = []
 
   for (const config of LAYERS) {
     const layer = map.createLayer(config.name, tilesets)
@@ -211,14 +209,26 @@ function _createLayers(
     // tiles marked as colliding get converted to Matter bodies.
     if (config.collision === 'fromGroup') {
       layer.setCollisionFromCollisionGroup()
+      // NOTE: Phaser bug — MatterTileBody calls Body.scale(body) where body is a null
+      // local variable when the tile has flipX/flipY and the body was created from tile
+      // collision shapes. Clear collision on flipped tiles to avoid the crash.
+      layer.forEachTile((tile) => {
+        if (tile.collides && (tile.flipX || tile.flipY)) tile.setCollision(false)
+      })
+      collisionLayers.push(layer)
     } else if (config.collision === 'allTiles') {
       layer.setCollisionByExclusion([-1])
+      collisionLayers.push(layer)
     }
 
-    layers.push(layer)
+    if (config.depth !== undefined) {
+      layer.setDepth(config.depth)
+    }
+
+    allLayers.push(layer)
   }
 
-  return layers
+  return { allLayers, collisionLayers }
 }
 
 function _buildTileAnimations(map: Phaser.Tilemaps.Tilemap, layers: Phaser.Tilemaps.TilemapLayer[]): TileAnimation[] {

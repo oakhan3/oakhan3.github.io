@@ -3,7 +3,6 @@ import { createObjectCollisions } from '../../lib/collision'
 import type { CollisionConfig } from '../../lib/collision'
 
 const COLLISION_CONFIG: CollisionConfig = {
-  collisionLayer: 'Collisions',
   interactablesLayer: 'Interactables',
 }
 

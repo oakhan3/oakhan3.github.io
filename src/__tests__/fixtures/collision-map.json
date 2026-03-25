@@ -12,8 +12,8 @@
   "tilesets": [],
   "layers": [
     {
-      "id": 1,
-      "name": "Collisions",
+      "id": 2,
+      "name": "Interactables",
       "type": "objectgroup",
       "draworder": "topdown",
       "objects": [
@@ -26,24 +26,25 @@
           "rotation": 0,
           "visible": true,
           "polygon": [
-            { "x": 0, "y": 0 },
-            { "x": 32, "y": 0 },
-            { "x": 32, "y": 320 },
-            { "x": 0, "y": 320 }
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 32,
+              "y": 0
+            },
+            {
+              "x": 32,
+              "y": 320
+            },
+            {
+              "x": 0,
+              "y": 320
+            }
           ]
         }
       ],
-      "visible": true,
-      "x": 0,
-      "y": 0,
-      "opacity": 1
-    },
-    {
-      "id": 2,
-      "name": "Interactables",
-      "type": "objectgroup",
-      "draworder": "topdown",
-      "objects": [],
       "visible": true,
       "x": 0,
       "y": 0,

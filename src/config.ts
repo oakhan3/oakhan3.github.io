@@ -18,6 +18,7 @@ export const PLAYER_FRAME_HEIGHT = 48
 
 // NOTE: Depth layers control draw order. Higher values render on top.
 export const DEPTH_PLAYER = 5
+export const DEPTH_ABOVE_PLAYER = 6
 export const DEPTH_JOYSTICK_BASE = 90
 export const DEPTH_JOYSTICK_KNOB = 91
 // NOTE: Lighting overlay sits above game objects but below UI elements.
