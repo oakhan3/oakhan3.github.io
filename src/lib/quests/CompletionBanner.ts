@@ -1,12 +1,16 @@
 import Phaser from 'phaser'
-import { DEPTH_QUEST_UI, MOBILE_UI_TOP_OFFSET } from '../../config'
+import {
+  DEPTH_QUEST_UI,
+  MOBILE_UI_TOP_OFFSET,
+  UI_BACKGROUND_COLOR,
+  UI_BORDER_COLOR,
+  UI_FONT_FAMILY,
+} from '../../config'
 
 const BOX_PADDING = 10
 // NOTE: Banner is narrower than the full screen so it doesn't cover the quest icon in the top-right.
 const BANNER_MAX_WIDTH = 300
 const BANNER_MARGIN_TOP = 8
-const BORDER_COLOR = 0xe2e8f0
-const BACKGROUND_COLOR = 0x1a1b2e
 const BACKGROUND_ALPHA = 0.92
 const HOLD_DURATION = 2000
 const SLIDE_DURATION = 300
@@ -28,13 +32,13 @@ export class CompletionBanner {
     const boxX = Math.floor((scene.scale.width - boxWidth) / 2)
 
     const background = scene.add.graphics()
-    background.fillStyle(BACKGROUND_COLOR, BACKGROUND_ALPHA)
+    background.fillStyle(UI_BACKGROUND_COLOR, BACKGROUND_ALPHA)
     background.fillRoundedRect(0, 0, boxWidth, boxHeight, 4)
-    background.lineStyle(2, BORDER_COLOR, 1)
+    background.lineStyle(2, UI_BORDER_COLOR, 1)
     background.strokeRoundedRect(0, 0, boxWidth, boxHeight, 4)
 
     this.label = scene.add.text(BOX_PADDING, BOX_PADDING, '', {
-      fontFamily: '"Press Start 2P"',
+      fontFamily: UI_FONT_FAMILY,
       fontSize,
       color: '#e2e8f0',
       wordWrap: { width: boxWidth - BOX_PADDING * 2 },

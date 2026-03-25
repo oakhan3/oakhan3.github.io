@@ -1,11 +1,9 @@
 import Phaser from 'phaser'
-import { DEPTH_DIALOG } from '../../config'
+import { DEPTH_DIALOG, UI_BACKGROUND_COLOR, UI_BORDER_COLOR, UI_FONT_FAMILY } from '../../config'
 
 const BOX_MARGIN = 8
 const BOX_PADDING = 10
 const TYPEWRITER_DELAY = 15
-const BORDER_COLOR = 0xe2e8f0
-const BACKGROUND_COLOR = 0x1a1b2e
 const BACKGROUND_ALPHA = 0.92
 const INDICATOR_SIZE = 5
 const INDICATOR_BLINK_DURATION = 400
@@ -39,13 +37,13 @@ export class DialogBox {
     const boxHeight = isMobile ? 80 : 66
 
     const background = scene.add.graphics()
-    background.fillStyle(BACKGROUND_COLOR, BACKGROUND_ALPHA)
+    background.fillStyle(UI_BACKGROUND_COLOR, BACKGROUND_ALPHA)
     background.fillRoundedRect(0, 0, boxWidth, boxHeight, 4)
-    background.lineStyle(2, BORDER_COLOR, 1)
+    background.lineStyle(2, UI_BORDER_COLOR, 1)
     background.strokeRoundedRect(0, 0, boxWidth, boxHeight, 4)
 
     this.textObject = scene.add.text(BOX_PADDING, BOX_PADDING, '', {
-      fontFamily: '"Press Start 2P"',
+      fontFamily: UI_FONT_FAMILY,
       fontSize,
       color: '#e2e8f0',
       wordWrap: { width: boxWidth - BOX_PADDING * 2 },
@@ -54,7 +52,7 @@ export class DialogBox {
 
     // NOTE: Small downward triangle at bottom-right of the box, classic GBA "press to continue" cue.
     this.indicator = scene.add.graphics()
-    this.indicator.fillStyle(BORDER_COLOR, 1)
+    this.indicator.fillStyle(UI_BORDER_COLOR, 1)
     this.indicator.fillTriangle(0, 0, INDICATOR_SIZE * 2, 0, INDICATOR_SIZE, INDICATOR_SIZE)
     this.indicator.setPosition(
       boxWidth - BOX_PADDING - INDICATOR_SIZE * 2,
@@ -76,7 +74,7 @@ export class DialogBox {
       boxY + boxHeight - BOX_PADDING - 27,
       '[ open link ]',
       {
-        fontFamily: '"Press Start 2P"',
+        fontFamily: UI_FONT_FAMILY,
         fontSize,
         color: '#60a5fa',
       },

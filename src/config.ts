@@ -34,3 +34,8 @@ export const TOUCH_DEADZONE = 4
 // NOTE: Extra top offset on mobile to avoid UI elements being clipped by the
 // browser chrome or notch area.
 export const MOBILE_UI_TOP_OFFSET = 70
+
+// NOTE: Shared UI theme constants used across dialog and quest overlays.
+export const UI_BACKGROUND_COLOR = 0x1a1b2e
+export const UI_BORDER_COLOR = 0xe2e8f0
+export const UI_FONT_FAMILY = '"Press Start 2P"'
