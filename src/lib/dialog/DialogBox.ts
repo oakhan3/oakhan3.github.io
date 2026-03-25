@@ -170,6 +170,18 @@ export class DialogBox {
     if (this.currentUrl) {
       this.linkButton.setText(`[ ${this._displayLink ?? 'open link'} ]`)
       this.linkButton.setVisible(true)
+      // NOTE: Set the hit area after text is set so the font is loaded and
+      // linkButton.width is accurate. Padding makes the link easier to tap on mobile.
+      const hitPadding = 12
+      this.linkButton.setInteractive(
+        new Phaser.Geom.Rectangle(
+          -hitPadding,
+          -hitPadding,
+          this.linkButton.width + hitPadding * 2,
+          this.linkButton.height + hitPadding * 2,
+        ),
+        Phaser.Geom.Rectangle.Contains,
+      )
     }
   }
 
