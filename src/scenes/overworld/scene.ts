@@ -113,16 +113,31 @@ export class OverworldScene extends Phaser.Scene {
     questBtnBg.lineStyle(2, 0xf97316, 1)
     questBtnBg.strokeRoundedRect(0, 0, btnWidth, btnHeight, 3)
 
-    const questBtnLabel = this.add.text(btnPadding, btnPadding, 'Quests', {
+    // NOTE: setPadding enlarges the text canvas so the hit area extends well
+    // beyond the visible text — same technique used for the dialog link button.
+    // The label position is offset by the padding amount so the text stays
+    // visually centered within the button background.
+    const hitPadding = isMobile ? { x: 28, y: 20 } : { x: 0, y: 0 }
+    const questBtnLabel = this.add.text(btnPadding - hitPadding.x, btnPadding - hitPadding.y, 'Quests', {
       fontFamily: '"Press Start 2P"',
       fontSize: btnFontSize,
       color: '#e2e8f0',
     })
+    if (isMobile) questBtnLabel.setPadding(hitPadding.x, hitPadding.y, hitPadding.x, hitPadding.y)
+    questBtnLabel.setInteractive({ useHandCursor: true })
+    questBtnLabel.on(
+      'pointerdown',
+      (_pointer: Phaser.Input.Pointer, _localX: number, _localY: number, event: Phaser.Types.Input.EventData) => {
+        // NOTE: Stop propagation so the scene-level 'pointerdown' dismiss listener on
+        // QuestOverlay does not fire for this same click and immediately hide the overlay.
+        event.stopPropagation()
+        questOverlay.show(questSystem.getAll())
+      },
+    )
 
     const questIcon = this.add.container(btnX - btnWidth, btnY, [questBtnBg, questBtnLabel])
     questIcon.setScrollFactor(0)
     questIcon.setDepth(DEPTH_QUEST_UI)
-    // NOTE: Zone provides a reliable hit area independent of font loading.
     const questZone = this.add.zone(btnX - btnWidth, btnY, btnWidth, btnHeight).setOrigin(0, 0)
     questZone.setScrollFactor(0)
     questZone.setDepth(DEPTH_QUEST_UI)
@@ -130,8 +145,6 @@ export class OverworldScene extends Phaser.Scene {
     questZone.on(
       'pointerdown',
       (_pointer: Phaser.Input.Pointer, _localX: number, _localY: number, event: Phaser.Types.Input.EventData) => {
-        // NOTE: Stop propagation so the scene-level 'pointerdown' dismiss listener on
-        // QuestOverlay does not fire for this same click and immediately hide the overlay.
         event.stopPropagation()
         questOverlay.show(questSystem.getAll())
       },
