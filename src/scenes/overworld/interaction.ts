@@ -30,7 +30,7 @@ const MESSAGES: Record<string, Message> = {
     display_link: 'GitHub',
   },
   'github-commit': { text: 'Look at this neat pile of commits!' },
-  'github-computer': { text: "Something's cooking..." },
+  'github-computer': { text: "Something's cooking...", url: 'https://github.com/oakhan3/', display_link: 'GitHub' },
   'github-stash': { text: 'This stash is embarrassing...' },
   'stage-sign': {
     text: 'Tune in to the Electric OAKS!',
@@ -42,12 +42,11 @@ const MESSAGES: Record<string, Message> = {
 
 export const QUEST_DEFINITIONS: Quest[] = [
   { name: 'kiwi-sign', label: "Find Kiwi's Home" },
-  { name: 'office-sign', label: "Find Omar's office" },
-  { name: 'github-sign', label: "Find Omar's GitHub" },
+  { name: 'office-sign', label: "Find Omar's Office" },
+  { name: 'github-computer', label: "Find Omar's Computer" },
   { name: 'stage-sign', label: 'Find the Electric OAKS' },
   { name: 'kiwi', label: 'Meet Kiwi' },
   { name: 'car', label: 'Check out the car' },
-  { name: 'github-computer', label: "See what's cooking" },
   { name: 'secret-lab', label: 'Try to enter the secret lab' },
 ]
 
