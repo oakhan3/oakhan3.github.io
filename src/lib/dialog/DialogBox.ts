@@ -87,7 +87,7 @@ export class DialogBox {
     this.linkButton.setVisible(false)
     this.linkButton.setInteractive({ useHandCursor: true })
     this.linkButton.on('pointerdown', () => {
-      if (this.currentUrl) window.open(this.currentUrl, '_blank')
+      if (this.currentUrl) _openUrl(this.currentUrl)
     })
 
     this.advanceKeys = [scene.input.keyboard!.addKey('SPACE'), scene.input.keyboard!.addKey('ENTER')]
@@ -204,4 +204,14 @@ export class DialogBox {
       this.onClose()
     }
   }
+}
+
+// NOTE: Safari blocks window.open() unless called directly from a native DOM
+// gesture. Creating and clicking an <a> element preserves the gesture context.
+function _openUrl(url: string): void {
+  const anchor = document.createElement('a')
+  anchor.href = url
+  anchor.target = '_blank'
+  anchor.rel = 'noopener noreferrer'
+  anchor.click()
 }

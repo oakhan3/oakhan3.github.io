@@ -42,13 +42,13 @@ const MESSAGES: Record<string, Message> = {
 
 export const QUEST_DEFINITIONS: Quest[] = [
   { name: 'kiwi-sign', label: "Find Kiwi's Home" },
-  { name: 'office-sign', label: 'Find Omar at work' },
+  { name: 'office-sign', label: "Find Omar's office" },
   { name: 'github-sign', label: "Find Omar's GitHub" },
   { name: 'stage-sign', label: 'Find the Electric OAKS' },
   { name: 'kiwi', label: 'Meet Kiwi' },
   { name: 'car', label: 'Check out the car' },
   { name: 'github-computer', label: "See what's cooking" },
-  { name: 'secret-lab', label: 'Discover the secret lab' },
+  { name: 'secret-lab', label: 'Try to enter the secret lab' },
 ]
 
 export function createInteractionSystem(
