@@ -34,9 +34,18 @@ The site renders at GBA resolution (480x320) and scales up to fill the browser w
 
 Scenes flow: **Boot** (press any key) → **Preload** (asset loading) → **Overworld** (explore and interact).
 
-Uses Matter.js physics for pixel-accurate tile collisions matching Tiled objectgroup polygon shapes. Controls are WASD/arrows on desktop and drag-from-origin with visual joystick on mobile.
+Uses Matter.js physics for pixel-accurate tile collisions from per-tile objectgroup polygon shapes defined in Tiled. Controls are WASD/arrows on desktop and drag-from-origin with visual joystick on mobile.
 
-Nighttime lighting uses two RenderTexture layers (MULTIPLY for darkness + ADD for colored glow). Fixed light sources support configurable cone types (stage, lamp, headlight) and three animation types: flicker (lamps/headlights), pulse (building windows), and color-cycle (stage spotlights). Each light has a random phase offset so animations look organic. A procedural lightning bolt strikes at tile (39, 8) at random intervals using midpoint displacement.
+## Notable Features
+
+- **Custom lighting** — nighttime overlay. Supports three cone types (stage, lamp, headlight) and three animation modes: flicker (lamps), pulse (building windows), and color-cycle (stage spotlights). Each light has a random phase offset for organic variation.
+- **Procedural lightning** — a bolt strikes at a fixed location at random intervals, built with midpoint displacement.
+- **Quest system** — tracks completion of named objectives. A banner slides in on each completion. Overall completion is tracked.
+- **Proximity interactables** — objects defined in Tiled trigger typewriter-style dialog when the player walks nearby. Dialogs support inline hyperlinks that open in a new tab (Safari-safe via anchor click).
+- **Custom map and collisions** — tilemap built in Tiled with per-tile convex polygon collision shapes, an above-player render layer, and separate object layers for interactables.
+- **Dialog system** — typewriter effect with configurable speed, optional URL link button with expanded mobile hit area, and open/close callbacks for chaining actions.
+- **Touch controls** — drag-from-origin virtual joystick with a visual indicator.
+- **Responsive design** — detects mobile vs desktop and adjusts camera zoom, UI element sizing and positioning, hit areas, and in-game hints accordingly.
 
 ## Source Layout
 
@@ -46,21 +55,22 @@ src/
   config.ts                # Global constants (tile size, depth layers, etc.)
   lib/                     # Generic, app-agnostic engine modules
     collision/             # Static Matter polygon bodies from Tiled object layers
-    dialog/                # Typewriter dialog box
+    dialog/                # Typewriter dialog box with optional inline link
     interaction/           # Proximity-based interactable system
     mobile/                # On-screen joystick touch controls
     overlay/
       spotlight/           # Nighttime spotlight overlay (ambient + fixed lights + cones)
-      LightningOverlay.ts  # Occasional lightning flash
+      LightningOverlay.ts  # Procedural lightning bolt at random intervals
       SparkleOverlay.ts    # Drifting sparkle particles
     player/                # Player sprite and controller
+    quests/                # Quest tracking, completion banner, and quest overlay
   scenes/
     BootScene.ts           # Title screen
     PreloadScene.ts        # Asset loading
     overworld/             # Main game scene
       scene.ts             # Wires all systems together
       collision/           # App config for collision layers
-      interaction/         # App config for interactables and dialog messages
+      interaction/         # App config for interactables, dialog messages, and quests
       overlays/            # App config and factory functions for each overlay
       player/              # App config for player animations
   __tests__/               # Browser integration tests
