@@ -1,5 +1,5 @@
 import Phaser from 'phaser'
-import { DEPTH_LIGHTING } from '../../config'
+import { DEPTH_SPARKLE } from '../../config'
 
 interface Sparkle {
   pixelX: number
@@ -47,7 +47,7 @@ export class SparkleOverlay {
     this.renderTexture = scene.add.renderTexture(0, 0, mapWidth, mapHeight)
     this.renderTexture.setOrigin(0, 0)
     this.renderTexture.setBlendMode(Phaser.BlendModes.ADD)
-    this.renderTexture.setDepth(DEPTH_LIGHTING + 2)
+    this.renderTexture.setDepth(DEPTH_SPARKLE)
 
     this.sparkles = []
     for (let index = 0; index < config.count; index++) {

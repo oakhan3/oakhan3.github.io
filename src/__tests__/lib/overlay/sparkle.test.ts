@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach } from 'vitest'
 import Phaser from 'phaser'
 import { SparkleOverlay, type SparkleConfig } from '../../../lib/overlay/SparkleOverlay'
-import { GBA_WIDTH, GBA_HEIGHT, DEPTH_LIGHTING } from '../../../config'
+import { GBA_WIDTH, GBA_HEIGHT, DEPTH_SPARKLE } from '../../../config'
 import { createMinimalGame, waitForScene, delay, countVisiblePixels, findRenderTextureByDepth } from '../../testing'
 
 const MAP_WIDTH = GBA_WIDTH
@@ -50,8 +50,8 @@ describe('sparkle overlay', () => {
     const scene = await waitForScene(game, 'SparkleTestScene')
     await delay(100)
 
-    // NOTE: SparkleOverlay renders at DEPTH_LIGHTING + 2.
-    const sparkle = findRenderTextureByDepth(scene, DEPTH_LIGHTING + 2)
+    // NOTE: SparkleOverlay renders at DEPTH_SPARKLE.
+    const sparkle = findRenderTextureByDepth(scene, DEPTH_SPARKLE)
     expect(sparkle).toBeDefined()
     expect(sparkle.visible).toBe(true)
   })
@@ -63,7 +63,7 @@ describe('sparkle overlay', () => {
     // NOTE: Wait for sparkles to fade in — they start at random sine phases.
     await delay(600)
 
-    const sparkle = findRenderTextureByDepth(scene, DEPTH_LIGHTING + 2)
+    const sparkle = findRenderTextureByDepth(scene, DEPTH_SPARKLE)
     expect(countVisiblePixels(sparkle, 4)).toBeGreaterThan(0)
   })
 
@@ -72,7 +72,7 @@ describe('sparkle overlay', () => {
     const scene = await waitForScene(game, 'SparkleTestScene')
     await delay(300)
 
-    const sparkle = findRenderTextureByDepth(scene, DEPTH_LIGHTING + 2)
+    const sparkle = findRenderTextureByDepth(scene, DEPTH_SPARKLE)
 
     const samples: number[] = []
     for (let step = 0; step < 5; step++) {

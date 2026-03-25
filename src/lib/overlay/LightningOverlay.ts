@@ -1,5 +1,5 @@
 import Phaser from 'phaser'
-import { DEPTH_LIGHTING, TILE_SIZE } from '../../config'
+import { DEPTH_LIGHTNING, TILE_SIZE } from '../../config'
 
 interface BoltSegment {
   x1: number
@@ -53,7 +53,7 @@ export class LightningOverlay {
     this.renderTexture.setOrigin(0, 0)
     this.renderTexture.setBlendMode(Phaser.BlendModes.ADD)
     // NOTE: Sits above sparkle layer (DEPTH_LIGHTING + 2) but below UI.
-    this.renderTexture.setDepth(DEPTH_LIGHTING + 3)
+    this.renderTexture.setDepth(DEPTH_LIGHTNING)
 
     this.canvasTexture = scene.textures.createCanvas('lightning-canvas', mapWidth, mapHeight)!
 

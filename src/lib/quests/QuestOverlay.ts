@@ -6,6 +6,7 @@ import {
   UI_MUTED_COLOR,
   UI_SUCCESS_COLOR,
   UI_TEXT_COLOR,
+  UI_TEXT_LINE_SPACING,
 } from '../../config'
 import type { Quest } from './QuestSystem'
 import { BaseOverlay } from './BaseOverlay'
@@ -18,6 +19,8 @@ import {
   OVERLAY_ITEM_FONT_MOBILE,
   OVERLAY_TITLE_FONT_DESKTOP,
   OVERLAY_TITLE_FONT_MOBILE,
+  QUEST_ROW_HEIGHT_DESKTOP,
+  QUEST_ROW_HEIGHT_MOBILE,
 } from './constants'
 
 export class QuestOverlay extends BaseOverlay {
@@ -26,7 +29,7 @@ export class QuestOverlay extends BaseOverlay {
 
     const scene = this.scene
     const mobile = isMobile()
-    const lineHeight = mobile ? 20 : 16
+    const lineHeight = mobile ? QUEST_ROW_HEIGHT_MOBILE : QUEST_ROW_HEIGHT_DESKTOP
     const topOffset = mobile ? MOBILE_UI_TOP_OFFSET + BOX_PADDING : BOX_PADDING
 
     const title = this._addText(scene, BOX_PADDING, topOffset, 'Quests', {
@@ -47,7 +50,7 @@ export class QuestOverlay extends BaseOverlay {
         fontFamily: UI_FONT_FAMILY,
         fontSize: mobile ? OVERLAY_ITEM_FONT_MOBILE : OVERLAY_ITEM_FONT_DESKTOP,
         color,
-        lineSpacing: 6,
+        lineSpacing: UI_TEXT_LINE_SPACING,
       })
       currentY += lineHeight + LINE_SPACING
     }

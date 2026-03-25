@@ -18,6 +18,7 @@ import {
   DEPTH_ABOVE_PLAYER,
   QUEST_BTN_BACKGROUND_COLOR,
   QUEST_BTN_BORDER_COLOR,
+  QUEST_BTN_MARGIN,
   UI_CHROME_ALPHA,
   UI_FONT_FAMILY,
   UI_TEXT_COLOR,
@@ -106,82 +107,9 @@ export class OverworldScene extends Phaser.Scene {
     const questOverlay = new QuestOverlay(this)
     const congratulatoryOverlay = new CongratulatoryOverlay(this)
 
-    // NOTE: Quest button in the top-right corner — styled like the dialog box.
-    const mobile = isMobile()
-    const BTN_FONT_MOBILE = '8px'
-    const BTN_FONT_DESKTOP = '6px'
-    const BTN_HEIGHT_MOBILE = 22
-    const BTN_HEIGHT_DESKTOP = 18
-    const BTN_WIDTH_MOBILE = 72
-    const BTN_WIDTH_DESKTOP = 60
-    const btnFontSize = mobile ? BTN_FONT_MOBILE : BTN_FONT_DESKTOP
-    const btnPadding = 6
-    const btnHeight = mobile ? BTN_HEIGHT_MOBILE : BTN_HEIGHT_DESKTOP
-    const btnWidth = mobile ? BTN_WIDTH_MOBILE : BTN_WIDTH_DESKTOP
-    const btnX = this.scale.width - 8
-    const btnY = mobile ? MOBILE_UI_TOP_OFFSET : 8
+    const { questIcon, questZone } = _createQuestButton(this, questOverlay, questSystem)
 
-    const questBtnBg = this.add.graphics()
-    questBtnBg.fillStyle(QUEST_BTN_BACKGROUND_COLOR, UI_CHROME_ALPHA)
-    questBtnBg.fillRoundedRect(0, 0, btnWidth, btnHeight, 3)
-    questBtnBg.lineStyle(2, QUEST_BTN_BORDER_COLOR, 1)
-    questBtnBg.strokeRoundedRect(0, 0, btnWidth, btnHeight, 3)
-
-    // NOTE: setPadding enlarges the text canvas so the hit area extends well
-    // beyond the visible text — same technique used for the dialog link button.
-    // The label position is offset by the padding amount so the text stays
-    // visually centered within the button background.
-    const hitPadding = mobile ? { x: 28, y: 20 } : { x: 0, y: 0 }
-    const questBtnLabel = this.add.text(btnPadding - hitPadding.x, btnPadding - hitPadding.y, 'Quests', {
-      fontFamily: UI_FONT_FAMILY,
-      fontSize: btnFontSize,
-      color: UI_TEXT_COLOR,
-    })
-    if (mobile) questBtnLabel.setPadding(hitPadding.x, hitPadding.y, hitPadding.x, hitPadding.y)
-    questBtnLabel.setInteractive({ useHandCursor: true })
-    questBtnLabel.on(
-      'pointerdown',
-      (_pointer: Phaser.Input.Pointer, _localX: number, _localY: number, event: Phaser.Types.Input.EventData) => {
-        // NOTE: Stop propagation so the scene-level 'pointerdown' dismiss listener on
-        // QuestOverlay does not fire for this same click and immediately hide the overlay.
-        event.stopPropagation()
-        questOverlay.show(questSystem.getAll())
-      },
-    )
-
-    const questIcon = this.add.container(btnX - btnWidth, btnY, [questBtnBg, questBtnLabel])
-    questIcon.setScrollFactor(0)
-    questIcon.setDepth(DEPTH_QUEST_UI)
-    const questZone = this.add.zone(btnX - btnWidth, btnY, btnWidth, btnHeight).setOrigin(0, 0)
-    questZone.setScrollFactor(0)
-    questZone.setDepth(DEPTH_QUEST_UI)
-    questZone.setInteractive({ useHandCursor: true })
-    questZone.on(
-      'pointerdown',
-      (_pointer: Phaser.Input.Pointer, _localX: number, _localY: number, event: Phaser.Types.Input.EventData) => {
-        event.stopPropagation()
-        questOverlay.show(questSystem.getAll())
-      },
-    )
-
-    if (mobile) {
-      this.cameras.main.setZoom(2)
-      // NOTE: A second camera at zoom 1 renders UI elements (dialog, quest UI) so they
-      // are not affected by the main camera's zoom. The main camera ignores
-      // UI objects; the UI camera ignores everything else.
-      const uiCamera = this.cameras.add(0, 0, this.scale.width, this.scale.height)
-      const uiObjects = [
-        ...dialog.getGameObjects(),
-        ...completionBanner.getGameObjects(),
-        ...questOverlay.getGameObjects(),
-        ...congratulatoryOverlay.getGameObjects(),
-        questIcon,
-        questZone,
-      ]
-      this.cameras.main.ignore(uiObjects)
-      const uiSet = new Set(uiObjects)
-      uiCamera.ignore(this.children.list.filter((obj) => !uiSet.has(obj)))
-    }
+    _setupCameras(this, dialog, completionBanner, questOverlay, congratulatoryOverlay, questIcon, questZone)
 
     this.interactionSystem = createInteractionSystem(
       this,
@@ -213,7 +141,7 @@ Hope you enjoyed it. Check back later, I might sneak in a few more updates!`,
       })(),
     )
     this.playerController.freeze()
-    const signHint = mobile ? 'Tapping' : "Hitting 'Enter'"
+    const signHint = isMobile() ? 'Tapping' : "Hitting 'Enter'"
     dialog.show(`Welcome, I'm Omar Ali Khan!\n\nTry ${signHint} on the signs!`, undefined, undefined, () => {
       this.playerController.unfreeze()
       questOverlay.show(questSystem.getAll())
@@ -228,6 +156,101 @@ Hope you enjoyed it. Check back later, I might sneak in a few more updates!`,
     this.lightningOverlay.update()
     _updateTileAnimations(this.tileAnimations, delta)
   }
+}
+
+function _createQuestButton(
+  scene: Phaser.Scene,
+  questOverlay: QuestOverlay,
+  questSystem: QuestSystem,
+): { questIcon: Phaser.GameObjects.Container; questZone: Phaser.GameObjects.Zone } {
+  const mobile = isMobile()
+  const BTN_FONT_MOBILE = '8px'
+  const BTN_FONT_DESKTOP = '6px'
+  const BTN_HEIGHT_MOBILE = 22
+  const BTN_HEIGHT_DESKTOP = 18
+  const BTN_WIDTH_MOBILE = 72
+  const BTN_WIDTH_DESKTOP = 60
+  const btnFontSize = mobile ? BTN_FONT_MOBILE : BTN_FONT_DESKTOP
+  const btnPadding = 6
+  const btnHeight = mobile ? BTN_HEIGHT_MOBILE : BTN_HEIGHT_DESKTOP
+  const btnWidth = mobile ? BTN_WIDTH_MOBILE : BTN_WIDTH_DESKTOP
+  const btnX = scene.scale.width - QUEST_BTN_MARGIN
+  const btnY = mobile ? MOBILE_UI_TOP_OFFSET : QUEST_BTN_MARGIN
+
+  const background = scene.add.graphics()
+  background.fillStyle(QUEST_BTN_BACKGROUND_COLOR, UI_CHROME_ALPHA)
+  background.fillRoundedRect(0, 0, btnWidth, btnHeight, 3)
+  background.lineStyle(2, QUEST_BTN_BORDER_COLOR, 1)
+  background.strokeRoundedRect(0, 0, btnWidth, btnHeight, 3)
+
+  // NOTE: setPadding enlarges the text canvas so the hit area extends well
+  // beyond the visible text — same technique used for the dialog link button.
+  // The label position is offset by the padding amount so the text stays
+  // visually centered within the button background.
+  const hitPadding = mobile ? { x: 28, y: 20 } : { x: 0, y: 0 }
+  const label = scene.add.text(btnPadding - hitPadding.x, btnPadding - hitPadding.y, 'Quests', {
+    fontFamily: UI_FONT_FAMILY,
+    fontSize: btnFontSize,
+    color: UI_TEXT_COLOR,
+  })
+  if (mobile) label.setPadding(hitPadding.x, hitPadding.y, hitPadding.x, hitPadding.y)
+  label.setInteractive({ useHandCursor: true })
+  label.on(
+    'pointerdown',
+    (_pointer: Phaser.Input.Pointer, _localX: number, _localY: number, event: Phaser.Types.Input.EventData) => {
+      // NOTE: Stop propagation so the scene-level 'pointerdown' dismiss listener on
+      // QuestOverlay does not fire for this same click and immediately hide the overlay.
+      event.stopPropagation()
+      questOverlay.show(questSystem.getAll())
+    },
+  )
+
+  const questIcon = scene.add.container(btnX - btnWidth, btnY, [background, label])
+  questIcon.setScrollFactor(0)
+  questIcon.setDepth(DEPTH_QUEST_UI)
+
+  const questZone = scene.add.zone(btnX - btnWidth, btnY, btnWidth, btnHeight).setOrigin(0, 0)
+  questZone.setScrollFactor(0)
+  questZone.setDepth(DEPTH_QUEST_UI)
+  questZone.setInteractive({ useHandCursor: true })
+  questZone.on(
+    'pointerdown',
+    (_pointer: Phaser.Input.Pointer, _localX: number, _localY: number, event: Phaser.Types.Input.EventData) => {
+      event.stopPropagation()
+      questOverlay.show(questSystem.getAll())
+    },
+  )
+
+  return { questIcon, questZone }
+}
+
+function _setupCameras(
+  scene: Phaser.Scene,
+  dialog: DialogBox,
+  completionBanner: CompletionBanner,
+  questOverlay: QuestOverlay,
+  congratulatoryOverlay: CongratulatoryOverlay,
+  questIcon: Phaser.GameObjects.Container,
+  questZone: Phaser.GameObjects.Zone,
+): void {
+  if (!isMobile()) return
+
+  scene.cameras.main.setZoom(2)
+  // NOTE: A second camera at zoom 1 renders UI elements (dialog, quest UI) so they
+  // are not affected by the main camera's zoom. The main camera ignores
+  // UI objects; the UI camera ignores everything else.
+  const uiCamera = scene.cameras.add(0, 0, scene.scale.width, scene.scale.height)
+  const uiObjects = [
+    ...dialog.getGameObjects(),
+    ...completionBanner.getGameObjects(),
+    ...questOverlay.getGameObjects(),
+    ...congratulatoryOverlay.getGameObjects(),
+    questIcon,
+    questZone,
+  ]
+  scene.cameras.main.ignore(uiObjects)
+  const uiSet = new Set(uiObjects)
+  uiCamera.ignore(scene.children.list.filter((obj) => !uiSet.has(obj)))
 }
 
 function _createLayers(

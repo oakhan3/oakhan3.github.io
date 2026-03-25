@@ -1,5 +1,5 @@
 import Phaser from 'phaser'
-import { DEPTH_LIGHTING } from '../../../config'
+import { DEPTH_LIGHTING, DEPTH_SPOTLIGHT_GLOW } from '../../../config'
 import { BRUSH_BASE_RADIUS, ConeSpec, createLightTexture, createConeTexture } from './textures'
 import { computeAnimation, modulateBrightness } from './animation'
 
@@ -85,7 +85,7 @@ export class SpotlightOverlay {
     this.glowTexture = scene.add.renderTexture(0, 0, mapWidth, mapHeight)
     this.glowTexture.setOrigin(0, 0)
     this.glowTexture.setBlendMode(Phaser.BlendModes.ADD)
-    this.glowTexture.setDepth(DEPTH_LIGHTING + 1)
+    this.glowTexture.setDepth(DEPTH_SPOTLIGHT_GLOW)
 
     // NOTE: Initial draw so the first frame isn't unlit.
     this.update()

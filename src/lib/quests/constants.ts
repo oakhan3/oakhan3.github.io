@@ -4,6 +4,10 @@ export const LINE_SPACING = 10
 export const DISMISS_HINT_MOBILE = 'Tap to close'
 export const DISMISS_HINT_DESKTOP = "Press 'Enter' to close"
 
+// NOTE: Height of each quest row in the quest list (text height + spacing).
+export const QUEST_ROW_HEIGHT_MOBILE = 20
+export const QUEST_ROW_HEIGHT_DESKTOP = 16
+
 // NOTE: Font sizes for full-screen overlay titles, body text, and hint text.
 export const OVERLAY_TITLE_FONT_MOBILE = '14px'
 export const OVERLAY_TITLE_FONT_DESKTOP = '10px'

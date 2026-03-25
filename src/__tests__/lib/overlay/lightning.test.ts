@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach } from 'vitest'
 import Phaser from 'phaser'
 import { LightningOverlay, type LightningConfig } from '../../../lib/overlay/LightningOverlay'
-import { GBA_WIDTH, GBA_HEIGHT, DEPTH_LIGHTING, TILE_SIZE } from '../../../config'
+import { GBA_WIDTH, GBA_HEIGHT, DEPTH_LIGHTNING, TILE_SIZE } from '../../../config'
 import { createMinimalGame, waitForScene, delay, countVisiblePixels, findRenderTextureByDepth } from '../../testing'
 
 const MAP_WIDTH = GBA_WIDTH
@@ -59,8 +59,8 @@ describe('lightning overlay', () => {
     const scene = await waitForScene(game, 'LightningTestScene')
     await delay(100)
 
-    // NOTE: LightningOverlay renders at DEPTH_LIGHTING + 3.
-    const lightning = findRenderTextureByDepth(scene, DEPTH_LIGHTING + 3)
+    // NOTE: LightningOverlay renders at DEPTH_LIGHTNING.
+    const lightning = findRenderTextureByDepth(scene, DEPTH_LIGHTNING)
     expect(lightning).toBeDefined()
     expect(lightning.visible).toBe(true)
   })
@@ -69,7 +69,7 @@ describe('lightning overlay', () => {
     game = createMinimalGame([LightningTestScene])
     const scene = await waitForScene(game, 'LightningTestScene')
 
-    const lightning = findRenderTextureByDepth(scene, DEPTH_LIGHTING + 3)
+    const lightning = findRenderTextureByDepth(scene, DEPTH_LIGHTNING)
 
     // NOTE: With minIntervalMs=100 and boltDurationMs=500, a bolt fires within 200ms
     // and stays visible for 500ms. Poll every 50ms — should catch it within 1s.

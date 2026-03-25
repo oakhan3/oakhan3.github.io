@@ -22,7 +22,14 @@ export const DEPTH_ABOVE_PLAYER = 6
 export const DEPTH_JOYSTICK_BASE = 90
 export const DEPTH_JOYSTICK_KNOB = 91
 // NOTE: Lighting overlay sits above game objects but below UI elements.
+// Sub-layers within the lighting range, in draw order (lower = drawn first):
+//   DEPTH_SPOTLIGHT_GLOW — ADD-blended colored glow on top of the spotlight MULTIPLY mask
+//   DEPTH_SPARKLE        — drifting sparkle particles
+//   DEPTH_LIGHTNING      — procedural lightning bolt
 export const DEPTH_LIGHTING = 50
+export const DEPTH_SPOTLIGHT_GLOW = DEPTH_LIGHTING + 1
+export const DEPTH_SPARKLE = DEPTH_LIGHTING + 2
+export const DEPTH_LIGHTNING = DEPTH_LIGHTING + 3
 export const DEPTH_DIALOG = 100
 // NOTE: Quest UI (banner, overlay, icon) renders above all other UI.
 export const DEPTH_QUEST_UI = 110
@@ -56,9 +63,10 @@ export const UI_CHROME_PADDING = 10
 // NOTE: Text line spacing used in dialog and banner label text objects.
 export const UI_TEXT_LINE_SPACING = 6
 
-// NOTE: Quest button colors — distinct from the general UI palette.
+// NOTE: Quest button colors and layout — distinct from the general UI palette.
 export const QUEST_BTN_BACKGROUND_COLOR = 0x1e3a5f
 export const QUEST_BTN_BORDER_COLOR = 0xf97316
+export const QUEST_BTN_MARGIN = 8
 
 // NOTE: Returns true when the viewport is phone-width. Use this everywhere
 // instead of inlining the threshold, so the breakpoint is defined once.

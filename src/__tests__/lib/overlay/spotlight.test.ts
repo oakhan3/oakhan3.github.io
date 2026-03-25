@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach } from 'vitest'
 import Phaser from 'phaser'
 import { SpotlightOverlay, type SpotlightConfig } from '../../../lib/overlay/spotlight/SpotlightOverlay'
-import { DEPTH_LIGHTING, GBA_WIDTH, GBA_HEIGHT } from '../../../config'
+import { DEPTH_LIGHTING, DEPTH_SPOTLIGHT_GLOW, GBA_WIDTH, GBA_HEIGHT } from '../../../config'
 import { createMinimalGame, waitForScene, delay, readTexturePixel, findRenderTextureByDepth } from '../../testing'
 
 // NOTE: Map fills GBA canvas exactly so world and screen coordinates coincide.
@@ -69,7 +69,7 @@ describe('spotlight overlay', () => {
     await delay(100)
 
     const multiply = findRenderTextureByDepth(scene, DEPTH_LIGHTING)
-    const add = findRenderTextureByDepth(scene, DEPTH_LIGHTING + 1)
+    const add = findRenderTextureByDepth(scene, DEPTH_SPOTLIGHT_GLOW)
 
     expect(multiply).toBeDefined()
     expect(add).toBeDefined()
@@ -102,7 +102,7 @@ describe('spotlight overlay', () => {
     const scene = await waitForScene(game, 'SpotlightTestScene')
     await delay(100)
 
-    const add = findRenderTextureByDepth(scene, DEPTH_LIGHTING + 1)
+    const add = findRenderTextureByDepth(scene, DEPTH_SPOTLIGHT_GLOW)
 
     const samples: string[] = []
     for (let step = 0; step < 8; step++) {
@@ -119,7 +119,7 @@ describe('spotlight overlay', () => {
     const scene = await waitForScene(game, 'SpotlightTestScene')
     await delay(200)
 
-    const add = findRenderTextureByDepth(scene, DEPTH_LIGHTING + 1)
+    const add = findRenderTextureByDepth(scene, DEPTH_SPOTLIGHT_GLOW)
     const pixel = readTexturePixel(add, GLOW_X, GLOW_Y)
 
     expect(pixel.r > 0 || pixel.g > 0 || pixel.b > 0).toBe(true)
