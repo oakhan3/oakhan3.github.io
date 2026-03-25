@@ -73,7 +73,7 @@ export class DialogBox {
     // computed in screen space, matching its scrollFactor(0) visual position.
     this.linkButton = scene.add.text(
       screenWidth - BOX_MARGIN - BOX_PADDING - INDICATOR_SIZE * 4,
-      boxY + boxHeight - BOX_PADDING - 11,
+      boxY + boxHeight - BOX_PADDING - 27,
       '[ open link ]',
       {
         fontFamily: '"Press Start 2P"',
@@ -170,18 +170,10 @@ export class DialogBox {
     if (this.currentUrl) {
       this.linkButton.setText(`[ ${this._displayLink ?? 'open link'} ]`)
       this.linkButton.setVisible(true)
-      // NOTE: Set the hit area after text is set so the font is loaded and
-      // linkButton.width is accurate. Padding makes the link easier to tap on mobile.
-      const hitPadding = 12
-      this.linkButton.setInteractive(
-        new Phaser.Geom.Rectangle(
-          -hitPadding,
-          -hitPadding,
-          this.linkButton.width + hitPadding * 2,
-          this.linkButton.height + hitPadding * 2,
-        ),
-        Phaser.Geom.Rectangle.Contains,
-      )
+      // NOTE: setPadding physically enlarges the text canvas so the default
+      // hit area covers the padding too — more reliable than a custom Rectangle.
+      this.linkButton.setPadding(24, 16, 24, 16)
+      this.linkButton.setInteractive({ useHandCursor: true })
     }
   }
 
