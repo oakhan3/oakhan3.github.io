@@ -1,5 +1,5 @@
 import Phaser from 'phaser'
-import { DEPTH_QUEST_UI } from '../../config'
+import { DEPTH_QUEST_UI, MOBILE_UI_TOP_OFFSET } from '../../config'
 import type { Quest } from './QuestSystem'
 
 const BACKGROUND_COLOR = 0x1a1b2e
@@ -46,7 +46,8 @@ export class QuestOverlay {
     }
     this.contents = []
 
-    const title = scene.add.text(BOX_PADDING, BOX_PADDING, 'Quests', {
+    const topOffset = isMobile ? MOBILE_UI_TOP_OFFSET + BOX_PADDING : BOX_PADDING
+    const title = scene.add.text(BOX_PADDING, topOffset, 'Quests', {
       fontFamily: '"Press Start 2P"',
       fontSize: isMobile ? '14px' : '10px',
       color: '#e2e8f0',
@@ -56,7 +57,7 @@ export class QuestOverlay {
 
     // NOTE: Separator line beneath the title.
     const separator = scene.add.graphics()
-    const separatorY = BOX_PADDING + title.height + 6
+    const separatorY = topOffset + title.height + 6
     separator.lineStyle(1, BORDER_COLOR, 0.5)
     separator.lineBetween(BOX_PADDING, separatorY, screenWidth - BOX_PADDING, separatorY)
     separator.setScrollFactor(0)

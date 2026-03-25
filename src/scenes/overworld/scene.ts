@@ -12,7 +12,7 @@ import { createInteractionSystem, QUEST_DEFINITIONS } from './interaction'
 import { setupPlayerAnimations } from './player'
 import { InteractionSystem } from '../../lib/interaction'
 import { QuestSystem, CompletionBanner, QuestOverlay } from '../../lib/quests'
-import { DEPTH_QUEST_UI } from '../../config'
+import { DEPTH_QUEST_UI, MOBILE_UI_TOP_OFFSET } from '../../config'
 
 interface LayerConfig {
   name: string
@@ -105,7 +105,7 @@ export class OverworldScene extends Phaser.Scene {
     const btnHeight = isMobile ? 22 : 18
     const btnWidth = isMobile ? 72 : 60
     const btnX = this.scale.width - 8
-    const btnY = 8
+    const btnY = isMobile ? MOBILE_UI_TOP_OFFSET : 8
 
     const questBtnBg = this.add.graphics()
     questBtnBg.fillStyle(0x1e3a5f, 0.92)

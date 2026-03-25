@@ -29,3 +29,7 @@ export const DEPTH_QUEST_UI = 110
 // NOTE: Minimum drag distance (in game pixels) before a touch is treated as
 // a drag rather than a tap. Used by both TouchControls and InteractionSystem.
 export const TOUCH_DEADZONE = 4
+
+// NOTE: Extra top offset on mobile to avoid UI elements being clipped by the
+// browser chrome or notch area.
+export const MOBILE_UI_TOP_OFFSET = 70

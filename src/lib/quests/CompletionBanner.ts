@@ -1,9 +1,9 @@
 import Phaser from 'phaser'
-import { DEPTH_QUEST_UI } from '../../config'
+import { DEPTH_QUEST_UI, MOBILE_UI_TOP_OFFSET } from '../../config'
 
 const BOX_PADDING = 10
 // NOTE: Banner is narrower than the full screen so it doesn't cover the quest icon in the top-right.
-const BANNER_MAX_WIDTH = 320
+const BANNER_MAX_WIDTH = 300
 const BANNER_MARGIN_TOP = 8
 const BORDER_COLOR = 0xe2e8f0
 const BACKGROUND_COLOR = 0x1a1b2e
@@ -22,7 +22,7 @@ export class CompletionBanner {
 
     const isMobile = window.innerWidth < 768
     const fontSize = isMobile ? '10px' : '8px'
-    const boxHeight = isMobile ? 40 : 32
+    const boxHeight = isMobile ? 45 : 38
     // NOTE: Centered narrow banner — leaves the top-right corner free for the quest icon.
     const boxWidth = Math.min(BANNER_MAX_WIDTH, scene.scale.width - BOX_PADDING * 4)
     const boxX = Math.floor((scene.scale.width - boxWidth) / 2)
@@ -38,6 +38,7 @@ export class CompletionBanner {
       fontSize,
       color: '#e2e8f0',
       wordWrap: { width: boxWidth - BOX_PADDING * 2 },
+      lineSpacing: 6,
     })
 
     this.container = scene.add.container(boxX, -boxHeight, [background, this.label])
@@ -54,7 +55,7 @@ export class CompletionBanner {
     }
 
     const boxHeight = this.container.getBounds().height
-    this.label.setText(`Quest complete! ${questLabel}`)
+    this.label.setText(`Quest complete!\n${questLabel}`)
     this.container.setY(-boxHeight)
     this.container.setAlpha(1)
     this.container.setVisible(true)
@@ -63,7 +64,11 @@ export class CompletionBanner {
     this.activeTween = this.scene.tweens.chain({
       targets: this.container,
       tweens: [
-        { y: BANNER_MARGIN_TOP, duration: SLIDE_DURATION, ease: 'Power2' },
+        {
+          y: window.innerWidth < 768 ? MOBILE_UI_TOP_OFFSET : BANNER_MARGIN_TOP,
+          duration: SLIDE_DURATION,
+          ease: 'Power2',
+        },
         { alpha: 0, duration: SLIDE_DURATION, delay: HOLD_DURATION },
       ],
       onComplete: () => {
