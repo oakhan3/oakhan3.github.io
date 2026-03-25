@@ -48,8 +48,8 @@ export const QUEST_DEFINITIONS: Quest[] = [
   { name: 'stage-sign', label: 'Find the Electric OAKS' },
   { name: 'car', label: 'Check out the car' },
   { name: 'secret-lab', label: 'Try to enter the Secret Lab' },
-  // { name: '???', label: '???' },
-  // { name: '???', label: '???' },
+  { name: '???', label: '???' },
+  { name: '???', label: '???' },
 ]
 
 export function createInteractionSystem(
