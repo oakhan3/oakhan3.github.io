@@ -103,6 +103,8 @@ src/
 - [ ] Implement the `???` quests
 - [ ] Analytics (page views, quest completion funnel)
 - [ ] User feedback (in-game form or link to submit comments/bug reports)
+- [ ] Mini game (simple arcade mechanic triggered by a quest or NPC interaction)
+- [ ] Custom sprites (hand-drawn player and NPC sprites to replace the asset pack defaults)
 
 ## Known Issues
 
