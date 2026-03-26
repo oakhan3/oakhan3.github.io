@@ -8,7 +8,8 @@ import { createSpotlightOverlay } from './overlays/spotlight'
 import { createLightningOverlay } from './overlays/lightning'
 import { createSparkleOverlay } from './overlays/sparkle'
 import { flags } from '../../game-flags'
-import { createInteractionSystem, QUEST_DEFINITIONS } from './interaction'
+import { createInteractionSystem, QUEST_DEFINITIONS, CONGRATULATORY_MESSAGE } from './interaction'
+import { TileAnimation, buildTileAnimations, updateTileAnimations } from './tile-animations'
 import { setupPlayerAnimations } from './player'
 import { InteractionSystem } from '../../lib/interaction'
 import { QuestSystem, CompletionBanner, QuestOverlay, CongratulatoryOverlay } from '../../lib/quests'
@@ -47,15 +48,6 @@ const LAYERS: LayerConfig[] = [
   { name: 'AbovePlayer', depth: DEPTH_ABOVE_PLAYER },
 ]
 
-interface TileAnimation {
-  layer: Phaser.Tilemaps.TilemapLayer
-  row: number
-  col: number
-  frames: { gid: number; duration: number }[]
-  frameIndex: number
-  elapsed: number
-}
-
 export class OverworldScene extends Phaser.Scene {
   private playerController!: PlayerController
   private tileAnimations: TileAnimation[] = []
@@ -81,7 +73,7 @@ export class OverworldScene extends Phaser.Scene {
 
     const { allLayers, collisionLayers } = _createLayers(map, tilesets)
 
-    this.tileAnimations = _buildTileAnimations(map, allLayers)
+    this.tileAnimations = buildTileAnimations(map, allLayers)
 
     setupPlayerAnimations(this)
 
@@ -146,13 +138,7 @@ export class OverworldScene extends Phaser.Scene {
           // Guard with a flag so it only fires once.
           if (!shown && this.questSystem.isComplete(name) && this.questSystem.isAllComplete()) {
             shown = true
-            congratulatoryOverlay.show(
-              `Thanks for stopping by!
-
-This started as a small experiment and turned into a fun way to explore map building, try game dev with Phaser, and get more familiar with frontend ecosystems.
-
-Hope you enjoyed it. Check back later, I might sneak in a few more updates!`,
-            )
+            congratulatoryOverlay.show(CONGRATULATORY_MESSAGE)
           }
         }
       })(),
@@ -177,7 +163,7 @@ Hope you enjoyed it. Check back later, I might sneak in a few more updates!`,
     this.spotlightOverlay?.update()
     this.sparkleOverlay?.update()
     this.lightningOverlay?.update()
-    _updateTileAnimations(this.tileAnimations, delta)
+    updateTileAnimations(this.tileAnimations, delta)
   }
 }
 
@@ -321,57 +307,4 @@ function _createLayers(
   }
 
   return { allLayers, collisionLayers }
-}
-
-function _buildTileAnimations(map: Phaser.Tilemaps.Tilemap, layers: Phaser.Tilemaps.TilemapLayer[]): TileAnimation[] {
-  // NOTE: Build a lookup of GID -> animation frames from tileset data
-  const animatedTiles = new Map<number, { firstgid: number; frames: { tileid: number; duration: number }[] }>()
-
-  for (const tileset of map.tilesets) {
-    const tileData = tileset.tileData as Record<string, { animation?: { tileid: number; duration: number }[] }>
-    for (const [localId, data] of Object.entries(tileData)) {
-      if (data.animation) {
-        const gid = tileset.firstgid + parseInt(localId, 10)
-        animatedTiles.set(gid, { firstgid: tileset.firstgid, frames: data.animation })
-      }
-    }
-  }
-
-  const animations: TileAnimation[] = []
-
-  for (const layer of layers) {
-    layer.forEachTile((tile) => {
-      const animData = animatedTiles.get(tile.index)
-      if (!animData) return
-
-      animations.push({
-        layer,
-        row: tile.y,
-        col: tile.x,
-        frames: animData.frames.map((frame) => ({
-          gid: animData.firstgid + frame.tileid,
-          duration: frame.duration,
-        })),
-        frameIndex: 0,
-        elapsed: 0,
-      })
-    })
-  }
-
-  return animations
-}
-
-function _updateTileAnimations(animations: TileAnimation[], delta: number) {
-  for (const anim of animations) {
-    anim.elapsed += delta
-    const currentFrame = anim.frames[anim.frameIndex]
-    if (anim.elapsed >= currentFrame.duration) {
-      anim.elapsed -= currentFrame.duration
-      anim.frameIndex = (anim.frameIndex + 1) % anim.frames.length
-      // NOTE: putTileAt swaps the visual tile but the MatterTileBody created by
-      // convertTilemapLayer persists. This works because all animation frames share
-      // the same collision shape (full-tile blockers) (for now!).
-      anim.layer.putTileAt(anim.frames[anim.frameIndex].gid, anim.col, anim.row)
-    }
-  }
 }

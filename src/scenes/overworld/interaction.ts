@@ -52,6 +52,12 @@ export const QUEST_DEFINITIONS: Quest[] = [
   { name: '???', label: '???' },
 ]
 
+export const CONGRATULATORY_MESSAGE = `Thanks for stopping by!
+
+This started as a small experiment and turned into a fun way to explore map building, try game dev with Phaser, and get more familiar with frontend ecosystems.
+
+Hope you enjoyed it. Check back later, I might sneak in a few more updates!`
+
 export function createInteractionSystem(
   scene: Phaser.Scene,
   map: Phaser.Tilemaps.Tilemap,
