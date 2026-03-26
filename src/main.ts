@@ -3,6 +3,7 @@ import { BootScene } from './scenes/BootScene'
 import { PreloadScene } from './scenes/PreloadScene'
 import { OverworldScene } from './scenes/overworld'
 import { GBA_WIDTH, GBA_HEIGHT } from './config'
+import { TEST_MODE } from './test-mode'
 
 export const GAME_CONFIG: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -33,7 +34,12 @@ export const GAME_CONFIG: Phaser.Types.Core.GameConfig = {
 }
 
 export function createGame(): Phaser.Game {
-  return new Phaser.Game(GAME_CONFIG)
+  const game = new Phaser.Game(GAME_CONFIG)
+  if (TEST_MODE) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ;(window as any).__phaserGame = game
+  }
+  return game
 }
 
 createGame()

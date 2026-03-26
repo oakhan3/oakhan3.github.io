@@ -1,4 +1,5 @@
 import Phaser from 'phaser'
+import { TEST_MODE } from '../test-mode'
 
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -27,13 +28,15 @@ export class BootScene extends Phaser.Scene {
       })
       .setOrigin(0.5)
 
-    this.tweens.add({
-      targets: prompt,
-      alpha: 0,
-      duration: 500,
-      yoyo: true,
-      repeat: -1,
-    })
+    if (!TEST_MODE) {
+      this.tweens.add({
+        targets: prompt,
+        alpha: 0,
+        duration: 500,
+        yoyo: true,
+        repeat: -1,
+      })
+    }
 
     this.input.keyboard!.on('keydown', () => {
       this.scene.start('PreloadScene')

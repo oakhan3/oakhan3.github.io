@@ -77,6 +77,18 @@ export class InteractionSystem {
     })
   }
 
+  triggerByName(name: string): void {
+    const message = this.config.messages[name]
+    if (!message) return
+    this.playerController.freeze()
+    this.config.onInteract?.(name)
+    this.dialog.show(message.text, message.url, message.display_link, () => {
+      this.playerController.unfreeze()
+      this.scene.input.keyboard!.resetKeys()
+      this.config.onDialogClose?.(name)
+    })
+  }
+
   update() {
     // NOTE: Don't check for new interactions while player is already frozen
     // (dialog open, etc.). Consume any pending tap so it doesn't fire after

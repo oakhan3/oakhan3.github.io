@@ -5,3 +5,4 @@ dist/
 *.tiled-session
 .claude
 coverage/
+.last-run.json

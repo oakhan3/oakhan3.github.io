@@ -161,6 +161,7 @@ Hope you enjoyed it. Check back later, I might sneak in a few more updates!`,
       ;(window as any).__overworldTest = {
         isReady: true,
         interact: (name: string) => this.interactionSystem.triggerByName(name),
+        hideBanner: () => completionBanner.hide(),
         showQuestOverlay: () => questOverlay.show(questSystem.getAll()),
       }
     }

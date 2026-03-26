@@ -1,4 +1,5 @@
 import Phaser from 'phaser'
+import { TEST_MODE } from '../../test-mode'
 import {
   DEPTH_DIALOG,
   DIALOG_LINK_BTN_ROW_HEIGHT_DESKTOP,
@@ -150,12 +151,18 @@ export class DialogBox {
     this.hideIndicator()
     this.container.setVisible(true)
 
-    this.typewriterTimer = this.scene.time.addEvent({
-      delay: TYPEWRITER_DELAY,
-      callback: this.advanceCharacter,
-      callbackScope: this,
-      repeat: this.fullText.length - 1,
-    })
+    if (TEST_MODE) {
+      this.displayedLength = this.fullText.length
+      this.textObject.setText(this.fullText)
+      this.showIndicator()
+    } else {
+      this.typewriterTimer = this.scene.time.addEvent({
+        delay: TYPEWRITER_DELAY,
+        callback: this.advanceCharacter,
+        callbackScope: this,
+        repeat: this.fullText.length - 1,
+      })
+    }
 
     for (const key of this.advanceKeys) {
       key.removeAllListeners()
