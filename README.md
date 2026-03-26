@@ -82,6 +82,10 @@ src/
 
 - **iOS Safari blocks navigation from Phaser input events** — `window.open()` and programmatic `anchor.click()` are blocked on iOS Safari unless called directly from a native DOM gesture. Phaser's input pipeline processes touch events asynchronously enough to exceed Safari's transient activation window, so any navigation triggered from a Phaser `pointerdown` listener silently fails. Fix: replace the Phaser link button's click handler with a transparent `<a>` element overlaid on the canvas at the button's position. iOS Safari treats a tap on a real anchor as a genuine user gesture regardless of what's underneath it.
 
+- **MULTIPLY blend can't produce vibrant colored light** — the nighttime overlay uses a MULTIPLY-blended render texture to darken the scene, with white circles drawn onto it to reveal lit areas. But drawing colored circles through MULTIPLY only produces dim, muddy tones because MULTIPLY can never make pixels brighter than the source. Fix: a second render texture with ADD blend mode sits on top. Glow lights draw white on the MULTIPLY layer (to reveal the area) and draw their full color on the ADD layer (to paint vibrant color on top). The two layers combine to produce bright, saturated glows — like the blue office windows.
+
+- **Phaser delta smoothing causes sluggish movement on startup** — Phaser's `smoothStep` calibrates over the first ~5 seconds, which makes the player feel slow and unresponsive at game start. Disabling it (`fps: { smoothStep: false }` in the game config) makes movement speed consistent from frame one.
+
 - **Mobile detection: `window.innerWidth` vs `screen.width`** — `screen.width` returns the physical screen resolution, which is misleadingly large on high-DPI mobile devices and doesn't reflect the viewport. `scene.scale.width` is even more misleading: it returns the logical game width (480), not the browser viewport at all. `window.innerWidth` is the correct signal — it reflects the actual CSS viewport width and reliably distinguishes mobile from desktop. Centralized in `isMobile()` in `config.ts` so it's never inlined.
 
 ## Known Issues
