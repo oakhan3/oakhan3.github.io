@@ -12,21 +12,8 @@ import { createInteractionSystem, QUEST_DEFINITIONS, CONGRATULATORY_MESSAGE } fr
 import { TileAnimation, buildTileAnimations, updateTileAnimations } from './tile-animations'
 import { setupPlayerAnimations } from './player'
 import { InteractionSystem } from '../../lib/interaction'
-import { QuestSystem, CompletionBanner, QuestOverlay, CongratulatoryOverlay } from '../../lib/quests'
-import {
-  DEPTH_QUEST_UI,
-  isMobile,
-  MOBILE_UI_TOP_OFFSET_PX,
-  DEPTH_ABOVE_PLAYER,
-  QUEST_BTN_BACKGROUND_COLOR,
-  QUEST_BTN_BORDER_COLOR,
-  QUEST_BTN_HIT_PADDING_X_PX,
-  QUEST_BTN_HIT_PADDING_Y_PX,
-  QUEST_BTN_MARGIN_PX,
-  UI_CHROME_ALPHA,
-  UI_FONT_FAMILY,
-  UI_TEXT_COLOR,
-} from '../../config'
+import { QuestSystem, CompletionBanner, QuestOverlay, CongratulatoryOverlay, QuestButton } from '../../lib/quests'
+import { isMobile, DEPTH_ABOVE_PLAYER } from '../../config'
 
 interface LayerConfig {
   name: string
@@ -107,7 +94,7 @@ export class OverworldScene extends Phaser.Scene {
     this.questOverlay = new QuestOverlay(this)
     const congratulatoryOverlay = new CongratulatoryOverlay(this)
 
-    const { questIcon, questZone } = _createQuestButton(this, this.questOverlay, this.questSystem)
+    const questButton = new QuestButton(this, this.questOverlay, this.questSystem)
 
     _setupCameras(
       this,
@@ -116,8 +103,7 @@ export class OverworldScene extends Phaser.Scene {
       this.completionBanner,
       this.questOverlay,
       congratulatoryOverlay,
-      questIcon,
-      questZone,
+      questButton.getGameObjects(),
     )
 
     this.interactionSystem = createInteractionSystem(
@@ -248,8 +234,7 @@ function _setupCameras(
   completionBanner: CompletionBanner,
   questOverlay: QuestOverlay,
   congratulatoryOverlay: CongratulatoryOverlay,
-  questIcon: Phaser.GameObjects.Container,
-  questZone: Phaser.GameObjects.Zone,
+  questButtonObjects: Phaser.GameObjects.GameObject[],
 ): void {
   if (!isMobile()) return
 
@@ -264,8 +249,7 @@ function _setupCameras(
     ...completionBanner.getGameObjects(),
     ...questOverlay.getGameObjects(),
     ...congratulatoryOverlay.getGameObjects(),
-    questIcon,
-    questZone,
+    ...questButtonObjects,
   ]
   scene.cameras.main.ignore(uiObjects)
   const uiSet = new Set(uiObjects)
