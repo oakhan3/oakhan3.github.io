@@ -9,9 +9,28 @@ import type { Quest } from '../../lib/quests'
 // is considered "in range". ~1.5 tiles gives comfortable trigger distance.
 const INTERACTION_RADIUS = 24
 
+// NOTE: Union of every named object in the Tiled Interactables layer.
+// Typed as the key type for MESSAGES so typos are caught at compile time.
+export type InteractableName =
+  | 'secret-lab'
+  | 'secret-lab-sign'
+  | 'kiwi'
+  | 'kiwi-sign'
+  | 'beach-sign'
+  | 'office-sign'
+  | 'office'
+  | 'car'
+  | 'github-sign'
+  | 'github-commit'
+  | 'github-computer'
+  | 'github-stash'
+  | 'stage-sign'
+  | 'stage'
+  | '???'
+
 // NOTE: Dialog messages keyed by the Tiled object name. Each interactable name
 // maps to the text shown in the dialog box when the player interacts with it.
-const MESSAGES: Record<string, Message> = {
+const MESSAGES: Partial<Record<InteractableName, Message>> = {
   'secret-lab': { text: "Hey! Don't go in here!" },
   'secret-lab-sign': { text: "Omar's Secret Lab" },
   kiwi: { text: 'Bakaaaw!' },
