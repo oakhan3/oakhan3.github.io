@@ -6,3 +6,4 @@ dist/
 .claude
 coverage/
 .last-run.json
+test-results/
