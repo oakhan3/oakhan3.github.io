@@ -152,11 +152,16 @@ Hope you enjoyed it. Check back later, I might sneak in a few more updates!`,
       })(),
     )
     this.playerController.freeze()
-    const signHint = isMobile() ? 'Tapping' : "Hitting 'Enter'"
-    dialog.show(`Welcome, I'm Omar Ali Khan!\n\nTry ${signHint} on the signs!`, undefined, undefined, () => {
-      this.playerController.unfreeze()
-      questOverlay.show(questSystem.getAll())
-    })
+    const signHint = isMobile() ? 'tapping' : "hitting 'Enter' near"
+    dialog.show(
+      `Welcome, I'm Omar Ali Khan!\nTry ${signHint} a sign - but get close first!`,
+      undefined,
+      undefined,
+      () => {
+        this.playerController.unfreeze()
+        questOverlay.show(questSystem.getAll())
+      },
+    )
   }
 
   update(_time: number, delta: number) {
