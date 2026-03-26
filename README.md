@@ -44,7 +44,7 @@ Uses Matter.js physics for pixel-accurate tile collisions from per-tile objectgr
 - **Proximity interactables** — objects defined in Tiled trigger typewriter-style dialog when the player walks nearby. Dialogs support inline hyperlinks that open in a new tab (Safari-safe via anchor click).
 - **Custom map and collisions** — tilemap built in Tiled with per-tile convex polygon collision shapes, an above-player render layer, and separate object layers for interactables.
 - **Dialog system** — typewriter effect with configurable speed, optional URL link button with expanded mobile hit area, and open/close callbacks for chaining actions.
-- **Touch controls** — drag-from-origin virtual joystick with a visual indicator.
+- **Touch controls** — drag-from-origin virtual d-pad with a visual indicator.
 - **Responsive design** — detects mobile vs desktop and adjusts camera zoom, UI element sizing and positioning, hit areas, and in-game hints accordingly.
 
 ## Source Layout
@@ -105,6 +105,10 @@ src/
 - [ ] User feedback (in-game form or link to submit comments/bug reports)
 - [ ] Mini game (simple arcade mechanic triggered by a quest or NPC interaction)
 - [ ] Custom sprites (hand-drawn player and NPC sprites to replace the asset pack defaults)
+
+## Credits
+
+- D-Pad by Nurhuda Rahmadihan from <a href="https://thenounproject.com/browse/icons/term/d-pad/" target="_blank" title="D-Pad Icons">Noun Project</a> (CC BY 3.0)
 
 ## Known Issues
 

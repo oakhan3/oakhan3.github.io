@@ -23,16 +23,17 @@ class TouchTestScene extends Phaser.Scene {
   }
 }
 
-function findJoystick(scene: Phaser.Scene): {
-  base: Phaser.GameObjects.Graphics
+function findControls(scene: Phaser.Scene): {
+  dpad: Phaser.GameObjects.Image
   knob: Phaser.GameObjects.Graphics
 } {
-  const graphics = scene.children.list.filter(
-    (child) => child instanceof Phaser.GameObjects.Graphics,
-  ) as Phaser.GameObjects.Graphics[]
   return {
-    base: graphics.find((graphic) => graphic.depth === DEPTH_JOYSTICK_BASE)!,
-    knob: graphics.find((graphic) => graphic.depth === DEPTH_JOYSTICK_KNOB)!,
+    dpad: scene.children.list.find(
+      (child) => child instanceof Phaser.GameObjects.Image && child.depth === DEPTH_JOYSTICK_BASE,
+    ) as Phaser.GameObjects.Image,
+    knob: scene.children.list.find(
+      (child) => child instanceof Phaser.GameObjects.Graphics && child.depth === DEPTH_JOYSTICK_KNOB,
+    ) as Phaser.GameObjects.Graphics,
   }
 }
 
@@ -46,24 +47,24 @@ afterEach(() => {
 })
 
 describe('touch controls', () => {
-  it('joystick appears on pointer down and hides on release', async () => {
+  it('dpad and knob appear on pointer down and hide on release', async () => {
     game = createMinimalGame([TouchTestScene])
     const scene = (await waitForScene(game, 'TouchTestScene')) as TouchTestScene
 
-    const { base, knob } = findJoystick(scene)
-    expect(base.visible).toBe(false)
+    const { dpad, knob } = findControls(scene)
+    expect(dpad.visible).toBe(false)
     expect(knob.visible).toBe(false)
 
     simulatePointerDown(game, GBA_WIDTH / 2, GBA_HEIGHT / 2)
     await delay(50)
 
-    expect(base.visible).toBe(true)
+    expect(dpad.visible).toBe(true)
     expect(knob.visible).toBe(true)
 
     simulatePointerUp(game, GBA_WIDTH / 2, GBA_HEIGHT / 2)
     await delay(50)
 
-    expect(base.visible).toBe(false)
+    expect(dpad.visible).toBe(false)
     expect(knob.visible).toBe(false)
   })
 
@@ -138,7 +139,7 @@ describe('touch controls', () => {
     expect(scene.touchControls.direction).toBe('none')
   })
 
-  it('knob moves right of base when dragging right', async () => {
+  it('knob moves right of dpad when dragging right', async () => {
     game = createMinimalGame([TouchTestScene])
     const scene = (await waitForScene(game, 'TouchTestScene')) as TouchTestScene
 
@@ -149,10 +150,9 @@ describe('touch controls', () => {
     simulatePointerMove(game, originX + 20, originY)
     await delay(50)
 
-    const { base, knob } = findJoystick(scene)
-    // NOTE: Knob should be to the right of the base and at the same height.
-    expect(knob.x).toBeGreaterThan(base.x)
-    expect(knob.y).toBeCloseTo(base.y, 0)
+    const { dpad, knob } = findControls(scene)
+    expect(knob.x).toBeGreaterThan(dpad.x)
+    expect(knob.y).toBeCloseTo(dpad.y, 0)
 
     simulatePointerUp(game, originX + 20, originY)
   })
