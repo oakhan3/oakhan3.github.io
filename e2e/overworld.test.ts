@@ -62,8 +62,11 @@ test('touch controls - dpad visible', async ({ page }) => {
   await bootToOverworld(page)
   await dismissDialog(page)
   await page.keyboard.press('Space')
-  // NOTE: Simulate a touch down to show the dpad at a bottom-left position.
-  await page.mouse.move(370, 450)
+  const box = await page.locator('canvas').boundingBox()
+  // NOTE: Touch at 25% from left, 70% from top — lower-left thumb position.
+  const touchX = box!.x + box!.width * 0.25
+  const touchY = box!.y + box!.height * 0.7
+  await page.mouse.move(touchX, touchY)
   await page.mouse.down()
   await expect(page.locator('canvas')).toHaveScreenshot()
   await page.mouse.up()
@@ -73,10 +76,13 @@ test('touch controls - knob offset', async ({ page }) => {
   await bootToOverworld(page)
   await dismissDialog(page)
   await page.keyboard.press('Space')
+  const box = await page.locator('canvas').boundingBox()
   // NOTE: Touch down then drag right to show the knob displaced from the dpad center.
-  await page.mouse.move(370, 450)
+  const touchX = box!.x + box!.width * 0.25
+  const touchY = box!.y + box!.height * 0.7
+  await page.mouse.move(touchX, touchY)
   await page.mouse.down()
-  await page.mouse.move(460, 450)
+  await page.mouse.move(touchX + box!.width * 0.1, touchY)
   await expect(page.locator('canvas')).toHaveScreenshot()
   await page.mouse.up()
 })
