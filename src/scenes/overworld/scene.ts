@@ -145,9 +145,20 @@ export class OverworldScene extends Phaser.Scene {
   }
 
   update(_time: number, delta: number) {
+    if (flags.collectFrameTimes) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ;((window as any).__frameTimes as number[]).push(delta)
+    }
     this.playerController.update()
     this.interactionSystem.update()
-    this.spotlightOverlay?.update()
+    if (flags.collectSpotlightTimes && this.spotlightOverlay) {
+      const start = performance.now()
+      this.spotlightOverlay.update()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ;((window as any).__spotlightTimes as number[]).push(performance.now() - start)
+    } else {
+      this.spotlightOverlay?.update()
+    }
     this.sparkleOverlay?.update()
     this.lightningOverlay?.update()
     updateTileAnimations(this.tileAnimations, delta)

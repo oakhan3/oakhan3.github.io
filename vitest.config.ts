@@ -6,7 +6,7 @@ export default defineConfig({
     exclude: ['playwright', '@playwright/test'],
   },
   test: {
-    exclude: ['e2e/**', 'node_modules/**'],
+    exclude: ['e2e/**', 'benchmark/**', 'node_modules/**'],
     testTimeout: 30000,
     coverage: {
       provider: 'istanbul',

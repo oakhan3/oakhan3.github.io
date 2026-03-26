@@ -4,6 +4,7 @@ import { PreloadScene } from './scenes/PreloadScene'
 import { OverworldScene } from './scenes/overworld'
 import { GBA_WIDTH, GBA_HEIGHT } from './config'
 import { TEST_MODE } from './test-mode'
+import { BENCHMARK_MODE } from './benchmark-mode'
 
 export const GAME_CONFIG: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -37,6 +38,9 @@ export function createGame(): Phaser.Game {
   const game = new Phaser.Game(GAME_CONFIG)
   if (TEST_MODE) {
     import('./test-hooks').then(({ setupTestHooks }) => setupTestHooks(game))
+  }
+  if (BENCHMARK_MODE) {
+    import('./benchmark-hooks').then(({ setupBenchmarkHooks }) => setupBenchmarkHooks(game))
   }
   return game
 }

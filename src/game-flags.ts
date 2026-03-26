@@ -2,4 +2,6 @@
 // are created — test-hooks.ts sets disableOverlays before OverworldScene runs.
 export const flags = {
   disableOverlays: false,
+  collectFrameTimes: false,
+  collectSpotlightTimes: false,
 }

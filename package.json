@@ -17,6 +17,7 @@
     "test:watch": "vitest",
     "test:screenshots": "playwright test",
     "test:screenshots:update": "playwright test --update-snapshots",
+    "benchmark": "playwright test --config playwright.benchmark.config.ts",
     "check": "npm run format && npm run lint && npm run typecheck && npm test && npm run test:screenshots",
     "clean": "rm -rf dist"
   },

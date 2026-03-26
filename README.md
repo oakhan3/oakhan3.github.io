@@ -24,6 +24,9 @@ npm run format:check   # Check formatting without writing
 npm run test           # Run tests (browser mode via Playwright)
 npm run test:coverage  # Run tests with coverage report (output: coverage/)
 npm run test:watch     # Run tests in watch mode
+npm run test:screenshots          # Run Playwright end-to-end screenshot tests
+npm run test:screenshots:update   # Update screenshot baselines
+npm run benchmark      # Run headed Playwright performance benchmark (prints frame timing stats)
 npm run check          # Format, lint, typecheck, and test in one go
 npm run clean          # Remove dist/
 ```
@@ -35,6 +38,14 @@ The site renders at GBA resolution (480x320) and scales up to fill the browser w
 Scenes flow: **Boot** (press any key) → **Preload** (asset loading) → **Overworld** (explore and interact).
 
 Uses Matter.js physics for pixel-accurate tile collisions from per-tile objectgroup polygon shapes defined in Tiled. Controls are WASD/arrows on desktop and drag-from-origin with visual joystick on mobile.
+
+## Testing
+
+Unit and integration tests run in a real Chromium instance via Vitest browser mode — no mocking, no jsdom. Tests assert observable behavior (player position, UI visibility) against a live Phaser game.
+
+End-to-end screenshot tests (`npm run test:screenshots`) boot the full game and compare canvas snapshots against committed baselines. Snapshots are platform-independent: baselines committed on macOS also pass on Linux CI.
+
+A headed Playwright benchmark (`npm run benchmark`) measures frame time and per-system update cost over a 5-second movement run. Use it before and after performance changes to quantify improvement.
 
 ## Notable Features
 
@@ -92,7 +103,7 @@ src/
 
 ## Ideas
 
-- [ ] Add Playwright end-to-end screenshot tests
+- [x] Add Playwright end-to-end screenshot tests
 - [ ] Support user resizing the browser window (resize and re-center the game)
 - [ ] Add background music and interaction SFX (with mute/unmute toggle)
 - [ ] PWA support (manifest + service worker for offline play and home screen install)
