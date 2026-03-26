@@ -1,12 +1,20 @@
 import Phaser from 'phaser'
-import { Direction, GBA_HEIGHT, DEPTH_JOYSTICK_BASE, DEPTH_JOYSTICK_KNOB, TOUCH_DEADZONE_PX } from '../../config'
+import {
+  Direction,
+  GBA_HEIGHT,
+  DEPTH_JOYSTICK_BASE,
+  DEPTH_JOYSTICK_KNOB,
+  TOUCH_DEADZONE_PX,
+  isMobile,
+} from '../../config'
 
 // NOTE: Sized relative to the shorter game dimension (320px). Phaser's Scale.FIT
 // stretches the canvas to fill the screen, so these scale up on all devices.
-const DPAD_SIZE = Math.round(GBA_HEIGHT * 0.7)
+const DPAD_SIZE = Math.round(GBA_HEIGHT * (isMobile() ? 0.7 : 0.35))
 const DPAD_ALPHA = 0.5
-const JOYSTICK_KNOB_RADIUS = Math.round(GBA_HEIGHT * 0.1)
-const JOYSTICK_BASE_RADIUS = Math.round(GBA_HEIGHT * 0.25)
+const JOYSTICK_SCALE = isMobile() ? 1 : 0.5
+const JOYSTICK_KNOB_RADIUS = Math.round(GBA_HEIGHT * 0.1 * JOYSTICK_SCALE)
+const JOYSTICK_BASE_RADIUS = Math.round(GBA_HEIGHT * 0.25 * JOYSTICK_SCALE)
 const JOYSTICK_KNOB_COLOR = 0xffffff
 const JOYSTICK_KNOB_ALPHA = 0.4
 
