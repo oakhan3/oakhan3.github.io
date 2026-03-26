@@ -20,7 +20,7 @@ export const GAME_CONFIG: Phaser.Types.Core.GameConfig = {
   physics: {
     default: 'matter',
     matter: {
-      // NOTE: Zero gravity for top-down RPG — no downward pull.
+      // NOTE: Zero gravity for top-down RPG.
       gravity: { x: 0, y: 0 },
       debug: false,
     },

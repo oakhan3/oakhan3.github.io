@@ -7,16 +7,14 @@ export const GBA_HEIGHT = 320
 // NOTE: Tile size from the Tiny Realm asset pack — all tilesets use 16x16 tiles.
 export const TILE_SIZE = 16
 
-// NOTE: Matter.js velocity is in pixels per physics step (at 60fps baseline),
-// not pixels per second like Arcade. 2 px/step ≈ 120 px/s at 60fps.
+// NOTE: Matter.js velocity is in pixels per physics step, not pixels per second like Arcade.
 export const PLAYER_SPEED = 2
 
-// NOTE: Player spritesheet frames are 48x48 (3x tile size) to allow detail
+// NOTE: Player spritesheet frames are larger than one tile to allow detail
 // on a character that occupies roughly one tile of space.
 export const PLAYER_FRAME_WIDTH = 48
 export const PLAYER_FRAME_HEIGHT = 48
 
-// NOTE: Depth layers control draw order. Higher values render on top.
 export const DEPTH_PLAYER = 5
 export const DEPTH_ABOVE_PLAYER = 6
 export const DEPTH_JOYSTICK_BASE = 90
@@ -42,12 +40,10 @@ export const TOUCH_DEADZONE = 4
 // browser chrome or notch area.
 export const MOBILE_UI_TOP_OFFSET = 70
 
-// NOTE: Shared UI theme constants used across dialog and quest overlays.
 export const UI_BACKGROUND_COLOR = 0x1a1b2e
 export const UI_BORDER_COLOR = 0xe2e8f0
 export const UI_FONT_FAMILY = '"Press Start 2P"'
 
-// NOTE: Text colors used across UI components.
 export const UI_TEXT_COLOR = '#e2e8f0'
 export const UI_SUCCESS_COLOR = '#86efac'
 export const UI_MUTED_COLOR = '#94a3b8'
@@ -60,7 +56,6 @@ export const UI_LINK_COLOR = '#60a5fa'
 export const UI_CHROME_ALPHA = 0.92
 export const UI_CHROME_PADDING = 10
 
-// NOTE: Text line spacing used in dialog and banner label text objects.
 export const UI_TEXT_LINE_SPACING = 6
 
 // NOTE: Quest button colors and layout — distinct from the general UI palette.

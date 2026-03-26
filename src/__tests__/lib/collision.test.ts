@@ -15,8 +15,6 @@ import {
 } from '../testing'
 import collisionMapData from '../fixtures/collision-map.json'
 
-// NOTE: The fixture places a 32px-wide wall at x=200 spanning the full map height.
-// Player starts at x=100 and moves right — expect it to stop before reaching x=200.
 const WALL_X = 200
 
 class CollisionTestScene extends Phaser.Scene {

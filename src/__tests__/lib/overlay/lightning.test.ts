@@ -71,8 +71,6 @@ describe('lightning overlay', () => {
 
     const lightning = findRenderTextureByDepth(scene, DEPTH_LIGHTNING)
 
-    // NOTE: With minIntervalMs=100 and boltDurationMs=500, a bolt fires within 200ms
-    // and stays visible for 500ms. Poll every 50ms — should catch it within 1s.
     let sawBolt = false
     for (let step = 0; step < 20; step++) {
       if (countVisiblePixels(lightning, 4) > 0) {

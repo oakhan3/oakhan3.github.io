@@ -8,7 +8,6 @@ import { TILE_SIZE } from '../../../config'
 // colored circles onto this dark fill creates tinted light effects.
 const AMBIENT_COLOR = 0x334466
 
-// NOTE: Player light radius in pixels.
 const PLAYER_LIGHT_RADIUS = 80
 
 // NOTE: Stage cones are wider at the tip (big stage lights). Lamp cones have a
@@ -27,7 +26,6 @@ const SPOTLIGHT_CONFIG: SpotlightConfig = {
   ambientColor: AMBIENT_COLOR,
   playerLightRadius: PLAYER_LIGHT_RADIUS,
   coneTypes: {
-    // NOTE: Stage cones are wider at the tip (big stage lights).
     stage: {
       spec: verticalConeSpec(STAGE_CONE_WIDTH, STAGE_CONE_HEIGHT, 0.3),
       origin: { x: 0.5, y: 0 },
@@ -35,7 +33,6 @@ const SPOTLIGHT_CONFIG: SpotlightConfig = {
       poolOffset: { x: 0, y: STAGE_CONE_HEIGHT },
       animationStyle: 'scale',
     },
-    // NOTE: Lamp cones have a narrow tip (small lamp heads) that flares out more.
     lamp: {
       spec: verticalConeSpec(LAMP_CONE_WIDTH, LAMP_CONE_HEIGHT, 0.42),
       origin: { x: 0.5, y: 0 },
@@ -43,7 +40,6 @@ const SPOTLIGHT_CONFIG: SpotlightConfig = {
       poolOffset: { x: 0, y: LAMP_CONE_HEIGHT },
       animationStyle: 'scale',
     },
-    // NOTE: Headlight cone projects horizontally to the left from the car.
     headlight: {
       spec: horizontalConeSpec(HEADLIGHT_CONE_LENGTH, HEADLIGHT_CONE_SPREAD, 0.25),
       origin: { x: 1, y: 0.5 },
@@ -170,8 +166,7 @@ const SPOTLIGHT_CONFIG: SpotlightConfig = {
       animation: 'flicker',
     },
 
-    // Car tail lights — small red glow at the right edge of tiles 41,21 and 41,22.
-    // NOTE: Top light (21) is lowered by 50% of a tile (8px) to align with the sprite.
+    // Car tail lights — small red glow at the right edge of the car.
     {
       pixelX: 42 * TILE_SIZE - 5,
       pixelY: 21.5 * TILE_SIZE + 8,
@@ -199,8 +194,7 @@ const SPOTLIGHT_CONFIG: SpotlightConfig = {
       animation: 'flicker',
     },
 
-    // Fairy lights — bright concentrated glows with lamp-style flicker.
-    // NOTE: Radius 4 (70% smaller than initial 14) for a tight, focused point.
+    // Fairy lights — tight concentrated glows with lamp-style flicker.
     {
       pixelX: 15.5 * TILE_SIZE,
       pixelY: 11.5 * TILE_SIZE,
