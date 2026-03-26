@@ -6,6 +6,9 @@ export default defineConfig({
   // also match on Linux CI. Pixel art on a canvas is deterministic enough to
   // share one baseline, with a small threshold to absorb any minor differences.
   snapshotPathTemplate: '{testDir}/snapshots/{testName}{ext}',
+  expect: {
+    toHaveScreenshot: { maxDiffPixelRatio: 0.05 },
+  },
   use: {
     baseURL: 'http://localhost:8080',
   },

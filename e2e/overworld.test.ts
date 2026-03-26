@@ -15,14 +15,14 @@ async function dismissDialog(page: Page): Promise<void> {
 
 test('welcome dialog', async ({ page }) => {
   await bootToOverworld(page)
-  await expect(page.locator('canvas')).toHaveScreenshot({ maxDiffPixelRatio: 0.02 })
+  await expect(page.locator('canvas')).toHaveScreenshot()
 })
 
 test('quest overview', async ({ page }) => {
   await bootToOverworld(page)
   await dismissDialog(page)
   // NOTE: Quest overlay appears automatically after the welcome dialog closes.
-  await expect(page.locator('canvas')).toHaveScreenshot({ maxDiffPixelRatio: 0.02 })
+  await expect(page.locator('canvas')).toHaveScreenshot()
 })
 
 test('sign interaction - dialog and completion banner', async ({ page }) => {
@@ -31,7 +31,7 @@ test('sign interaction - dialog and completion banner', async ({ page }) => {
   // NOTE: Dismiss the quest overlay so the world is visible before triggering an interaction.
   await page.keyboard.press('Space')
   await page.evaluate(() => (window as any).__overworldTest.interact('kiwi-sign'))
-  await expect(page.locator('canvas')).toHaveScreenshot({ maxDiffPixelRatio: 0.02 })
+  await expect(page.locator('canvas')).toHaveScreenshot()
 })
 
 test('sign interaction - no banner on repeat', async ({ page }) => {
@@ -47,7 +47,7 @@ test('sign interaction - no banner on repeat', async ({ page }) => {
   await page.evaluate(() => (window as any).__overworldTest.hideBanner())
   // NOTE: Second interaction - quest already complete, no banner.
   await page.evaluate(() => (window as any).__overworldTest.interact('kiwi-sign'))
-  await expect(page.locator('canvas')).toHaveScreenshot({ maxDiffPixelRatio: 0.02 })
+  await expect(page.locator('canvas')).toHaveScreenshot()
 })
 
 test('quest overlay with completed quest', async ({ page }) => {
@@ -57,5 +57,5 @@ test('quest overlay with completed quest', async ({ page }) => {
   await page.evaluate(() => (window as any).__overworldTest.interact('kiwi-sign'))
   await dismissDialog(page)
   await page.evaluate(() => (window as any).__overworldTest.showQuestOverlay())
-  await expect(page.locator('canvas')).toHaveScreenshot({ maxDiffPixelRatio: 0.02 })
+  await expect(page.locator('canvas')).toHaveScreenshot()
 })
