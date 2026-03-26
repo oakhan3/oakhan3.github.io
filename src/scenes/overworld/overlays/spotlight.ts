@@ -8,43 +8,43 @@ import { TILE_SIZE } from '../../../config'
 // colored circles onto this dark fill creates tinted light effects.
 const AMBIENT_COLOR = 0x334466
 
-const PLAYER_LIGHT_RADIUS = 80
+const PLAYER_LIGHT_RADIUS_PX = 80
 
 // NOTE: Stage cones are wider at the tip (big stage lights). Lamp cones have a
 // narrow tip (small lamp heads) that flares out more.
-const STAGE_CONE_WIDTH = 48
-const STAGE_CONE_HEIGHT = 40
-const LAMP_CONE_WIDTH = 32
-const LAMP_CONE_HEIGHT = 40
+const STAGE_CONE_WIDTH_PX = 48
+const STAGE_CONE_HEIGHT_PX = 40
+const LAMP_CONE_WIDTH_PX = 32
+const LAMP_CONE_HEIGHT_PX = 40
 // NOTE: Headlight cone projects horizontally to the left from the car.
-const HEADLIGHT_CONE_LENGTH = 40
-const HEADLIGHT_CONE_SPREAD = 16
+const HEADLIGHT_CONE_LENGTH_PX = 40
+const HEADLIGHT_CONE_SPREAD_PX = 16
 
 // NOTE: Tile coords x TILE_SIZE = pixel coords. Spotlights are placed a few
 // tiles below the gem sources so the light pools onto the stage surface.
 const SPOTLIGHT_CONFIG: SpotlightConfig = {
   ambientColor: AMBIENT_COLOR,
-  playerLightRadius: PLAYER_LIGHT_RADIUS,
+  playerLightRadius: PLAYER_LIGHT_RADIUS_PX,
   coneTypes: {
     stage: {
-      spec: verticalConeSpec(STAGE_CONE_WIDTH, STAGE_CONE_HEIGHT, 0.3),
+      spec: verticalConeSpec(STAGE_CONE_WIDTH_PX, STAGE_CONE_HEIGHT_PX, 0.3),
       origin: { x: 0.5, y: 0 },
       sourceOffset: { x: 0, y: TILE_SIZE / 2 },
-      poolOffset: { x: 0, y: STAGE_CONE_HEIGHT },
+      poolOffset: { x: 0, y: STAGE_CONE_HEIGHT_PX },
       animationStyle: 'scale',
     },
     lamp: {
-      spec: verticalConeSpec(LAMP_CONE_WIDTH, LAMP_CONE_HEIGHT, 0.42),
+      spec: verticalConeSpec(LAMP_CONE_WIDTH_PX, LAMP_CONE_HEIGHT_PX, 0.42),
       origin: { x: 0.5, y: 0 },
       sourceOffset: { x: 0, y: TILE_SIZE / 2 },
-      poolOffset: { x: 0, y: LAMP_CONE_HEIGHT },
+      poolOffset: { x: 0, y: LAMP_CONE_HEIGHT_PX },
       animationStyle: 'scale',
     },
     headlight: {
-      spec: horizontalConeSpec(HEADLIGHT_CONE_LENGTH, HEADLIGHT_CONE_SPREAD, 0.25),
+      spec: horizontalConeSpec(HEADLIGHT_CONE_LENGTH_PX, HEADLIGHT_CONE_SPREAD_PX, 0.25),
       origin: { x: 1, y: 0.5 },
       sourceOffset: { x: 0, y: 0 },
-      poolOffset: { x: -HEADLIGHT_CONE_LENGTH, y: 0 },
+      poolOffset: { x: -HEADLIGHT_CONE_LENGTH_PX, y: 0 },
       animationStyle: 'modulate',
     },
   },

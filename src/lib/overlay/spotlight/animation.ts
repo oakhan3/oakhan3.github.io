@@ -17,7 +17,7 @@ const PULSE_SPEED = 0.002
 const PULSE_AMPLITUDE = 0.15
 
 // NOTE: Color-cycle constants. Full hue rotation period in milliseconds.
-const COLOR_CYCLE_PERIOD = 10000
+const COLOR_CYCLE_PERIOD_MS = 10000
 
 export function computeAnimation(
   light: FixedLight,
@@ -51,8 +51,8 @@ export function computeAnimation(
   } else if (light.animation === 'color-cycle') {
     // NOTE: Each spotlight starts at a different hue position (spread
     // evenly across the 6 lights by index) and rotates through the
-    // full wheel over COLOR_CYCLE_PERIOD milliseconds.
-    const hue = ((time / COLOR_CYCLE_PERIOD + index / 6) % 1) * 360
+    // full wheel over COLOR_CYCLE_PERIOD_MS milliseconds.
+    const hue = ((time / COLOR_CYCLE_PERIOD_MS + index / 6) % 1) * 360
     color = _hslToHex(hue, 0.9, 0.55)
   }
 

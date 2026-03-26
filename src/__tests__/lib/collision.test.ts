@@ -15,7 +15,7 @@ import {
 } from '../testing'
 import collisionMapData from '../fixtures/collision-map.json'
 
-const WALL_X = 200
+const WALL_X_PX = 200
 
 class CollisionTestScene extends Phaser.Scene {
   player!: PlayerSprite
@@ -83,6 +83,6 @@ describe('collision behavior', () => {
 
     // NOTE: Player moved right but is stopped by the wall at x=200.
     expect(scene.player.x).toBeGreaterThan(startX)
-    expect(scene.player.x).toBeLessThan(WALL_X)
+    expect(scene.player.x).toBeLessThan(WALL_X_PX)
   }, 8000)
 })

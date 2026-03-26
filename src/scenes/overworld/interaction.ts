@@ -7,7 +7,7 @@ import type { Quest } from '../../lib/quests'
 
 // NOTE: Pixel radius around the player's position within which an interactable
 // is considered "in range". ~1.5 tiles gives comfortable trigger distance.
-const INTERACTION_RADIUS = 24
+const INTERACTION_RADIUS_PX = 24
 
 // NOTE: Union of every named object in the Tiled Interactables layer.
 // Typed as the key type for MESSAGES so typos are caught at compile time.
@@ -87,7 +87,7 @@ export function createInteractionSystem(
   onDialogClose?: (name: string) => void,
 ): InteractionSystem {
   const config: InteractionConfig = {
-    radius: INTERACTION_RADIUS,
+    radius: INTERACTION_RADIUS_PX,
     messages: MESSAGES,
     onInteract,
     onDialogClose,

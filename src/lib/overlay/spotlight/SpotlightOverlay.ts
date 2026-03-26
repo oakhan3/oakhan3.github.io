@@ -1,6 +1,6 @@
 import Phaser from 'phaser'
 import { DEPTH_LIGHTING, DEPTH_SPOTLIGHT_GLOW } from '../../../config'
-import { BRUSH_BASE_RADIUS, ConeSpec, createLightTexture, createConeTexture } from './textures'
+import { BRUSH_BASE_RADIUS_PX, ConeSpec, createLightTexture, createConeTexture } from './textures'
 import { computeAnimation, modulateBrightness } from './animation'
 
 export interface FixedLight {
@@ -66,7 +66,7 @@ export class SpotlightOverlay {
     this.config = config
     this.lightSeeds = config.fixedLights.map(() => Math.random() * 10000)
 
-    createLightTexture(scene, 'light-gradient', BRUSH_BASE_RADIUS)
+    createLightTexture(scene, 'light-gradient', BRUSH_BASE_RADIUS_PX)
 
     for (const [key, coneConfig] of Object.entries(config.coneTypes)) {
       createConeTexture(scene, `cone-${key}`, coneConfig.spec)
@@ -100,7 +100,7 @@ export class SpotlightOverlay {
 
     // NOTE: Player light — white so it reveals the scene at full color.
     this.lightBrush.setTint(0xffffff)
-    this.lightBrush.setScale(playerLightRadius / BRUSH_BASE_RADIUS)
+    this.lightBrush.setScale(playerLightRadius / BRUSH_BASE_RADIUS_PX)
     this.renderTexture.draw(this.lightBrush, this.player.x, this.player.y)
 
     this.glowTexture.clear()
@@ -122,7 +122,7 @@ export class SpotlightOverlay {
       }
 
       const animatedRadius = light.radius * radiusScale
-      this.lightBrush.setScale(animatedRadius / BRUSH_BASE_RADIUS)
+      this.lightBrush.setScale(animatedRadius / BRUSH_BASE_RADIUS_PX)
 
       if (light.glow) {
         // NOTE: Glow lights get drawn white on the MULTIPLY layer (to reveal

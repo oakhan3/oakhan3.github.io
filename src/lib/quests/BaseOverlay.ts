@@ -2,10 +2,10 @@ import Phaser from 'phaser'
 import { DEPTH_QUEST_UI, UI_BACKGROUND_COLOR, UI_BORDER_COLOR } from '../../config'
 import {
   BACKGROUND_ALPHA,
-  BOX_PADDING,
+  BOX_PADDING_PX,
   DISMISS_HINT_DESKTOP,
   DISMISS_HINT_MOBILE,
-  OVERLAY_SEPARATOR_OFFSET,
+  OVERLAY_SEPARATOR_OFFSET_PX,
 } from './constants'
 
 export abstract class BaseOverlay {
@@ -71,10 +71,10 @@ export abstract class BaseOverlay {
   // Y position of the separator so callers can position content beneath it.
   protected _addSeparator(scene: Phaser.Scene, topOffset: number, title: Phaser.GameObjects.Text): number {
     const screenWidth = scene.scale.width
-    const separatorY = topOffset + title.height + OVERLAY_SEPARATOR_OFFSET
+    const separatorY = topOffset + title.height + OVERLAY_SEPARATOR_OFFSET_PX
     const separator = this._addGraphics(scene)
     separator.lineStyle(1, this.borderColor, 0.5)
-    separator.lineBetween(BOX_PADDING, separatorY, screenWidth - BOX_PADDING, separatorY)
+    separator.lineBetween(BOX_PADDING_PX, separatorY, screenWidth - BOX_PADDING_PX, separatorY)
     return separatorY
   }
 

@@ -1,5 +1,5 @@
 import Phaser from 'phaser'
-import { TOUCH_DEADZONE } from '../../config'
+import { TOUCH_DEADZONE_PX } from '../../config'
 import { computeCentroid } from '../math'
 import { PlayerController } from '../player/PlayerController'
 import { DialogBox } from '../dialog/DialogBox'
@@ -71,7 +71,7 @@ export class InteractionSystem {
       if (this.dialogOpenOnTouchStart) return
       const dx = pointer.x - this.touchStartX
       const dy = pointer.y - this.touchStartY
-      if (Math.abs(dx) < TOUCH_DEADZONE && Math.abs(dy) < TOUCH_DEADZONE) {
+      if (Math.abs(dx) < TOUCH_DEADZONE_PX && Math.abs(dy) < TOUCH_DEADZONE_PX) {
         this.tapPending = true
       }
     })

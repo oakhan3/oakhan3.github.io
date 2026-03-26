@@ -1,35 +1,35 @@
 import Phaser from 'phaser'
 import {
   DEPTH_DIALOG,
-  DIALOG_LINK_BTN_ROW_HEIGHT_DESKTOP,
-  DIALOG_LINK_BTN_ROW_HEIGHT_MOBILE,
+  DIALOG_LINK_BTN_ROW_HEIGHT_DESKTOP_PX,
+  DIALOG_LINK_BTN_ROW_HEIGHT_MOBILE_PX,
   isMobile,
   UI_BORDER_COLOR,
   UI_CHROME_ALPHA,
-  UI_CHROME_PADDING,
+  UI_CHROME_PADDING_PX,
   UI_FONT_FAMILY,
   UI_LINK_COLOR,
   UI_TEXT_COLOR,
-  UI_TEXT_LINE_SPACING,
+  UI_TEXT_LINE_SPACING_PX,
 } from '../../config'
 import { createRoundedBackground } from '../ui'
 
-const BOX_MARGIN = 8
+const BOX_MARGIN_PX = 8
 const DIALOG_FONT_MOBILE = '12px'
 const DIALOG_FONT_DESKTOP = '8px'
-const DIALOG_HEIGHT_MOBILE = 80
-const DIALOG_HEIGHT_DESKTOP = 66
-const TYPEWRITER_DELAY = 15
-const INDICATOR_SIZE = 5
-const INDICATOR_BLINK_DURATION = 400
+const DIALOG_HEIGHT_MOBILE_PX = 80
+const DIALOG_HEIGHT_DESKTOP_PX = 66
+const TYPEWRITER_DELAY_MS = 15
+const INDICATOR_SIZE_PX = 5
+const INDICATOR_BLINK_DURATION_MS = 400
 // NOTE: Approximate game-pixel width of the "[ open link ]" label including padding.
-const LINK_BTN_GAME_WIDTH = 150
+const LINK_BTN_GAME_WIDTH_PX = 150
 // NOTE: Minimum tap target height in CSS pixels for the DOM link anchor (accessibility standard).
-const LINK_BTN_MIN_DOM_HEIGHT = 44
+const LINK_BTN_MIN_DOM_HEIGHT_PX = 44
 // NOTE: CSS pixels to extend the tap target above the text's top edge, so the hit area is
 // roughly centered on the label rather than flush with its top.
-const LINK_BTN_TAP_TOP_OFFSET_MOBILE = 12
-const LINK_BTN_TAP_TOP_OFFSET_DESKTOP = 20
+const LINK_BTN_TAP_TOP_OFFSET_MOBILE_PX = 12
+const LINK_BTN_TAP_TOP_OFFSET_DESKTOP_PX = 20
 
 export class DialogBox {
   private scene: Phaser.Scene
@@ -57,43 +57,43 @@ export class DialogBox {
     // bottom on any screen, including expanded mobile viewports.
     const screenWidth = scene.scale.width
     const screenHeight = scene.scale.height
-    const boxWidth = screenWidth - BOX_MARGIN * 2
+    const boxWidth = screenWidth - BOX_MARGIN_PX * 2
     const boxY = screenHeight * 0.7
     const mobile = isMobile()
     this.mobile = mobile
     const fontSize = mobile ? DIALOG_FONT_MOBILE : DIALOG_FONT_DESKTOP
-    const boxHeight = mobile ? DIALOG_HEIGHT_MOBILE : DIALOG_HEIGHT_DESKTOP
+    const boxHeight = mobile ? DIALOG_HEIGHT_MOBILE_PX : DIALOG_HEIGHT_DESKTOP_PX
 
     const background = createRoundedBackground(scene, boxWidth, boxHeight, UI_CHROME_ALPHA)
 
-    this.textObject = scene.add.text(UI_CHROME_PADDING, UI_CHROME_PADDING, '', {
+    this.textObject = scene.add.text(UI_CHROME_PADDING_PX, UI_CHROME_PADDING_PX, '', {
       fontFamily: UI_FONT_FAMILY,
       fontSize,
       color: UI_TEXT_COLOR,
-      wordWrap: { width: boxWidth - UI_CHROME_PADDING * 2 },
-      lineSpacing: UI_TEXT_LINE_SPACING,
+      wordWrap: { width: boxWidth - UI_CHROME_PADDING_PX * 2 },
+      lineSpacing: UI_TEXT_LINE_SPACING_PX,
     })
 
     // NOTE: Small downward triangle at bottom-right of the box, classic GBA "press to continue" cue.
     this.indicator = scene.add.graphics()
     this.indicator.fillStyle(UI_BORDER_COLOR, 1)
-    this.indicator.fillTriangle(0, 0, INDICATOR_SIZE * 2, 0, INDICATOR_SIZE, INDICATOR_SIZE)
+    this.indicator.fillTriangle(0, 0, INDICATOR_SIZE_PX * 2, 0, INDICATOR_SIZE_PX, INDICATOR_SIZE_PX)
     this.indicator.setPosition(
-      boxWidth - UI_CHROME_PADDING - INDICATOR_SIZE * 2,
-      boxHeight - UI_CHROME_PADDING - INDICATOR_SIZE * 2,
+      boxWidth - UI_CHROME_PADDING_PX - INDICATOR_SIZE_PX * 2,
+      boxHeight - UI_CHROME_PADDING_PX - INDICATOR_SIZE_PX * 2,
     )
     this.indicator.setVisible(false)
 
-    this.container = scene.add.container(BOX_MARGIN, boxY, [background, this.textObject, this.indicator])
+    this.container = scene.add.container(BOX_MARGIN_PX, boxY, [background, this.textObject, this.indicator])
     // NOTE: scrollFactor(0) pins the dialog to the screen, not the world — it stays
     // at the bottom of the viewport regardless of camera position.
     this.container.setScrollFactor(0)
     this.container.setDepth(DEPTH_DIALOG)
     this.container.setVisible(false)
 
-    this.linkButtonGameX = screenWidth - BOX_MARGIN - UI_CHROME_PADDING - INDICATOR_SIZE * 4
-    const linkBtnRowHeight = mobile ? DIALOG_LINK_BTN_ROW_HEIGHT_MOBILE : DIALOG_LINK_BTN_ROW_HEIGHT_DESKTOP
-    this.linkButtonGameY = boxY + boxHeight - UI_CHROME_PADDING - linkBtnRowHeight
+    this.linkButtonGameX = screenWidth - BOX_MARGIN_PX - UI_CHROME_PADDING_PX - INDICATOR_SIZE_PX * 4
+    const linkBtnRowHeight = mobile ? DIALOG_LINK_BTN_ROW_HEIGHT_MOBILE_PX : DIALOG_LINK_BTN_ROW_HEIGHT_DESKTOP_PX
+    this.linkButtonGameY = boxY + boxHeight - UI_CHROME_PADDING_PX - linkBtnRowHeight
 
     // NOTE: Link button sits outside the container so its interactive hit area is
     // computed in screen space, matching its scrollFactor(0) visual position.
@@ -151,7 +151,7 @@ export class DialogBox {
     this.container.setVisible(true)
 
     this.typewriterTimer = this.scene.time.addEvent({
-      delay: TYPEWRITER_DELAY,
+      delay: TYPEWRITER_DELAY_MS,
       callback: this.advanceCharacter,
       callbackScope: this,
       repeat: this.fullText.length - 1,
@@ -199,7 +199,7 @@ export class DialogBox {
     this.indicatorTween = this.scene.tweens.add({
       targets: this.indicator,
       alpha: { from: 1, to: 0 },
-      duration: INDICATOR_BLINK_DURATION,
+      duration: INDICATOR_BLINK_DURATION_MS,
       yoyo: true,
       repeat: -1,
     })
@@ -250,12 +250,12 @@ export class DialogBox {
     // NOTE: linkButtonGameX is the right edge of the button (origin is (1, 0)).
     const domRight = canvasBounds.x + this.linkButtonGameX * scaleX
     const domTop = canvasBounds.y + this.linkButtonGameY * scaleY
-    const domWidth = LINK_BTN_GAME_WIDTH * scaleX
-    const domHeight = LINK_BTN_MIN_DOM_HEIGHT
+    const domWidth = LINK_BTN_GAME_WIDTH_PX * scaleX
+    const domHeight = LINK_BTN_MIN_DOM_HEIGHT_PX
 
     Object.assign(this.domLinkAnchor.style, {
       left: `${domRight - domWidth}px`,
-      top: `${domTop - (this.mobile ? LINK_BTN_TAP_TOP_OFFSET_MOBILE : LINK_BTN_TAP_TOP_OFFSET_DESKTOP)}px`,
+      top: `${domTop - (this.mobile ? LINK_BTN_TAP_TOP_OFFSET_MOBILE_PX : LINK_BTN_TAP_TOP_OFFSET_DESKTOP_PX)}px`,
       width: `${domWidth}px`,
       height: `${domHeight}px`,
     })

@@ -16,13 +16,13 @@ import { QuestSystem, CompletionBanner, QuestOverlay, CongratulatoryOverlay } fr
 import {
   DEPTH_QUEST_UI,
   isMobile,
-  MOBILE_UI_TOP_OFFSET,
+  MOBILE_UI_TOP_OFFSET_PX,
   DEPTH_ABOVE_PLAYER,
   QUEST_BTN_BACKGROUND_COLOR,
   QUEST_BTN_BORDER_COLOR,
-  QUEST_BTN_HIT_PADDING_X,
-  QUEST_BTN_HIT_PADDING_Y,
-  QUEST_BTN_MARGIN,
+  QUEST_BTN_HIT_PADDING_X_PX,
+  QUEST_BTN_HIT_PADDING_Y_PX,
+  QUEST_BTN_MARGIN_PX,
   UI_CHROME_ALPHA,
   UI_FONT_FAMILY,
   UI_TEXT_COLOR,
@@ -183,8 +183,8 @@ function _createQuestButton(
   const btnPadding = 6
   const btnHeight = mobile ? BTN_HEIGHT_MOBILE : BTN_HEIGHT_DESKTOP
   const btnWidth = mobile ? BTN_WIDTH_MOBILE : BTN_WIDTH_DESKTOP
-  const btnX = scene.scale.width - QUEST_BTN_MARGIN
-  const btnY = mobile ? MOBILE_UI_TOP_OFFSET : QUEST_BTN_MARGIN
+  const btnX = scene.scale.width - QUEST_BTN_MARGIN_PX
+  const btnY = mobile ? MOBILE_UI_TOP_OFFSET_PX : QUEST_BTN_MARGIN_PX
 
   const background = scene.add.graphics()
   background.fillStyle(QUEST_BTN_BACKGROUND_COLOR, UI_CHROME_ALPHA)
@@ -196,7 +196,7 @@ function _createQuestButton(
   // beyond the visible text — same technique used for the dialog link button.
   // The label position is offset by the padding amount so the text stays
   // visually centered within the button background.
-  const hitPadding = mobile ? { x: QUEST_BTN_HIT_PADDING_X, y: QUEST_BTN_HIT_PADDING_Y } : { x: 0, y: 0 }
+  const hitPadding = mobile ? { x: QUEST_BTN_HIT_PADDING_X_PX, y: QUEST_BTN_HIT_PADDING_Y_PX } : { x: 0, y: 0 }
   const label = scene.add.text(btnPadding - hitPadding.x, btnPadding - hitPadding.y, 'Quests', {
     fontFamily: UI_FONT_FAMILY,
     fontSize: btnFontSize,

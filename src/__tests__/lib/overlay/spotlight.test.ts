@@ -9,26 +9,26 @@ const MAP_WIDTH = GBA_WIDTH
 const MAP_HEIGHT = GBA_HEIGHT
 
 // NOTE: Two test lights at known positions — a flickering lamp and a pulsing window glow.
-const LAMP_X = 100
-const LAMP_Y = 100
-const LAMP_RADIUS = 40
+const LAMP_X_PX = 100
+const LAMP_Y_PX = 100
+const LAMP_RADIUS_PX = 40
 // NOTE: Sample at 75% radius from center to hit the gradient transition where animation is visible.
-const LAMP_EDGE_X = LAMP_X + Math.round(LAMP_RADIUS * 0.75)
-const LAMP_EDGE_Y = LAMP_Y
+const LAMP_EDGE_X = LAMP_X_PX + Math.round(LAMP_RADIUS_PX * 0.75)
+const LAMP_EDGE_Y = LAMP_Y_PX
 
-const GLOW_X = 300
-const GLOW_Y = 100
-const GLOW_RADIUS = 40
-const GLOW_EDGE_X = GLOW_X + Math.round(GLOW_RADIUS * 0.9)
-const GLOW_EDGE_Y = GLOW_Y
+const GLOW_X_PX = 300
+const GLOW_Y_PX = 100
+const GLOW_RADIUS_PX = 40
+const GLOW_EDGE_X = GLOW_X_PX + Math.round(GLOW_RADIUS_PX * 0.9)
+const GLOW_EDGE_Y = GLOW_Y_PX
 
 const TEST_CONFIG: SpotlightConfig = {
   ambientColor: 0x111111,
   playerLightRadius: 80,
   coneTypes: {},
   fixedLights: [
-    { pixelX: LAMP_X, pixelY: LAMP_Y, radius: LAMP_RADIUS, color: 0xffffff, animation: 'flicker' },
-    { pixelX: GLOW_X, pixelY: GLOW_Y, radius: GLOW_RADIUS, color: 0x8080ff, glow: true, animation: 'pulse' },
+    { pixelX: LAMP_X_PX, pixelY: LAMP_Y_PX, radius: LAMP_RADIUS_PX, color: 0xffffff, animation: 'flicker' },
+    { pixelX: GLOW_X_PX, pixelY: GLOW_Y_PX, radius: GLOW_RADIUS_PX, color: 0x8080ff, glow: true, animation: 'pulse' },
   ],
 }
 
@@ -120,7 +120,7 @@ describe('spotlight overlay', () => {
     await delay(200)
 
     const add = findRenderTextureByDepth(scene, DEPTH_SPOTLIGHT_GLOW)
-    const pixel = readTexturePixel(add, GLOW_X, GLOW_Y)
+    const pixel = readTexturePixel(add, GLOW_X_PX, GLOW_Y_PX)
 
     expect(pixel.r > 0 || pixel.g > 0 || pixel.b > 0).toBe(true)
   })

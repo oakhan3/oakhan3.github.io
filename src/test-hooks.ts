@@ -3,10 +3,10 @@ import { flags } from './game-flags'
 import { DialogBox } from './lib/dialog/DialogBox'
 import { CompletionBanner } from './lib/quests/CompletionBanner'
 import { BootScene } from './scenes/BootScene'
-import { MOBILE_UI_TOP_OFFSET } from './config'
+import { MOBILE_UI_TOP_OFFSET_PX } from './config'
 
-// NOTE: Banner rests 8px from the top on desktop — mirrors BANNER_MARGIN_TOP in CompletionBanner.ts.
-const BANNER_MARGIN_TOP = 8
+// NOTE: Mirrors BANNER_MARGIN_TOP_PX in CompletionBanner.ts.
+const BANNER_MARGIN_TOP_PX = 8
 
 export function setupTestHooks(game: Phaser.Game): void {
   flags.disableOverlays = true
@@ -40,7 +40,7 @@ function _patchCompletionBanner(): void {
       self.activeTween.destroy()
       self.activeTween = null
     }
-    const targetY = window.innerWidth < 768 ? MOBILE_UI_TOP_OFFSET : BANNER_MARGIN_TOP
+    const targetY = window.innerWidth < 768 ? MOBILE_UI_TOP_OFFSET_PX : BANNER_MARGIN_TOP_PX
     self.container.setY(targetY)
   }
 }

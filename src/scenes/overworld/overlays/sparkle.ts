@@ -6,7 +6,7 @@ import type { SparkleConfig } from '../../../lib/overlay'
 const SPARKLE_COUNT = 60
 
 // NOTE: Sparkle dot radius in pixels. Kept tiny for a subtle star-like effect.
-const SPARKLE_RADIUS = 1.5
+const SPARKLE_RADIUS_PX = 1.5
 
 // NOTE: Each sparkle completes a full fade-in/fade-out cycle over a random
 // period in this range (milliseconds). Variation prevents synchronized blinking.
@@ -24,7 +24,7 @@ const SWAY_SPEED = 0.001
 
 const SPARKLE_CONFIG: SparkleConfig = {
   count: SPARKLE_COUNT,
-  radius: SPARKLE_RADIUS,
+  radius: SPARKLE_RADIUS_PX,
   minCycleMs: MIN_CYCLE_MS,
   maxCycleMs: MAX_CYCLE_MS,
   maxAlpha: MAX_ALPHA,

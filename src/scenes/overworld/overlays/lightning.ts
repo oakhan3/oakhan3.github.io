@@ -21,7 +21,7 @@ const FADE_MS = 80
 
 // NOTE: Midpoint displacement parameters. Each recursion halves the segment
 // and reduces the max displacement by this decay factor.
-const DISPLACEMENT_INITIAL = 18
+const DISPLACEMENT_INITIAL_PX = 18
 const DISPLACEMENT_DECAY = 0.55
 // NOTE: Number of recursive subdivisions. 5 levels = 32 segments, plenty
 // of jaggedness for a 96px bolt.
@@ -36,14 +36,14 @@ const BRANCH_LENGTH_RATIO = 0.4
 const BRANCH_SUBDIVISION_DEPTH = 3
 
 // NOTE: Bolt line thickness in pixels. Main bolt is thicker, branches thinner.
-const MAIN_BOLT_WIDTH = 2
-const BRANCH_BOLT_WIDTH = 1
+const MAIN_BOLT_WIDTH_PX = 2
+const BRANCH_BOLT_WIDTH_PX = 1
 
 // NOTE: Lightning bolt color - bright white-blue.
 const BOLT_COLOR = 'rgba(200, 220, 255, 1)'
 // NOTE: Glow around the bolt for a bloom-like effect, drawn wider and dimmer.
 const GLOW_COLOR = 'rgba(100, 140, 255, 0.4)'
-const GLOW_WIDTH = 6
+const GLOW_WIDTH_PX = 6
 
 const LIGHTNING_CONFIG: LightningConfig = {
   targetTileX: TARGET_TILE_X,
@@ -52,17 +52,17 @@ const LIGHTNING_CONFIG: LightningConfig = {
   maxIntervalMs: MAX_INTERVAL_MS,
   boltDurationMs: BOLT_DURATION_MS,
   fadeMs: FADE_MS,
-  displacementInitial: DISPLACEMENT_INITIAL,
+  displacementInitial: DISPLACEMENT_INITIAL_PX,
   displacementDecay: DISPLACEMENT_DECAY,
   subdivisionDepth: SUBDIVISION_DEPTH,
   branchProbability: BRANCH_PROBABILITY,
   branchLengthRatio: BRANCH_LENGTH_RATIO,
   branchSubdivisionDepth: BRANCH_SUBDIVISION_DEPTH,
-  mainBoltWidth: MAIN_BOLT_WIDTH,
-  branchBoltWidth: BRANCH_BOLT_WIDTH,
+  mainBoltWidth: MAIN_BOLT_WIDTH_PX,
+  branchBoltWidth: BRANCH_BOLT_WIDTH_PX,
   boltColor: BOLT_COLOR,
   glowColor: GLOW_COLOR,
-  glowWidth: GLOW_WIDTH,
+  glowWidth: GLOW_WIDTH_PX,
 }
 
 export function createLightningOverlay(scene: Phaser.Scene, mapWidth: number, mapHeight: number): LightningOverlay {

@@ -2,7 +2,7 @@ import Phaser from 'phaser'
 
 // NOTE: Shared light brush texture radius. All lights use the same gradient
 // texture, scaled via setScale on the brush image before drawing.
-export const BRUSH_BASE_RADIUS = 80
+export const BRUSH_BASE_RADIUS_PX = 80
 
 export interface ConeGradientStop {
   offset: number

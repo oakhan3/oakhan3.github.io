@@ -27,7 +27,7 @@ class OverlayTestScene extends Phaser.Scene {
   }
 }
 
-// NOTE: Overlay container sits at (0,0); banner container sits at (BOX_MARGIN, -height).
+// NOTE: Overlay container sits at (0,0); banner container sits at (BOX_MARGIN_PX, -height).
 // Using x===0 to distinguish overlay from banner in overworld tests.
 function findOverlayContainer(scene: Phaser.Scene): Phaser.GameObjects.Container {
   return scene.children.list.find(
