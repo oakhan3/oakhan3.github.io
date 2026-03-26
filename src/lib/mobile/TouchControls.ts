@@ -3,7 +3,7 @@ import { Direction, GBA_HEIGHT, DEPTH_JOYSTICK_BASE, DEPTH_JOYSTICK_KNOB, TOUCH_
 
 // NOTE: Sized relative to the shorter game dimension (320px). Phaser's Scale.FIT
 // stretches the canvas to fill the screen, so these scale up on all devices.
-const DPAD_SIZE = Math.round(GBA_HEIGHT * 0.5)
+const DPAD_SIZE = Math.round(GBA_HEIGHT * 0.7)
 const DPAD_ALPHA = 0.5
 const JOYSTICK_KNOB_RADIUS = Math.round(GBA_HEIGHT * 0.1)
 const JOYSTICK_BASE_RADIUS = Math.round(GBA_HEIGHT * 0.25)
