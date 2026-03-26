@@ -78,6 +78,7 @@ test('touch controls - knob offset', async ({ page }) => {
   await page.keyboard.press('Space')
   const box = await page.locator('canvas').boundingBox()
   // NOTE: Touch down then drag right to show the knob displaced from the dpad center.
+  await page.evaluate(() => (window as any).__overworldTest.freezePlayer())
   const touchX = box!.x + box!.width * 0.25
   const touchY = box!.y + box!.height * 0.7
   await page.mouse.move(touchX, touchY)
@@ -85,6 +86,22 @@ test('touch controls - knob offset', async ({ page }) => {
   await page.mouse.move(touchX + box!.width * 0.1, touchY)
   await expect(page.locator('canvas')).toHaveScreenshot()
   await page.mouse.up()
+})
+
+test('touch controls - player moves down', async ({ page }) => {
+  await bootToOverworld(page)
+  await dismissDialog(page)
+  await page.keyboard.press('Space')
+  const box = await page.locator('canvas').boundingBox()
+  // NOTE: Touch at center-left, drag down past the deadzone to walk the player south.
+  const touchX = box!.x + box!.width * 0.25
+  const touchY = box!.y + box!.height * 0.5
+  await page.mouse.move(touchX, touchY)
+  await page.mouse.down()
+  await page.mouse.move(touchX, touchY + box!.height * 0.15)
+  await page.waitForTimeout(5000)
+  await page.mouse.up()
+  await expect(page.locator('canvas')).toHaveScreenshot()
 })
 
 test('quest overlay with completed quest', async ({ page }) => {

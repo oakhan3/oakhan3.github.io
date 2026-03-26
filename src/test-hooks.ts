@@ -69,6 +69,7 @@ function _pollForOverworld(game: Phaser.Game): void {
       hideBanner: () => scene.completionBanner?.hide(),
       showQuestOverlay: () => scene.questOverlay?.show(scene.questSystem?.getAll()),
       showCongratulatoryOverlay: () => scene.congratulatoryOverlay?.show(CONGRATULATORY_MESSAGE),
+      freezePlayer: () => scene.playerController?.freeze(),
     }
   }, 50)
 }
