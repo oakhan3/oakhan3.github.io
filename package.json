@@ -17,7 +17,7 @@
     "test:watch": "vitest",
     "test:screenshots": "playwright test",
     "test:screenshots:update": "playwright test --update-snapshots",
-    "check": "npm run format && npm run lint && npm run typecheck && npm test",
+    "check": "npm run format && npm run lint && npm run typecheck && npm test && npm run test:screenshots",
     "clean": "rm -rf dist"
   },
   "dependencies": {
