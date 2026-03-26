@@ -90,6 +90,20 @@ src/
 
 - **Mobile detection: `window.innerWidth` vs `screen.width`** — `screen.width` returns the physical screen resolution, which is misleadingly large on high-DPI mobile devices and doesn't reflect the viewport. `scene.scale.width` is even more misleading: it returns the logical game width (480), not the browser viewport at all. `window.innerWidth` is the correct signal — it reflects the actual CSS viewport width and reliably distinguishes mobile from desktop. Centralized in `isMobile()` in `config.ts` so it's never inlined.
 
+## Ideas
+
+- [ ] Add Playwright end-to-end screenshot tests
+- [ ] Support user resizing the browser window (resize and re-center the game)
+- [ ] Add background music and interaction SFX (with mute/unmute toggle)
+- [ ] PWA support (manifest + service worker for offline play and home screen install)
+- [ ] Local session state (persist quest progress across page reloads)
+- [ ] Automated cross-device testing (real mobile devices via BrowserStack or similar)
+- [ ] Animated tiles (water, torches, flowers via Tiled animation data)
+- [ ] Custom tileset tiles
+- [ ] Implement the `???` quests
+- [ ] Analytics (page views, quest completion funnel)
+- [ ] User feedback (in-game form or link to submit comments/bug reports)
+
 ## Known Issues
 
 - **Phaser bug: MatterTileBody crashes on flipped tiles** — `convertTilemapLayer` crashes with `TypeError: Cannot read properties of null (reading 'inertia')` when a colliding tile has `flipX` or `flipY` set. Workaround applied in `scene.ts`: collision is cleared on flipped tiles before conversion. Filed as [phaserjs/phaser#7247](https://github.com/phaserjs/phaser/issues/7267).
