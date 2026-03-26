@@ -123,6 +123,35 @@ describe('quest icon', () => {
     expect(overlay.visible).toBe(true)
   })
 
+  it('clicking quest icon while open closes overlay', async () => {
+    game = createGame()
+    const scene = await bootToOverworld(game)
+    await dismissDialog(game)
+    await dismissQuestOverlay(game, scene)
+
+    // NOTE: Open the overlay by clicking the quest zone.
+    const zone = findQuestZone(scene)
+    const zoneX = zone.x + zone.width / 2
+    const zoneY = zone.y + zone.height / 2
+    simulatePointerDown(game, zoneX, zoneY)
+    simulatePointerUp(game, zoneX, zoneY)
+    await waitFor(() => {
+      const overlay = findOverlayContainer(scene)
+      return overlay?.visible === true
+    })
+
+    // NOTE: Click again while open - should close.
+    simulatePointerDown(game, zoneX, zoneY)
+    simulatePointerUp(game, zoneX, zoneY)
+    await waitFor(() => {
+      const overlay = findOverlayContainer(scene)
+      return !overlay?.visible
+    })
+
+    const overlay = findOverlayContainer(scene)
+    expect(overlay.visible).toBe(false)
+  })
+
   it.skip('quest overlay appears after welcome dialog is dismissed', async () => {
     game = createGame()
     const scene = await bootToOverworld(game)

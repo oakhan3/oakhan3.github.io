@@ -7,6 +7,7 @@ import { SpotlightOverlay, LightningOverlay, SparkleOverlay } from '../../lib/ov
 import { createSpotlightOverlay } from './overlays/spotlight'
 import { createLightningOverlay } from './overlays/lightning'
 import { createSparkleOverlay } from './overlays/sparkle'
+import { TEST_MODE } from '../../test-mode'
 import { createInteractionSystem, QUEST_DEFINITIONS } from './interaction'
 import { setupPlayerAnimations } from './player'
 import { InteractionSystem } from '../../lib/interaction'
@@ -58,9 +59,9 @@ interface TileAnimation {
 export class OverworldScene extends Phaser.Scene {
   private playerController!: PlayerController
   private tileAnimations: TileAnimation[] = []
-  private spotlightOverlay!: SpotlightOverlay
-  private sparkleOverlay!: SparkleOverlay
-  private lightningOverlay!: LightningOverlay
+  private spotlightOverlay?: SpotlightOverlay
+  private sparkleOverlay?: SparkleOverlay
+  private lightningOverlay?: LightningOverlay
   private interactionSystem!: InteractionSystem
 
   constructor() {
@@ -95,9 +96,11 @@ export class OverworldScene extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
     this.matter.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
 
-    this.spotlightOverlay = createSpotlightOverlay(this, map.widthInPixels, map.heightInPixels, player)
-    this.sparkleOverlay = createSparkleOverlay(this, map.widthInPixels, map.heightInPixels)
-    this.lightningOverlay = createLightningOverlay(this, map.widthInPixels, map.heightInPixels)
+    if (!TEST_MODE) {
+      this.spotlightOverlay = createSpotlightOverlay(this, map.widthInPixels, map.heightInPixels, player)
+      this.sparkleOverlay = createSparkleOverlay(this, map.widthInPixels, map.heightInPixels)
+      this.lightningOverlay = createLightningOverlay(this, map.widthInPixels, map.heightInPixels)
+    }
 
     const touchControls = new TouchControls(this)
     this.playerController = new PlayerController(this, player, touchControls)
@@ -151,6 +154,17 @@ Hope you enjoyed it. Check back later, I might sneak in a few more updates!`,
         }
       })(),
     )
+    if (TEST_MODE) {
+      // NOTE: Expose helpers so Playwright tests can drive the game to specific
+      // UI states without navigating the map.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ;(window as any).__overworldTest = {
+        isReady: true,
+        interact: (name: string) => this.interactionSystem.triggerByName(name),
+        showQuestOverlay: () => questOverlay.show(questSystem.getAll()),
+      }
+    }
+
     this.playerController.freeze()
     const signHint = isMobile() ? 'tapping' : "hitting 'Enter' near"
     dialog.show(
@@ -167,9 +181,9 @@ Hope you enjoyed it. Check back later, I might sneak in a few more updates!`,
   update(_time: number, delta: number) {
     this.playerController.update()
     this.interactionSystem.update()
-    this.spotlightOverlay.update()
-    this.sparkleOverlay.update()
-    this.lightningOverlay.update()
+    this.spotlightOverlay?.update()
+    this.sparkleOverlay?.update()
+    this.lightningOverlay?.update()
     _updateTileAnimations(this.tileAnimations, delta)
   }
 }
@@ -217,7 +231,11 @@ function _createQuestButton(
       // NOTE: Stop propagation so the scene-level 'pointerdown' dismiss listener on
       // QuestOverlay does not fire for this same click and immediately hide the overlay.
       event.stopPropagation()
-      questOverlay.show(questSystem.getAll())
+      if (questOverlay.isOpen) {
+        questOverlay.dismiss()
+      } else {
+        questOverlay.show(questSystem.getAll())
+      }
     },
   )
 
@@ -233,7 +251,11 @@ function _createQuestButton(
     'pointerdown',
     (_pointer: Phaser.Input.Pointer, _localX: number, _localY: number, event: Phaser.Types.Input.EventData) => {
       event.stopPropagation()
-      questOverlay.show(questSystem.getAll())
+      if (questOverlay.isOpen) {
+        questOverlay.dismiss()
+      } else {
+        questOverlay.show(questSystem.getAll())
+      }
     },
   )
 

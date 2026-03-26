@@ -78,6 +78,10 @@ export abstract class BaseOverlay {
     return separatorY
   }
 
+  get isOpen(): boolean {
+    return this.container.visible
+  }
+
   protected _show(onDismiss?: () => void): void {
     this.onDismiss = onDismiss
 
@@ -94,6 +98,10 @@ export abstract class BaseOverlay {
     }
     // NOTE: Use a bound method (not an arrow function) so off() can find and remove the same reference.
     this.scene.input.on('pointerdown', this._dismiss, this)
+  }
+
+  dismiss(): void {
+    this._dismiss()
   }
 
   private _dismiss(): void {
