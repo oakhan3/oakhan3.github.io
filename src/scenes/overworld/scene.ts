@@ -58,6 +58,7 @@ export class OverworldScene extends Phaser.Scene {
   private completionBanner!: CompletionBanner
   private questOverlay!: QuestOverlay
   private questSystem!: QuestSystem
+  private congratulatoryOverlay!: CongratulatoryOverlay
 
   constructor() {
     super({ key: 'OverworldScene' })
@@ -105,7 +106,7 @@ export class OverworldScene extends Phaser.Scene {
     this.questSystem = new QuestSystem(QUEST_DEFINITIONS)
     this.completionBanner = new CompletionBanner(this)
     this.questOverlay = new QuestOverlay(this)
-    const congratulatoryOverlay = new CongratulatoryOverlay(this)
+    this.congratulatoryOverlay = new CongratulatoryOverlay(this)
 
     const { questIcon, questZone } = _createQuestButton(this, this.questOverlay, this.questSystem)
 
@@ -115,7 +116,7 @@ export class OverworldScene extends Phaser.Scene {
       dialog,
       this.completionBanner,
       this.questOverlay,
-      congratulatoryOverlay,
+      this.congratulatoryOverlay,
       questIcon,
       questZone,
     )
@@ -138,7 +139,7 @@ export class OverworldScene extends Phaser.Scene {
           // Guard with a flag so it only fires once.
           if (!shown && this.questSystem.isComplete(name) && this.questSystem.isAllComplete()) {
             shown = true
-            congratulatoryOverlay.show(CONGRATULATORY_MESSAGE)
+            this.congratulatoryOverlay.show(CONGRATULATORY_MESSAGE)
           }
         }
       })(),

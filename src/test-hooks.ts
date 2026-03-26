@@ -3,6 +3,7 @@ import { flags } from './game-flags'
 import { DialogBox } from './lib/dialog/DialogBox'
 import { CompletionBanner } from './lib/quests/CompletionBanner'
 import { BootScene } from './scenes/BootScene'
+import { CONGRATULATORY_MESSAGE } from './scenes/overworld/interaction'
 import { MOBILE_UI_TOP_OFFSET_PX } from './config'
 
 // NOTE: Mirrors BANNER_MARGIN_TOP_PX in CompletionBanner.ts.
@@ -67,6 +68,7 @@ function _pollForOverworld(game: Phaser.Game): void {
       interact: (name: string) => scene.interactionSystem.triggerByName(name),
       hideBanner: () => scene.completionBanner?.hide(),
       showQuestOverlay: () => scene.questOverlay?.show(scene.questSystem?.getAll()),
+      showCongratulatoryOverlay: () => scene.congratulatoryOverlay?.show(CONGRATULATORY_MESSAGE),
     }
   }, 50)
 }

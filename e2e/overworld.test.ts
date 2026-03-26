@@ -50,6 +50,14 @@ test('sign interaction - no banner on repeat', async ({ page }) => {
   await expect(page.locator('canvas')).toHaveScreenshot()
 })
 
+test('congratulatory overlay', async ({ page }) => {
+  await bootToOverworld(page)
+  await dismissDialog(page)
+  await page.keyboard.press('Space')
+  await page.evaluate(() => (window as any).__overworldTest.showCongratulatoryOverlay())
+  await expect(page.locator('canvas')).toHaveScreenshot()
+})
+
 test('quest overlay with completed quest', async ({ page }) => {
   await bootToOverworld(page)
   await dismissDialog(page)
