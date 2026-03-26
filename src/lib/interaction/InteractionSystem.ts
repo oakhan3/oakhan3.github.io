@@ -1,6 +1,6 @@
 import Phaser from 'phaser'
 import { TOUCH_DEADZONE } from '../../config'
-import { computeCentroid } from '../collision'
+import { computeCentroid } from '../math'
 import { PlayerController } from '../player/PlayerController'
 import { DialogBox } from '../dialog/DialogBox'
 
