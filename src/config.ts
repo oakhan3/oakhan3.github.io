@@ -76,7 +76,8 @@ export const QUEST_BTN_HIT_PADDING_Y = 20
 // NOTE: Approximate rendered height of one text row in the dialog box (font height +
 // vertical buffer). Used to vertically position the link button inside the box.
 // Tuned visually for "Press Start 2P" at the dialog font sizes.
-export const DIALOG_LINK_BTN_ROW_HEIGHT = 27
+export const DIALOG_LINK_BTN_ROW_HEIGHT_MOBILE = 17
+export const DIALOG_LINK_BTN_ROW_HEIGHT_DESKTOP = 10
 
 // NOTE: Returns true when the viewport is phone-width. Use this everywhere
 // instead of inlining the threshold, so the breakpoint is defined once.

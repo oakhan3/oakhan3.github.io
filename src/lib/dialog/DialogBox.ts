@@ -1,7 +1,8 @@
 import Phaser from 'phaser'
 import {
   DEPTH_DIALOG,
-  DIALOG_LINK_BTN_ROW_HEIGHT,
+  DIALOG_LINK_BTN_ROW_HEIGHT_DESKTOP,
+  DIALOG_LINK_BTN_ROW_HEIGHT_MOBILE,
   isMobile,
   UI_BORDER_COLOR,
   UI_CHROME_ALPHA,
@@ -21,6 +22,14 @@ const DIALOG_HEIGHT_DESKTOP = 66
 const TYPEWRITER_DELAY = 15
 const INDICATOR_SIZE = 5
 const INDICATOR_BLINK_DURATION = 400
+// NOTE: Approximate game-pixel width of the "[ open link ]" label including padding.
+const LINK_BTN_GAME_WIDTH = 150
+// NOTE: Minimum tap target height in CSS pixels for the DOM link anchor (accessibility standard).
+const LINK_BTN_MIN_DOM_HEIGHT = 44
+// NOTE: CSS pixels to extend the tap target above the text's top edge, so the hit area is
+// roughly centered on the label rather than flush with its top.
+const LINK_BTN_TAP_TOP_OFFSET_MOBILE = 12
+const LINK_BTN_TAP_TOP_OFFSET_DESKTOP = 20
 
 export class DialogBox {
   private scene: Phaser.Scene
@@ -36,6 +45,10 @@ export class DialogBox {
   private linkButton: Phaser.GameObjects.Text
   private currentUrl: string | null = null
   private _displayLink: string | null = null
+  private domLinkAnchor: HTMLAnchorElement
+  private linkButtonGameX: number
+  private linkButtonGameY: number
+  private mobile: boolean
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene
@@ -47,6 +60,7 @@ export class DialogBox {
     const boxWidth = screenWidth - BOX_MARGIN * 2
     const boxY = screenHeight * 0.7
     const mobile = isMobile()
+    this.mobile = mobile
     const fontSize = mobile ? DIALOG_FONT_MOBILE : DIALOG_FONT_DESKTOP
     const boxHeight = mobile ? DIALOG_HEIGHT_MOBILE : DIALOG_HEIGHT_DESKTOP
 
@@ -77,26 +91,42 @@ export class DialogBox {
     this.container.setDepth(DEPTH_DIALOG)
     this.container.setVisible(false)
 
+    this.linkButtonGameX = screenWidth - BOX_MARGIN - UI_CHROME_PADDING - INDICATOR_SIZE * 4
+    const linkBtnRowHeight = mobile ? DIALOG_LINK_BTN_ROW_HEIGHT_MOBILE : DIALOG_LINK_BTN_ROW_HEIGHT_DESKTOP
+    this.linkButtonGameY = boxY + boxHeight - UI_CHROME_PADDING - linkBtnRowHeight
+
     // NOTE: Link button sits outside the container so its interactive hit area is
     // computed in screen space, matching its scrollFactor(0) visual position.
-    this.linkButton = scene.add.text(
-      screenWidth - BOX_MARGIN - UI_CHROME_PADDING - INDICATOR_SIZE * 4,
-      boxY + boxHeight - UI_CHROME_PADDING - DIALOG_LINK_BTN_ROW_HEIGHT,
-      '[ open link ]',
-      {
-        fontFamily: UI_FONT_FAMILY,
-        fontSize,
-        color: UI_LINK_COLOR,
-      },
-    )
+    this.linkButton = scene.add.text(this.linkButtonGameX, this.linkButtonGameY, '[ open link ]', {
+      fontFamily: UI_FONT_FAMILY,
+      fontSize,
+      color: UI_LINK_COLOR,
+    })
     this.linkButton.setOrigin(1, 0)
     this.linkButton.setScrollFactor(0)
     this.linkButton.setDepth(DEPTH_DIALOG + 1)
     this.linkButton.setVisible(false)
-    this.linkButton.setInteractive({ useHandCursor: true })
-    this.linkButton.on('pointerdown', () => {
-      if (this.currentUrl) _openUrl(this.currentUrl)
+
+    // NOTE: A real DOM <a> element handles navigation instead of a Phaser pointerdown
+    // listener. iOS Safari blocks programmatic window.open() and anchor.click() calls
+    // that are not directly triggered by a native DOM gesture — the Phaser input
+    // pipeline introduces enough delay to exceed Safari's transient activation window.
+    // A transparent <a> overlaid precisely on the Phaser button is treated as a genuine
+    // user-initiated navigation on all browsers.
+    this.domLinkAnchor = document.createElement('a')
+    this.domLinkAnchor.target = '_blank'
+    this.domLinkAnchor.rel = 'noopener noreferrer'
+    Object.assign(this.domLinkAnchor.style, {
+      position: 'fixed',
+      display: 'none',
+      zIndex: '1000',
+      opacity: '0',
+      cursor: 'pointer',
     })
+    document.body.appendChild(this.domLinkAnchor)
+
+    scene.scale.on('resize', this._updateDomLinkPosition, this)
+    scene.events.on('shutdown', this._destroyDomLink, this)
 
     this.advanceKeys = [scene.input.keyboard!.addKey('SPACE'), scene.input.keyboard!.addKey('ENTER')]
   }
@@ -178,10 +208,9 @@ export class DialogBox {
     if (this.currentUrl) {
       this.linkButton.setText(`[ ${this._displayLink ?? 'open link'} ]`)
       this.linkButton.setVisible(true)
-      // NOTE: setPadding physically enlarges the text canvas so the default
-      // hit area covers the padding too — more reliable than a custom Rectangle.
-      this.linkButton.setPadding(24, 16, 24, 16)
-      this.linkButton.setInteractive({ useHandCursor: true })
+      this.domLinkAnchor.href = this.currentUrl
+      this._updateDomLinkPosition()
+      this.domLinkAnchor.style.display = 'block'
     }
   }
 
@@ -193,6 +222,7 @@ export class DialogBox {
     this.indicator.setVisible(false)
     this.indicator.setAlpha(1)
     this.linkButton.setVisible(false)
+    this.domLinkAnchor.style.display = 'none'
   }
 
   private close(): void {
@@ -212,14 +242,27 @@ export class DialogBox {
       this.onClose()
     }
   }
-}
+  private _updateDomLinkPosition(): void {
+    const canvasBounds = this.scene.scale.canvasBounds
+    const scaleX = canvasBounds.width / this.scene.scale.width
+    const scaleY = canvasBounds.height / this.scene.scale.height
 
-// NOTE: Safari blocks window.open() unless called directly from a native DOM
-// gesture. Creating and clicking an <a> element preserves the gesture context.
-function _openUrl(url: string): void {
-  const anchor = document.createElement('a')
-  anchor.href = url
-  anchor.target = '_blank'
-  anchor.rel = 'noopener noreferrer'
-  anchor.click()
+    // NOTE: linkButtonGameX is the right edge of the button (origin is (1, 0)).
+    const domRight = canvasBounds.x + this.linkButtonGameX * scaleX
+    const domTop = canvasBounds.y + this.linkButtonGameY * scaleY
+    const domWidth = LINK_BTN_GAME_WIDTH * scaleX
+    const domHeight = LINK_BTN_MIN_DOM_HEIGHT
+
+    Object.assign(this.domLinkAnchor.style, {
+      left: `${domRight - domWidth}px`,
+      top: `${domTop - (this.mobile ? LINK_BTN_TAP_TOP_OFFSET_MOBILE : LINK_BTN_TAP_TOP_OFFSET_DESKTOP)}px`,
+      width: `${domWidth}px`,
+      height: `${domHeight}px`,
+    })
+  }
+
+  private _destroyDomLink(): void {
+    this.domLinkAnchor.remove()
+    this.scene.scale.off('resize', this._updateDomLinkPosition, this)
+  }
 }

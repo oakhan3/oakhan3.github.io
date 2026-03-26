@@ -78,6 +78,12 @@ src/
 
 `src/lib/` contains generic engine code with no knowledge of the game world. `src/scenes/overworld/` contains app-specific config and factory functions that wire lib modules to the actual map content.
 
+## Problems I Had to Solve
+
+- **iOS Safari blocks navigation from Phaser input events** — `window.open()` and programmatic `anchor.click()` are blocked on iOS Safari unless called directly from a native DOM gesture. Phaser's input pipeline processes touch events asynchronously enough to exceed Safari's transient activation window, so any navigation triggered from a Phaser `pointerdown` listener silently fails. Fix: replace the Phaser link button's click handler with a transparent `<a>` element overlaid on the canvas at the button's position. iOS Safari treats a tap on a real anchor as a genuine user gesture regardless of what's underneath it.
+
+- **Mobile detection: `window.innerWidth` vs `screen.width`** — `screen.width` returns the physical screen resolution, which is misleadingly large on high-DPI mobile devices and doesn't reflect the viewport. `scene.scale.width` is even more misleading: it returns the logical game width (480), not the browser viewport at all. `window.innerWidth` is the correct signal — it reflects the actual CSS viewport width and reliably distinguishes mobile from desktop. Centralized in `isMobile()` in `config.ts` so it's never inlined.
+
 ## Known Issues
 
 - **Phaser bug: MatterTileBody crashes on flipped tiles** — `convertTilemapLayer` crashes with `TypeError: Cannot read properties of null (reading 'inertia')` when a colliding tile has `flipX` or `flipY` set. Workaround applied in `scene.ts`: collision is cleared on flipped tiles before conversion. Filed as [phaserjs/phaser#7247](https://github.com/phaserjs/phaser/issues/7267).
