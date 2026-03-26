@@ -7,7 +7,7 @@ import { SpotlightOverlay, LightningOverlay, SparkleOverlay } from '../../lib/ov
 import { createSpotlightOverlay } from './overlays/spotlight'
 import { createLightningOverlay } from './overlays/lightning'
 import { createSparkleOverlay } from './overlays/sparkle'
-import { TEST_MODE } from '../../test-mode'
+import { flags } from '../../game-flags'
 import { createInteractionSystem, QUEST_DEFINITIONS } from './interaction'
 import { setupPlayerAnimations } from './player'
 import { InteractionSystem } from '../../lib/interaction'
@@ -63,6 +63,9 @@ export class OverworldScene extends Phaser.Scene {
   private sparkleOverlay?: SparkleOverlay
   private lightningOverlay?: LightningOverlay
   private interactionSystem!: InteractionSystem
+  private completionBanner!: CompletionBanner
+  private questOverlay!: QuestOverlay
+  private questSystem!: QuestSystem
 
   constructor() {
     super({ key: 'OverworldScene' })
@@ -96,7 +99,7 @@ export class OverworldScene extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
     this.matter.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
 
-    if (!TEST_MODE) {
+    if (!flags.disableOverlays) {
       this.spotlightOverlay = createSpotlightOverlay(this, map.widthInPixels, map.heightInPixels, player)
       this.sparkleOverlay = createSparkleOverlay(this, map.widthInPixels, map.heightInPixels)
       this.lightningOverlay = createLightningOverlay(this, map.widthInPixels, map.heightInPixels)
@@ -107,19 +110,19 @@ export class OverworldScene extends Phaser.Scene {
 
     const dialog = new DialogBox(this)
 
-    const questSystem = new QuestSystem(QUEST_DEFINITIONS)
-    const completionBanner = new CompletionBanner(this)
-    const questOverlay = new QuestOverlay(this)
+    this.questSystem = new QuestSystem(QUEST_DEFINITIONS)
+    this.completionBanner = new CompletionBanner(this)
+    this.questOverlay = new QuestOverlay(this)
     const congratulatoryOverlay = new CongratulatoryOverlay(this)
 
-    const { questIcon, questZone } = _createQuestButton(this, questOverlay, questSystem)
+    const { questIcon, questZone } = _createQuestButton(this, this.questOverlay, this.questSystem)
 
     _setupCameras(
       this,
       touchControls,
       dialog,
-      completionBanner,
-      questOverlay,
+      this.completionBanner,
+      this.questOverlay,
       congratulatoryOverlay,
       questIcon,
       questZone,
@@ -132,8 +135,8 @@ export class OverworldScene extends Phaser.Scene {
       this.playerController,
       dialog,
       (name: string) => {
-        const quest = questSystem.complete(name)
-        if (quest) completionBanner.show(quest.label)
+        const quest = this.questSystem.complete(name)
+        if (quest) this.completionBanner.show(quest.label)
       },
       (() => {
         let shown = false
@@ -141,7 +144,7 @@ export class OverworldScene extends Phaser.Scene {
           // NOTE: Show congratulations after the interaction dialog closes so it
           // does not get overwritten by the interaction dialog itself.
           // Guard with a flag so it only fires once.
-          if (!shown && questSystem.isComplete(name) && questSystem.isAllComplete()) {
+          if (!shown && this.questSystem.isComplete(name) && this.questSystem.isAllComplete()) {
             shown = true
             congratulatoryOverlay.show(
               `Thanks for stopping by!
@@ -154,17 +157,6 @@ Hope you enjoyed it. Check back later, I might sneak in a few more updates!`,
         }
       })(),
     )
-    if (TEST_MODE) {
-      // NOTE: Expose helpers so Playwright tests can drive the game to specific
-      // UI states without navigating the map.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ;(window as any).__overworldTest = {
-        isReady: true,
-        interact: (name: string) => this.interactionSystem.triggerByName(name),
-        hideBanner: () => completionBanner.hide(),
-        showQuestOverlay: () => questOverlay.show(questSystem.getAll()),
-      }
-    }
 
     this.playerController.freeze()
     const signHint = isMobile() ? 'tapping' : "hitting 'Enter' near"
@@ -174,7 +166,7 @@ Hope you enjoyed it. Check back later, I might sneak in a few more updates!`,
       undefined,
       () => {
         this.playerController.unfreeze()
-        questOverlay.show(questSystem.getAll())
+        this.questOverlay.show(this.questSystem.getAll())
       },
     )
   }

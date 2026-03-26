@@ -36,8 +36,7 @@ export const GAME_CONFIG: Phaser.Types.Core.GameConfig = {
 export function createGame(): Phaser.Game {
   const game = new Phaser.Game(GAME_CONFIG)
   if (TEST_MODE) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ;(window as any).__phaserGame = game
+    import('./test-hooks').then(({ setupTestHooks }) => setupTestHooks(game))
   }
   return game
 }

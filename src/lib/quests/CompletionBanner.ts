@@ -1,5 +1,4 @@
 import Phaser from 'phaser'
-import { TEST_MODE } from '../../test-mode'
 import {
   DEPTH_QUEST_UI,
   isMobile,
@@ -66,11 +65,6 @@ export class CompletionBanner {
     this.container.setY(-boxHeight)
     this.container.setAlpha(1)
     this.container.setVisible(true)
-
-    if (TEST_MODE) {
-      this.container.setY(isMobile() ? MOBILE_UI_TOP_OFFSET : BANNER_MARGIN_TOP)
-      return
-    }
 
     // NOTE: Slide down to BANNER_MARGIN_TOP, hold, then fade out.
     this.activeTween = this.scene.tweens.chain({
