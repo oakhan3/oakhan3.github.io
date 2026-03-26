@@ -10,6 +10,10 @@ test('measure frame and spotlight times during movement', async ({ page }) => {
   await page.goto('/?benchmark')
   await page.locator('canvas').waitFor({ state: 'visible' })
   await page.waitForFunction(() => document.fonts.check('8px "Press Start 2P"'))
+  // NOTE: 4x CPU throttle approximates a mid-range Android device.
+  const cdp = await page.context().newCDPSession(page)
+  await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 })
+
   // NOTE: Click to advance from BootScene through PreloadScene to OverworldScene.
   await page.locator('canvas').click()
   await page.waitForFunction(() => (window as any).__benchmark?.isReady === true, { timeout: 20000 })
