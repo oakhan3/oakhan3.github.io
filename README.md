@@ -112,19 +112,16 @@ src/
 
 ## Ideas
 
-- [x] Add Playwright end-to-end screenshot tests
 - [ ] Support user resizing the browser window (resize and re-center the game)
 - [ ] Add background music and interaction SFX (with mute/unmute toggle)
 - [ ] PWA support (manifest + service worker for offline play and home screen install)
 - [ ] Local session state (persist quest progress across page reloads)
 - [ ] Automated cross-device testing (real mobile devices via BrowserStack or similar)
-- [ ] Animated tiles (water, torches, flowers via Tiled animation data)
 - [ ] Custom tileset tiles
 - [ ] Implement the `???` quests
 - [ ] Analytics (page views, quest completion funnel)
 - [ ] User feedback (in-game form or link to submit comments/bug reports)
 - [ ] Mini game (simple arcade mechanic triggered by a quest or NPC interaction)
-- [ ] Custom sprites (hand-drawn player and NPC sprites to replace the asset pack defaults)
 
 ## Credits
 
