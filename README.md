@@ -49,7 +49,7 @@ A headed Playwright benchmark (`npm run benchmark`) measures frame time and per-
 
 ## Performance
 
-The game targets 60fps on desktop and smooth play on mid-range Android. A headed Playwright benchmark with 4x CPU throttle (`npm run benchmark`) approximates mobile conditions and measures frame time and per-system cost over a sustained movement run.
+The game targets 30fps with consistent movement speed across varying frame rates. A headed Playwright benchmark with 4x CPU throttle (`npm run benchmark`) approximates mid-range Android conditions and measures frame time and per-system cost over a sustained movement run.
 
 Optimisations applied:
 
