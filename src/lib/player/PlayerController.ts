@@ -3,6 +3,14 @@ import { PlayerSprite } from './PlayerSprite'
 import { PLAYER_SPEED, Direction } from '../../config'
 import { TouchControls } from '../mobile/TouchControls'
 
+const IDLE_FRAME: Record<Direction, number> = {
+  down: 1,
+  up: 4,
+  left: 7,
+  right: 10,
+  none: 1,
+}
+
 export class PlayerController {
   private cursors: Phaser.Types.Input.Keyboard.CursorKeys
   private wasd: Record<string, Phaser.Input.Keyboard.Key>
@@ -29,6 +37,7 @@ export class PlayerController {
     if (this.frozen) {
       this.player.setVelocity(0, 0)
       this.player.anims.stop()
+      this.player.setFrame(IDLE_FRAME[this.currentFacing])
       return
     }
 
@@ -64,6 +73,7 @@ export class PlayerController {
       this.player.anims.play('walk-down', true)
     } else {
       this.player.anims.stop()
+      this.player.setFrame(IDLE_FRAME[this.currentFacing])
     }
   }
 
