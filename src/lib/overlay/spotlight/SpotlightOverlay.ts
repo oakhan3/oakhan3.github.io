@@ -53,6 +53,7 @@ export class SpotlightOverlay {
   // NOTE: Each animated light gets a random phase offset so they don't
   // flicker/pulse in lockstep. Seeded once at construction time.
   private lightSeeds: number[]
+  private lastUpdateTime = -1
 
   constructor(
     scene: Phaser.Scene,
@@ -93,6 +94,10 @@ export class SpotlightOverlay {
 
   update() {
     const time = this.scene.time.now
+    // NOTE: Cap spotlight updates to 30fps — lighting changes are imperceptible
+    // above 30fps in a top-down RPG, and this halves the per-frame cost.
+    if (time - this.lastUpdateTime < 33) return
+    this.lastUpdateTime = time
     const { ambientColor, playerLightRadius, fixedLights } = this.config
     const camera = this.scene.cameras.main
 
