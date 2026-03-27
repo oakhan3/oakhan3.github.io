@@ -11,7 +11,7 @@ import {
 // NOTE: Sized relative to the shorter game dimension (320px). Phaser's Scale.FIT
 // stretches the canvas to fill the screen, so these scale up on all devices.
 const DPAD_SIZE = Math.round(GBA_HEIGHT * (isMobile() ? 0.7 : 0.35))
-const DPAD_ALPHA = 0.5
+const DPAD_ALPHA = 0.3
 const JOYSTICK_SCALE = isMobile() ? 1 : 0.5
 const JOYSTICK_KNOB_RADIUS = Math.round(GBA_HEIGHT * 0.1 * JOYSTICK_SCALE)
 const JOYSTICK_BASE_RADIUS = Math.round(GBA_HEIGHT * 0.25 * JOYSTICK_SCALE)
