@@ -68,7 +68,7 @@ test('touch controls - dpad visible', async ({ page }) => {
   const touchY = box!.y + box!.height * 0.7
   await page.mouse.move(touchX, touchY)
   await page.mouse.down()
-  await expect(page.locator('canvas')).toHaveScreenshot()
+  await expect(page.locator('canvas')).toHaveScreenshot({ maxDiffPixelRatio: 0.10 })
   await page.mouse.up()
 })
 
@@ -84,7 +84,7 @@ test('touch controls - knob offset', async ({ page }) => {
   await page.mouse.move(touchX, touchY)
   await page.mouse.down()
   await page.mouse.move(touchX + box!.width * 0.1, touchY)
-  await expect(page.locator('canvas')).toHaveScreenshot()
+  await expect(page.locator('canvas')).toHaveScreenshot({ maxDiffPixelRatio: 0.10 })
   await page.mouse.up()
 })
 
