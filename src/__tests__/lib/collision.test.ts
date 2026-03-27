@@ -45,8 +45,8 @@ class CollisionTestScene extends Phaser.Scene {
     this.controller = new PlayerController(this, this.player, touchControls)
   }
 
-  update(_time: number, delta: number) {
-    this.controller.update(delta)
+  update() {
+    this.controller.update()
   }
 }
 

@@ -49,11 +49,11 @@ A headed Playwright benchmark (`npm run benchmark`) measures frame time and per-
 
 ## Performance
 
-The game targets 30fps with consistent movement speed across varying frame rates. A headed Playwright benchmark with 4x CPU throttle (`npm run benchmark`) approximates mid-range Android conditions and measures frame time and per-system cost over a sustained movement run.
+The game targets 30fps with consistent movement speed across varying frame rates. A headed Playwright benchmark with CPU throttle (`npm run benchmark`) approximates mid-range Android conditions and measures frame time and per-system cost over a sustained movement run.
 
-Optimisations applied:
+Optimizations applied:
 
-- **30fps target with delta-scaled movement** — the game targets 30fps with `smoothStep` enabled to absorb frame spikes. Player velocity is scaled by `delta / (1000/30)` so movement speed is consistent regardless of actual frame rate.
+- **30fps hard cap with fixed velocity** — the game targets 30fps with `limit: 30` enforced. Player velocity is a fixed constant calibrated at 30fps.
 - **Matter.js solver iterations halved** — `positionIterations: 3`, `velocityIterations: 2`, `constraintIterations: 1` (defaults are 6/4/2). Safe for a top-down RPG with no complex joints or stacking.
 - **High-performance GPU hint** — `render: { powerPreference: 'high-performance' }` tells the browser to prefer the discrete GPU on dual-GPU devices.
 - **Off-screen light culling** — fixed lights outside the camera viewport are skipped each frame.
@@ -107,8 +107,6 @@ src/
 - **MULTIPLY blend can't produce vibrant colored light** — the nighttime overlay uses a MULTIPLY-blended render texture to darken the scene, with white circles drawn onto it to reveal lit areas. But drawing colored circles through MULTIPLY only produces dim, muddy tones because MULTIPLY can never make pixels brighter than the source. Fix: a second render texture with ADD blend mode sits on top. Glow lights draw white on the MULTIPLY layer (to reveal the area) and draw their full color on the ADD layer (to paint vibrant color on top). The two layers combine to produce bright, saturated glows — like the blue office windows.
 
 - **Mobile camera zoom breaks UI element sizing** — zooming the main camera 2x on mobile also zooms dialog boxes, quest overlays, and other UI, making them oversized and misaligned. Fix: a second camera at zoom 1 renders only the UI game objects. Each UI element is added to the main camera's ignore list and rendered exclusively by the UI camera, so game world zoom and UI scale are controlled independently.
-
-- **Phaser delta smoothing causes sluggish movement on startup** — Phaser's `smoothStep` calibrates over the first ~5 seconds, which makes the player feel slow and unresponsive at game start. Disabling it (`fps: { smoothStep: false }` in the game config) makes movement speed consistent from frame one.
 
 - **Mobile detection: `window.innerWidth` vs `screen.width`** — `screen.width` returns the physical screen resolution, which is misleadingly large on high-DPI mobile devices and doesn't reflect the viewport. `scene.scale.width` is even more misleading: it returns the logical game width (480), not the browser viewport at all. `window.innerWidth` is the correct signal — it reflects the actual CSS viewport width and reliably distinguishes mobile from desktop. Centralized in `isMobile()` in `config.ts` so it's never inlined.
 

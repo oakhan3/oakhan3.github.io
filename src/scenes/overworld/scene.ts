@@ -149,7 +149,7 @@ export class OverworldScene extends Phaser.Scene {
       }
       bench._lastFrameTime = now
     }
-    this.playerController.update(delta)
+    this.playerController.update()
     this.interactionSystem.update()
     if (flags.collectSpotlightTimes && this.spotlightOverlay) {
       const start = performance.now()
