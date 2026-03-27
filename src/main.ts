@@ -24,12 +24,23 @@ export const GAME_CONFIG: Phaser.Types.Core.GameConfig = {
       // NOTE: Zero gravity for top-down RPG.
       gravity: { x: 0, y: 0 },
       debug: false,
+      // NOTE: Defaults are 6/4/2. Halving is safe for a top-down RPG with no
+      // complex joints or stacking — reduces solver cost per frame.
+      positionIterations: 3,
+      velocityIterations: 2,
+      constraintIterations: 1,
     },
+  },
+  render: {
+    // NOTE: Hints the browser to prefer the discrete/high-performance GPU.
+    powerPreference: 'high-performance',
   },
   // NOTE: Phaser's delta smoothing causes sluggish movement for ~5s on startup
   // while it calibrates. Disabling it makes speed consistent from frame one.
   fps: {
     smoothStep: false,
+    target: 60,
+    limit: 60,
   },
   scene: [BootScene, PreloadScene, OverworldScene],
 }
