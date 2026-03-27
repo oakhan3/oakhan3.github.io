@@ -52,19 +52,15 @@ export class PlayerController {
 
     if (velocityX < 0) {
       this.currentFacing = 'left'
-      this.player.setFlipX(true)
-      this.player.anims.play('walk-right', true)
+      this.player.anims.play('walk-left', true)
     } else if (velocityX > 0) {
       this.currentFacing = 'right'
-      this.player.setFlipX(false)
       this.player.anims.play('walk-right', true)
     } else if (velocityY < 0) {
       this.currentFacing = 'up'
-      this.player.setFlipX(false)
       this.player.anims.play('walk-up', true)
     } else if (velocityY > 0) {
       this.currentFacing = 'down'
-      this.player.setFlipX(false)
       this.player.anims.play('walk-down', true)
     } else {
       this.player.anims.stop()

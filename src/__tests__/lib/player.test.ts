@@ -64,7 +64,7 @@ describe('player controller', () => {
     expect(scene.controller.facing).toBe('right')
   })
 
-  it('moves left and flips sprite when A is held', async () => {
+  it('moves left when A is held', async () => {
     game = createMinimalGame([PlayerTestScene], { physics: true })
     const scene = (await waitForScene(game, 'PlayerTestScene')) as PlayerTestScene
 
@@ -75,7 +75,6 @@ describe('player controller', () => {
     simulateKeyUp(game, 'a', 65)
 
     expect(scene.player.x).toBeLessThan(startX)
-    expect(scene.player.flipX).toBe(true)
     expect(scene.controller.facing).toBe('left')
   })
 

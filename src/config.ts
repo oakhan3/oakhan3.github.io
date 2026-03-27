@@ -10,10 +10,8 @@ export const TILE_SIZE = 16
 // NOTE: Matter.js velocity is in pixels per physics step, not pixels per second like Arcade.
 export const PLAYER_SPEED = 1.8
 
-// NOTE: Player spritesheet frames are larger than one tile to allow detail
-// on a character that occupies roughly one tile of space.
-export const PLAYER_FRAME_WIDTH = 48
-export const PLAYER_FRAME_HEIGHT = 48
+export const PLAYER_FRAME_WIDTH = 16
+export const PLAYER_FRAME_HEIGHT = 24
 
 export const DEPTH_PLAYER = 5
 export const DEPTH_ABOVE_PLAYER = 6

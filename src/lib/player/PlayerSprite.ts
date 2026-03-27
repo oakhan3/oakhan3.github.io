@@ -6,6 +6,7 @@ export interface PlayerAnimationConfig {
   frameRate: number
   animations: {
     down: { key: string; frames: [number, number] }
+    left: { key: string; frames: [number, number] }
     right: { key: string; frames: [number, number] }
     up: { key: string; frames: [number, number] }
   }
@@ -26,34 +27,14 @@ export class PlayerSprite extends Phaser.Physics.Matter.Sprite {
   }
 }
 
-// NOTE: No walk-left animation — walk-right is reused with setFlipX(true) in the controller.
 export function createPlayerAnimations(scene: Phaser.Scene, config: PlayerAnimationConfig): void {
   const { spriteKey, frameRate, animations } = config
-  scene.anims.create({
-    key: animations.down.key,
-    frames: scene.anims.generateFrameNumbers(spriteKey, {
-      start: animations.down.frames[0],
-      end: animations.down.frames[1],
-    }),
-    frameRate,
-    repeat: -1,
-  })
-  scene.anims.create({
-    key: animations.right.key,
-    frames: scene.anims.generateFrameNumbers(spriteKey, {
-      start: animations.right.frames[0],
-      end: animations.right.frames[1],
-    }),
-    frameRate,
-    repeat: -1,
-  })
-  scene.anims.create({
-    key: animations.up.key,
-    frames: scene.anims.generateFrameNumbers(spriteKey, {
-      start: animations.up.frames[0],
-      end: animations.up.frames[1],
-    }),
-    frameRate,
-    repeat: -1,
-  })
+  for (const anim of Object.values(animations)) {
+    scene.anims.create({
+      key: anim.key,
+      frames: scene.anims.generateFrameNumbers(spriteKey, { start: anim.frames[0], end: anim.frames[1] }),
+      frameRate,
+      repeat: -1,
+    })
+  }
 }

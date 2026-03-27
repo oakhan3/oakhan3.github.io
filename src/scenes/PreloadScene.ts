@@ -34,9 +34,11 @@ export class PreloadScene extends Phaser.Scene {
     this.load.image('computer-1', 'assets/tilesets/computer-1.png')
     this.load.image('dpad', 'assets/controls/noun-d-pad-1670944.png')
     this.load.tilemapTiledJSON('overworld-map', 'assets/maps/overworld-3.json')
-    this.load.spritesheet('player', 'assets/sprites/player.png', {
+    this.load.spritesheet('player', 'assets/sprites/npc.png', {
       frameWidth: PLAYER_FRAME_WIDTH,
       frameHeight: PLAYER_FRAME_HEIGHT,
+      margin: 1,
+      spacing: 1,
     })
   }
 
