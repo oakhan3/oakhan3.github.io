@@ -41,7 +41,20 @@ export class QuestOverlay extends BaseOverlay {
     // NOTE: Separator line beneath the title.
     const separatorY = this._addSeparator(scene, topOffset, title)
 
-    let currentY = separatorY + LINE_SPACING_PX
+    const signHint = mobile ? 'tapping' : "hitting 'Enter'"
+    const instruction = this._addText(
+      scene,
+      BOX_PADDING_PX,
+      separatorY + LINE_SPACING_PX,
+      `Walk up signs/points of interest on the map\n\nand try ${signHint} near them!`,
+      {
+        fontFamily: UI_FONT_FAMILY,
+        fontSize: mobile ? OVERLAY_ITEM_FONT_MOBILE : OVERLAY_ITEM_FONT_DESKTOP,
+        color: UI_HINT_COLOR,
+      },
+    )
+
+    let currentY = instruction.y + instruction.height + LINE_SPACING_PX * 2
 
     for (const quest of quests) {
       const check = quest.completed ? '[x]' : '[ ]'

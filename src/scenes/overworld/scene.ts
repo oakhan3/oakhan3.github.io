@@ -132,16 +132,10 @@ export class OverworldScene extends Phaser.Scene {
     )
 
     this.playerController.freeze()
-    const signHint = isMobile() ? 'tapping' : "hitting 'Enter' near"
-    dialog.show(
-      `Welcome, I'm Omar Ali Khan!\nTry ${signHint} a sign - but get close first!`,
-      undefined,
-      undefined,
-      () => {
-        this.playerController.unfreeze()
-        this.questOverlay.show(this.questSystem.getAll())
-      },
-    )
+    dialog.show(`Hi, I'm Omar Ali Khan,\nwelcome to my World!`, undefined, undefined, () => {
+      this.playerController.unfreeze()
+      this.questOverlay.show(this.questSystem.getAll())
+    })
   }
 
   update(_time: number, delta: number) {
