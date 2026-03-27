@@ -23,7 +23,7 @@ export class PlayerController {
     }
   }
 
-  update(): void {
+  update(delta: number): void {
     // NOTE: Must explicitly zero velocity each frame while frozen — Matter bodies
     // retain momentum from the previous frame otherwise.
     if (this.frozen) {
@@ -48,7 +48,10 @@ export class PlayerController {
       velocityY = PLAYER_SPEED
     }
 
-    this.player.setVelocity(velocityX, velocityY)
+    // NOTE: Scale velocity by delta so movement speed is consistent regardless
+    // of frame rate. PLAYER_SPEED is calibrated at 30fps (33.33ms per frame).
+    const deltaScale = delta / (1000 / 30)
+    this.player.setVelocity(velocityX * deltaScale, velocityY * deltaScale)
 
     if (velocityX < 0) {
       this.currentFacing = 'left'

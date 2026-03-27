@@ -8,7 +8,7 @@ export const GBA_HEIGHT = 320
 export const TILE_SIZE = 16
 
 // NOTE: Matter.js velocity is in pixels per physics step, not pixels per second like Arcade.
-export const PLAYER_SPEED = 1.5
+export const PLAYER_SPEED = .9
 
 // NOTE: Player spritesheet frames are larger than one tile to allow detail
 // on a character that occupies roughly one tile of space.

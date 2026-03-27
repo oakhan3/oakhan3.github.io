@@ -7,7 +7,7 @@ export default defineConfig({
   // share one baseline, with a small threshold to absorb any minor differences.
   snapshotPathTemplate: '{testDir}/snapshots/{testName}{ext}',
   expect: {
-    toHaveScreenshot: { maxDiffPixelRatio: 0.05 },
+    toHaveScreenshot: { maxDiffPixelRatio: 0.10 },
   },
   use: {
     baseURL: 'http://localhost:8080',

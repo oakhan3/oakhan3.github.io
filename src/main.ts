@@ -38,9 +38,9 @@ export const GAME_CONFIG: Phaser.Types.Core.GameConfig = {
   // NOTE: Phaser's delta smoothing causes sluggish movement for ~5s on startup
   // while it calibrates. Disabling it makes speed consistent from frame one.
   fps: {
-    smoothStep: false,
-    target: 60,
-    limit: 60,
+    smoothStep: true,
+    target: 30,
+    limit: 30,
   },
   scene: [BootScene, PreloadScene, OverworldScene],
 }

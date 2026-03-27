@@ -35,8 +35,8 @@ class PlayerTestScene extends Phaser.Scene {
     this.controller = new PlayerController(this, this.player, touchControls)
   }
 
-  update() {
-    this.controller.update()
+  update(_time: number, delta: number) {
+    this.controller.update(delta)
   }
 }
 

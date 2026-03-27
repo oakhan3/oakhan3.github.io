@@ -149,7 +149,7 @@ export class OverworldScene extends Phaser.Scene {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ;((window as any).__frameTimes as number[]).push(delta)
     }
-    this.playerController.update()
+    this.playerController.update(delta)
     this.interactionSystem.update()
     if (flags.collectSpotlightTimes && this.spotlightOverlay) {
       const start = performance.now()
