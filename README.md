@@ -53,10 +53,9 @@ The game targets 60fps on desktop and smooth play on mid-range Android. A headed
 
 Optimisations applied:
 
+- **30fps target with delta-scaled movement** — the game targets 30fps with `smoothStep` enabled to absorb frame spikes. Player velocity is scaled by `delta / (1000/30)` so movement speed is consistent regardless of actual frame rate.
 - **Matter.js solver iterations halved** — `positionIterations: 3`, `velocityIterations: 2`, `constraintIterations: 1` (defaults are 6/4/2). Safe for a top-down RPG with no complex joints or stacking.
-- **60fps cap** — `fps: { target: 60, limit: 60 }` prevents Phaser running uncapped and burning CPU above the display refresh rate.
 - **High-performance GPU hint** — `render: { powerPreference: 'high-performance' }` tells the browser to prefer the discrete GPU on dual-GPU devices.
-- **Spotlight throttled to 30fps** — lighting updates are capped at 33ms intervals. Lighting changes are imperceptible above 30fps in an RPG, halving the overlay cost.
 - **Off-screen light culling** — fixed lights outside the camera viewport are skipped each frame.
 
 ## Notable Features
