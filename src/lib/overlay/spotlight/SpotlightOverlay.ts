@@ -94,6 +94,7 @@ export class SpotlightOverlay {
   update() {
     const time = this.scene.time.now
     const { ambientColor, playerLightRadius, fixedLights } = this.config
+    const camera = this.scene.cameras.main
 
     this.renderTexture.clear()
     this.renderTexture.fill(ambientColor)
@@ -108,6 +109,19 @@ export class SpotlightOverlay {
     for (let index = 0; index < fixedLights.length; index++) {
       const light = fixedLights[index]
       const seed = this.lightSeeds[index]
+
+      // NOTE: Skip lights whose pool + cone bounding box is entirely outside
+      // the camera viewport. Use the larger of radius and cone height as a
+      // conservative bounds so partially visible lights are never clipped.
+      const maxReach = Math.max(light.radius, light.cone ? 60 : 0)
+      if (
+        light.pixelX + maxReach < camera.scrollX ||
+        light.pixelX - maxReach > camera.scrollX + camera.width ||
+        light.pixelY + maxReach < camera.scrollY ||
+        light.pixelY - maxReach > camera.scrollY + camera.height
+      ) {
+        continue
+      }
 
       const { radiusScale, color } = computeAnimation(light, time, seed, index)
 
