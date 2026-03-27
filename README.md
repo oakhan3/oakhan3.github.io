@@ -47,6 +47,18 @@ End-to-end screenshot tests (`npm run test:screenshots`) boot the full game and 
 
 A headed Playwright benchmark (`npm run benchmark`) measures frame time and per-system update cost over a 5-second movement run. Use it before and after performance changes to quantify improvement.
 
+## Performance
+
+The game targets 60fps on desktop and smooth play on mid-range Android. A headed Playwright benchmark with 4x CPU throttle (`npm run benchmark`) approximates mobile conditions and measures frame time and per-system cost over a sustained movement run.
+
+Optimisations applied:
+
+- **Matter.js solver iterations halved** — `positionIterations: 3`, `velocityIterations: 2`, `constraintIterations: 1` (defaults are 6/4/2). Safe for a top-down RPG with no complex joints or stacking.
+- **60fps cap** — `fps: { target: 60, limit: 60 }` prevents Phaser running uncapped and burning CPU above the display refresh rate.
+- **High-performance GPU hint** — `render: { powerPreference: 'high-performance' }` tells the browser to prefer the discrete GPU on dual-GPU devices.
+- **Spotlight throttled to 30fps** — lighting updates are capped at 33ms intervals. Lighting changes are imperceptible above 30fps in an RPG, halving the overlay cost.
+- **Off-screen light culling** — fixed lights outside the camera viewport are skipped each frame.
+
 ## Notable Features
 
 - **Custom lighting** — nighttime overlay. Supports three cone types (stage, lamp, headlight) and three animation modes: flicker (lamps), pulse (building windows), and color-cycle (stage spotlights). Each light has a random phase offset for organic variation.
