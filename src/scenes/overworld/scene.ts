@@ -140,8 +140,14 @@ export class OverworldScene extends Phaser.Scene {
 
   update(_time: number, delta: number) {
     if (flags.collectFrameTimes) {
+      const now = performance.now()
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ;((window as any).__frameTimes as number[]).push(delta)
+      const bench = (window as any).__benchmark
+      if (bench._lastFrameTime !== undefined) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ;((window as any).__frameTimes as number[]).push(now - bench._lastFrameTime)
+      }
+      bench._lastFrameTime = now
     }
     this.playerController.update(delta)
     this.interactionSystem.update()
