@@ -20,43 +20,28 @@ export type InteractableName =
   | 'stage'
   | '???'
 
+const TIKTOK_URL = 'https://www.tiktok.com/@kingkiwifi'
+const LINKEDIN_URL = 'https://www.linkedin.com/in/omarkhan01/'
+const GITHUB_URL = 'https://github.com/oakhan3/'
+const INSTAGRAM_URL = 'https://www.instagram.com/electricoaksband/'
+
 // NOTE: Dialog messages keyed by the Tiled object name. Each interactable name
 // maps to the text shown in the dialog box when the player interacts with it.
 export const MESSAGES: Partial<Record<InteractableName, Message>> = {
   'secret-lab': { text: "Hey! Don't go in here!" },
   'secret-lab-sign': { text: "Omar's Secret Lab" },
-  kiwi: { text: 'Bakaaaw!', url: 'https://www.tiktok.com/@kingkiwifi', display_link: 'TikTok' },
-  'kiwi-sign': { text: 'Find Kiwi here!', url: 'https://www.tiktok.com/@kingkiwifi', display_link: 'TikTok' },
+  kiwi: { text: 'Bakaaaw!', url: TIKTOK_URL, display_link: 'TikTok' },
+  'kiwi-sign': { text: 'Find Kiwi here!', url: TIKTOK_URL, display_link: 'TikTok' },
   'beach-sign': { text: 'Coming soon!' },
-  'office-sign': {
-    text: "Omar's Office!",
-    url: 'https://www.linkedin.com/in/omarkhan01/',
-    display_link: 'LinkedIn',
-  },
-  office: {
-    text: 'Very business-ey building over here...',
-    url: 'https://www.linkedin.com/in/omarkhan01/',
-    display_link: 'LinkedIn',
-  },
+  'office-sign': { text: "Omar's Office!", url: LINKEDIN_URL, display_link: 'LinkedIn' },
+  office: { text: 'Very business-ey building over here...', url: LINKEDIN_URL, display_link: 'LinkedIn' },
   car: { text: "Ooooo nice car! Wait there's no roads..." },
-  'github-sign': {
-    text: "Find Omar's latest activity here!",
-    url: 'https://github.com/oakhan3/',
-    display_link: 'GitHub',
-  },
+  'github-sign': { text: "Find Omar's latest activity here!", url: GITHUB_URL, display_link: 'GitHub' },
   'github-commit': { text: 'Look at this neat pile of commits!' },
-  'github-computer': { text: "Something's cooking...", url: 'https://github.com/oakhan3/', display_link: 'GitHub' },
+  'github-computer': { text: "Something's cooking...", url: GITHUB_URL, display_link: 'GitHub' },
   'github-stash': { text: 'This stash is embarrassing...' },
-  'stage-sign': {
-    text: 'Tune in to the Electric OAKS!',
-    url: 'https://www.instagram.com/electricoaksband/',
-    display_link: 'Instagram',
-  },
-  stage: {
-    text: 'When are they coming on???',
-    url: 'https://www.instagram.com/electricoaksband/',
-    display_link: 'Instagram',
-  },
+  'stage-sign': { text: 'Tune in to the Electric OAKS!', url: INSTAGRAM_URL, display_link: 'Instagram' },
+  stage: { text: 'When are they coming on???', url: INSTAGRAM_URL, display_link: 'Instagram' },
 }
 
 export const QUEST_DEFINITIONS: Quest[] = [
