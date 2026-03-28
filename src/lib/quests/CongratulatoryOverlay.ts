@@ -21,7 +21,7 @@ import {
 
 export class CongratulatoryOverlay extends BaseOverlay {
   show(message: string, onDismiss?: () => void): void {
-    super._show(onDismiss)
+    super._show(onDismiss, 5000)
 
     const scene = this.scene
     const mobile = isMobile()

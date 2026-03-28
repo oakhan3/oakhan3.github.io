@@ -53,7 +53,7 @@ describe('CongratulatoryOverlay', () => {
     expect(container.visible).toBe(true)
   })
 
-  it('overlay hides after Enter key', async () => {
+  it('overlay stays visible if dismissed before 5 seconds', async () => {
     game = createMinimalGame([CongratulatoryTestScene])
     const scene = (await waitForScene(game, 'CongratulatoryTestScene')) as CongratulatoryTestScene
 
@@ -62,14 +62,28 @@ describe('CongratulatoryOverlay', () => {
     await delay(50)
 
     const container = findOverlayContainer(scene)
-    expect(container.visible).toBe(false)
+    expect(container.visible).toBe(true)
   })
 
-  it('overlay hides after tap', async () => {
+  it('overlay hides after Enter key once 5 seconds have passed', async () => {
     game = createMinimalGame([CongratulatoryTestScene])
     const scene = (await waitForScene(game, 'CongratulatoryTestScene')) as CongratulatoryTestScene
 
     scene.overlay.show('Well done!')
+    await delay(5100)
+    simulateKeyPress(game, 'Enter', 13)
+    await delay(50)
+
+    const container = findOverlayContainer(scene)
+    expect(container.visible).toBe(false)
+  })
+
+  it('overlay hides after tap once 5 seconds have passed', async () => {
+    game = createMinimalGame([CongratulatoryTestScene])
+    const scene = (await waitForScene(game, 'CongratulatoryTestScene')) as CongratulatoryTestScene
+
+    scene.overlay.show('Well done!')
+    await delay(5100)
     simulatePointerDown(game, GBA_WIDTH / 2, 100)
     await delay(50)
 
@@ -77,7 +91,7 @@ describe('CongratulatoryOverlay', () => {
     expect(container.visible).toBe(false)
   })
 
-  it('onDismiss callback fires when dismissed', async () => {
+  it('onDismiss callback fires when dismissed after 5 seconds', async () => {
     game = createMinimalGame([CongratulatoryTestScene])
     const scene = (await waitForScene(game, 'CongratulatoryTestScene')) as CongratulatoryTestScene
 
@@ -85,6 +99,7 @@ describe('CongratulatoryOverlay', () => {
     scene.overlay.show('Well done!', () => {
       called = true
     })
+    await delay(5100)
     simulateKeyPress(game, 'Enter', 13)
     await delay(50)
 

@@ -82,7 +82,7 @@ export abstract class BaseOverlay {
     return this.container.visible
   }
 
-  protected _show(onDismiss?: () => void): void {
+  protected _show(onDismiss?: () => void, dismissDelayMs = 0): void {
     this.onDismiss = onDismiss
 
     for (const object of this.contents) {
@@ -92,12 +92,20 @@ export abstract class BaseOverlay {
 
     this.container.setVisible(true)
 
-    for (const key of this.dismissKeys) {
-      key.removeAllListeners()
-      key.once('down', this._dismiss, this)
+    const registerDismissListeners = () => {
+      for (const key of this.dismissKeys) {
+        key.removeAllListeners()
+        key.once('down', this._dismiss, this)
+      }
+      // NOTE: Use a bound method (not an arrow function) so off() can find and remove the same reference.
+      this.scene.input.on('pointerdown', this._dismiss, this)
     }
-    // NOTE: Use a bound method (not an arrow function) so off() can find and remove the same reference.
-    this.scene.input.on('pointerdown', this._dismiss, this)
+
+    if (dismissDelayMs > 0) {
+      this.scene.time.delayedCall(dismissDelayMs, registerDismissListeners)
+    } else {
+      registerDismissListeners()
+    }
   }
 
   dismiss(): void {
