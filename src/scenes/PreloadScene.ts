@@ -30,13 +30,14 @@ export class PreloadScene extends Phaser.Scene {
       progressBar.width = (barWidth - 2) * value
     })
 
-    this.load.image('heliodor', 'assets/tilesets/heliodor.png')
-    this.load.image('computer-1', 'assets/tilesets/computer-1.png')
-    this.load.image('supercar-blue', 'assets/tilesets/supercar-blue.png')
-    this.load.image('dpad', 'assets/controls/noun-d-pad-1670944.png')
-    this.load.image('dpad-highlight', 'assets/controls/noun-d-pad-up-highlight.png')
-    this.load.tilemapTiledJSON('overworld-map', 'assets/maps/overworld-3.json')
-    this.load.spritesheet('player', 'assets/sprites/player.png', {
+    const v = __GIT_SHA__
+    this.load.image('heliodor', `assets/tilesets/heliodor.png?v=${v}`)
+    this.load.image('computer-1', `assets/tilesets/computer-1.png?v=${v}`)
+    this.load.image('supercar-blue', `assets/tilesets/supercar-blue.png?v=${v}`)
+    this.load.image('dpad', `assets/controls/noun-d-pad-1670944.png?v=${v}`)
+    this.load.image('dpad-highlight', `assets/controls/noun-d-pad-up-highlight.png?v=${v}`)
+    this.load.tilemapTiledJSON('overworld-map', `assets/maps/overworld-3.json?v=${v}`)
+    this.load.spritesheet('player', `assets/sprites/player.png?v=${v}`, {
       frameWidth: PLAYER_FRAME_WIDTH,
       frameHeight: PLAYER_FRAME_HEIGHT,
     })

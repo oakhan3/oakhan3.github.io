@@ -1,7 +1,13 @@
+import { execSync } from 'child_process'
 import { defineConfig } from 'vitest/config'
 import { playwright } from '@vitest/browser-playwright'
 
+const gitSha = execSync('git rev-parse --short HEAD').toString().trim()
+
 export default defineConfig({
+  define: {
+    __GIT_SHA__: JSON.stringify(gitSha),
+  },
   optimizeDeps: {
     exclude: ['playwright', '@playwright/test'],
   },
