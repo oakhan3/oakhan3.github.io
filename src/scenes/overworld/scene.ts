@@ -69,8 +69,8 @@ export class OverworldScene extends Phaser.Scene {
 
     setupPlayerAnimations(this)
 
-    const spawnX = Math.floor(map.widthInPixels / 2)
-    const spawnY = Math.floor(map.heightInPixels / 2)
+    const spawnX = 28 * 16
+    const spawnY = 12 * 16
     const player = new PlayerSprite(this, spawnX, spawnY)
 
     // NOTE: Only convert layers that have collision defined — layers without
