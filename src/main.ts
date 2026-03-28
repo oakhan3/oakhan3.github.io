@@ -3,8 +3,8 @@ import { BootScene } from './scenes/BootScene'
 import { PreloadScene } from './scenes/PreloadScene'
 import { OverworldScene } from './scenes/overworld'
 import { GBA_WIDTH, GBA_HEIGHT } from './config'
-import { TEST_MODE } from './test-mode'
-import { BENCHMARK_MODE } from './benchmark-mode'
+const TEST_MODE = new URLSearchParams(window.location.search).has('test')
+const BENCHMARK_MODE = new URLSearchParams(window.location.search).has('benchmark')
 
 export const GAME_CONFIG: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
