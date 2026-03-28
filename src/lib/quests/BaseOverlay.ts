@@ -15,6 +15,7 @@ export abstract class BaseOverlay {
   private background: Phaser.GameObjects.Graphics
   private dismissKeys: Phaser.Input.Keyboard.Key[]
   private onDismiss?: () => void
+  private pointerDismissHandler?: () => void
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene
@@ -92,20 +93,24 @@ export abstract class BaseOverlay {
 
     this.container.setVisible(true)
 
-    const registerDismissListeners = () => {
-      for (const key of this.dismissKeys) {
-        key.removeAllListeners()
-        key.once('down', this._dismiss, this)
-      }
-      // NOTE: Use a bound method (not an arrow function) so off() can find and remove the same reference.
-      this.scene.input.on('pointerdown', this._dismiss, this)
-    }
+    // NOTE: Guard dismiss with a wall-clock check rather than delaying listener
+    // registration via Phaser's delayedCall. Phaser's game time lags wall-clock
+    // time under CI load (frame drops), causing the callback to fire after the
+    // real-time delay has elapsed, leaving the overlay non-dismissible.
+    const shownAt = Date.now()
+    const canDismiss = () => Date.now() - shownAt >= dismissDelayMs
 
-    if (dismissDelayMs > 0) {
-      this.scene.time.delayedCall(dismissDelayMs, registerDismissListeners)
-    } else {
-      registerDismissListeners()
+    for (const key of this.dismissKeys) {
+      key.removeAllListeners()
+      key.on('down', () => {
+        if (canDismiss()) this._dismiss()
+      })
     }
+    // NOTE: Store the handler reference so _dismiss can remove the exact listener with off().
+    this.pointerDismissHandler = () => {
+      if (canDismiss()) this._dismiss()
+    }
+    this.scene.input.on('pointerdown', this.pointerDismissHandler)
   }
 
   dismiss(): void {
@@ -117,7 +122,10 @@ export abstract class BaseOverlay {
     for (const key of this.dismissKeys) {
       key.removeAllListeners()
     }
-    this.scene.input.off('pointerdown', this._dismiss, this)
+    if (this.pointerDismissHandler) {
+      this.scene.input.off('pointerdown', this.pointerDismissHandler)
+      this.pointerDismissHandler = undefined
+    }
     this.onDismiss?.()
   }
 }
