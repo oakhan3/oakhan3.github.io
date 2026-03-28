@@ -59,7 +59,7 @@ export class DialogBox {
     const screenHeight = scene.scale.height
     const boxWidth = screenWidth - BOX_MARGIN_PX * 2
     const mobile = isMobile()
-    const boxY = screenHeight * 0.7 - (mobile ? 120 : 0)
+    const boxY = screenHeight * 0.7 - (mobile ? 170 : 0)
     this.mobile = mobile
     const fontSize = mobile ? DIALOG_FONT_MOBILE : DIALOG_FONT_DESKTOP
     const boxHeight = mobile ? DIALOG_HEIGHT_MOBILE_PX : DIALOG_HEIGHT_DESKTOP_PX
