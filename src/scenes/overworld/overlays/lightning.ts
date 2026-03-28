@@ -4,7 +4,7 @@ import type { LightningConfig } from '../../../lib/overlay'
 
 // NOTE: Target tile coordinates where the lightning bolt strikes.
 const TARGET_TILE_X = 39
-const TARGET_TILE_Y = 8
+const TARGET_TILE_Y = 18
 
 // NOTE: Random interval range between strikes (milliseconds). The bolt fires
 // at a random time within this window, creating unpredictable timing.

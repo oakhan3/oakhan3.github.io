@@ -77,12 +77,12 @@ export class SpotlightOverlay {
 
     this.lightBrush = scene.make.image({ key: 'light-gradient', add: false })
 
-    this.renderTexture = scene.add.renderTexture(0, 0, mapWidth, mapHeight)
+    this.renderTexture = scene.add.renderTexture(-1, 0, mapWidth + 1, mapHeight)
     this.renderTexture.setOrigin(0, 0)
     this.renderTexture.setBlendMode(Phaser.BlendModes.MULTIPLY)
     this.renderTexture.setDepth(DEPTH_LIGHTING)
 
-    this.glowTexture = scene.add.renderTexture(0, 0, mapWidth, mapHeight)
+    this.glowTexture = scene.add.renderTexture(-1, 0, mapWidth + 1, mapHeight)
     this.glowTexture.setOrigin(0, 0)
     this.glowTexture.setBlendMode(Phaser.BlendModes.ADD)
     this.glowTexture.setDepth(DEPTH_SPOTLIGHT_GLOW)
