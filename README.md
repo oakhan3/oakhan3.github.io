@@ -100,6 +100,26 @@ src/
 
 `src/lib/` contains generic engine code with no knowledge of the game world. `src/scenes/overworld/` contains app-specific config and factory functions that wire lib modules to the actual map content.
 
+## Learnings from User Testing
+
+- **Camera centering needs to account for UI** — centering the camera on the player puts the player at the visual center of the screen, but on mobile the bottom half is occupied by the virtual joystick and dialog UI. The player ends up obscured by controls. Fix: offset the camera north so the player appears in the lower half of the playable area, keeping more of the map visible above them.
+
+- **UI component scaling must be independent of game zoom** — increasing camera zoom to fill the screen on mobile also scales up dialog boxes, quest overlays, and other HUD elements, making them oversized and breaking layout. Fix: render all UI on a separate camera at zoom 1, and exclude UI objects from the main camera. Game world and UI scale are then controlled independently.
+
+- **Oversizing the map prevents immersion-breaking edges** — if the map is only as large as the visible viewport, players can see the edge of the world during normal movement or when the camera is offset. Fix: extend the map beyond the expected play area (especially north) so the camera never reaches a boundary during normal play, preserving the illusion of a larger world.
+
+- **Lighting effects add life to a static map** — a tilemap with no dynamic lighting reads as flat and lifeless regardless of art quality. Colored ambient glows, flickering lamp lights, and pulsing window lights create a sense of depth and atmosphere, making the world feel inhabited rather than decorative.
+
+- **Links need descriptive labels to set expectations** — bare or generic link text gives players no context about where they are being sent or what they will find. Named links (e.g. "View on GitHub" rather than "here") let players make an informed choice before tapping, which is especially important on mobile where mis-taps are costly.
+
+- **Accidental dismissal ruins curated moments** — players can tap or click reflexively and dismiss a congratulatory overlay before they have time to read it, cutting short a moment that should feel rewarding. Fix: ignore dismiss input for the first 5 seconds after the overlay appears, so the experience plays out fully before the player can close it.
+
+- **Players need persistent access to instructions** — first-time instructions shown only at startup are forgotten as soon as gameplay begins. Players get lost and have no way to recover. Fix: expose controls and objectives at any time through the quest overlay, so players can pull up a reminder without restarting or missing anything.
+
+- **D-pad needs visual feedback to feel responsive** — without any indication of which direction is active, the virtual joystick feels unresponsive and players are unsure if their input registered. Fix: highlight the active arrow on the d-pad graphic while the player is moving in that direction, giving immediate tactile confirmation of input.
+
+- **Tile animations signal an active world** — static tiles feel frozen. Animating water, foliage, and other environmental tiles gives the impression that the world exists independently of the player, which is key to immersion in a top-down RPG.
+
 ## Problems I Had to Solve
 
 - **iOS Safari blocks navigation from Phaser input events** — `window.open()` and programmatic `anchor.click()` are blocked on iOS Safari unless called directly from a native DOM gesture. Phaser's input pipeline processes touch events asynchronously enough to exceed Safari's transient activation window, so any navigation triggered from a Phaser `pointerdown` listener silently fails. Fix: replace the Phaser link button's click handler with a transparent `<a>` element overlaid on the canvas at the button's position. iOS Safari treats a tap on a real anchor as a genuine user gesture regardless of what's underneath it.
