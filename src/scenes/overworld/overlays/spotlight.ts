@@ -146,20 +146,20 @@ const SPOTLIGHT_CONFIG: SpotlightConfig = {
     { pixelX: 35.5 * TILE_SIZE, pixelY: 20 * TILE_SIZE, radius: 30, color: 0x0e3388, glow: true, animation: 'pulse' },
 
     // Car headlights — beams project left from tile 39. Start 5% into the tile.
-    // Small glow at the headlight source so the cone doesn't emerge from darkness.
-    { pixelX: 39 * TILE_SIZE + 1, pixelY: 21.5 * TILE_SIZE + 8, radius: 10, color: 0x665533 },
-    { pixelX: 39 * TILE_SIZE + 1, pixelY: 22.5 * TILE_SIZE, radius: 10, color: 0x665533 },
+    // Bright bulb at headlight source.
+    { pixelX: 39 * TILE_SIZE + 5, pixelY: 20.5 * TILE_SIZE + 10, radius: 3, color: 0xffffff, glow: true },
+    { pixelX: 39 * TILE_SIZE + 5, pixelY: 21.5 * TILE_SIZE + 1, radius: 3, color: 0xffffff, glow: true },
     {
-      pixelX: 39 * TILE_SIZE + 1,
-      pixelY: 21.5 * TILE_SIZE + 8,
+      pixelX: 39 * TILE_SIZE + 5,
+      pixelY: 20.5 * TILE_SIZE + 12,
       radius: 20,
       color: 0xffeecc,
       cone: 'headlight',
       animation: 'flicker',
     },
     {
-      pixelX: 39 * TILE_SIZE + 1,
-      pixelY: 22.5 * TILE_SIZE,
+      pixelX: 39 * TILE_SIZE + 5,
+      pixelY: 21.5 * TILE_SIZE,
       radius: 20,
       color: 0xffeecc,
       cone: 'headlight',
@@ -169,7 +169,7 @@ const SPOTLIGHT_CONFIG: SpotlightConfig = {
     // Car tail lights — small red glow at the right edge of the car.
     {
       pixelX: 42 * TILE_SIZE - 5,
-      pixelY: 21.5 * TILE_SIZE + 8,
+      pixelY: 20.5 * TILE_SIZE + 12,
       radius: 12,
       color: 0xdd1111,
       glow: true,
@@ -177,7 +177,7 @@ const SPOTLIGHT_CONFIG: SpotlightConfig = {
     },
     {
       pixelX: 42 * TILE_SIZE - 5,
-      pixelY: 22.5 * TILE_SIZE,
+      pixelY: 21.5 * TILE_SIZE,
       radius: 12,
       color: 0xdd1111,
       glow: true,
@@ -212,7 +212,7 @@ const SPOTLIGHT_CONFIG: SpotlightConfig = {
       animation: 'flicker',
     },
     {
-      pixelX: 22.5 * TILE_SIZE,
+      pixelX: 21.5 * TILE_SIZE,
       pixelY: 24.5 * TILE_SIZE,
       radius: 4,
       color: 0xffffff,

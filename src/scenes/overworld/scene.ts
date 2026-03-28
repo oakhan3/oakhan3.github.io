@@ -59,7 +59,9 @@ export class OverworldScene extends Phaser.Scene {
     if (!heliodor) throw new Error("Tileset 'heliodor' not found in the tilemap.")
     const computer1 = map.addTilesetImage('computer-1')
     if (!computer1) throw new Error("Tileset 'computer-1' not found in the tilemap.")
-    const tilesets = [heliodor, computer1]
+    const supercarBlue = map.addTilesetImage('supercar-blue')
+    if (!supercarBlue) throw new Error("Tileset 'supercar-blue' not found in the tilemap.")
+    const tilesets = [heliodor, computer1, supercarBlue]
 
     const { allLayers, collisionLayers } = _createLayers(map, tilesets)
 

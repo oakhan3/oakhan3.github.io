@@ -33,7 +33,7 @@ export type InteractableName =
 const MESSAGES: Partial<Record<InteractableName, Message>> = {
   'secret-lab': { text: "Hey! Don't go in here!" },
   'secret-lab-sign': { text: "Omar's Secret Lab" },
-  kiwi: { text: 'Bakaaaw!' },
+  kiwi: { text: 'Bakaaaw!', url: 'https://www.tiktok.com/@kingkiwifi', display_link: 'TikTok' },
   'kiwi-sign': { text: 'Find Kiwi here!', url: 'https://www.tiktok.com/@kingkiwifi', display_link: 'TikTok' },
   'beach-sign': { text: 'Coming soon!' },
   'office-sign': {
@@ -41,8 +41,12 @@ const MESSAGES: Partial<Record<InteractableName, Message>> = {
     url: 'https://www.linkedin.com/in/omarkhan01/',
     display_link: 'LinkedIn',
   },
-  office: { text: "I probably shouldn't bother him at work..." },
-  car: { text: 'Ooooo nice car!' },
+  office: {
+    text: "Very business-ey building over here...",
+    url: 'https://www.linkedin.com/in/omarkhan01/',
+    display_link: 'LinkedIn',
+  },
+  car: { text: "Ooooo nice car! Wait there's no roads..." },
   'github-sign': {
     text: "Find Omar's latest activity here!",
     url: 'https://github.com/oakhan3/',
@@ -56,7 +60,11 @@ const MESSAGES: Partial<Record<InteractableName, Message>> = {
     url: 'https://www.instagram.com/electricoaksband/',
     display_link: 'Instagram',
   },
-  stage: { text: 'When are they coming on???' },
+  stage: {
+    text: 'When are they coming on???',
+    url: 'https://www.instagram.com/electricoaksband/',
+    display_link: 'Instagram',
+  },
 }
 
 export const QUEST_DEFINITIONS: Quest[] = [
@@ -65,7 +73,7 @@ export const QUEST_DEFINITIONS: Quest[] = [
   { name: 'office-sign', label: "Find Omar's Office" },
   { name: 'github-computer', label: "Mess with Omar's Computer" },
   { name: 'stage-sign', label: 'Tune in to the Electric OAKS' },
-  { name: 'car', label: 'Check out the car' },
+  { name: 'car', label: 'Check out the Car' },
   { name: 'secret-lab', label: 'Try to enter the Secret Lab' },
   { name: '???', label: '???' },
   { name: '???', label: '???' },
