@@ -21,6 +21,9 @@ export interface SparkleConfig {
   fallSpeed: number
   swayAmplitude: number
   swaySpeed: number
+  // NOTE: Pixel bounds within the map to constrain sparkle spawning and rendering.
+  // Defaults to the full map if not provided.
+  bounds?: { x: number; y: number; width: number; height: number }
 }
 
 export class SparkleOverlay {
@@ -30,28 +33,32 @@ export class SparkleOverlay {
   private sparkles: Sparkle[]
   private brush: Phaser.GameObjects.Image
 
-  private mapWidth: number
-  private mapHeight: number
+  private boundsX: number
+  private boundsY: number
+  private boundsWidth: number
+  private boundsHeight: number
 
   constructor(scene: Phaser.Scene, mapWidth: number, mapHeight: number, config: SparkleConfig) {
     this.scene = scene
     this.config = config
-    this.mapWidth = mapWidth
-    this.mapHeight = mapHeight
+    this.boundsX = config.bounds?.x ?? 0
+    this.boundsY = config.bounds?.y ?? 0
+    this.boundsWidth = config.bounds?.width ?? mapWidth
+    this.boundsHeight = config.bounds?.height ?? mapHeight
 
     _createSparkleTexture(scene, 'sparkle-dot', config.radius)
 
     this.brush = scene.make.image({ key: 'sparkle-dot', add: false })
 
     // NOTE: Sits above the glow layer (DEPTH_LIGHTING + 1) but below UI.
-    this.renderTexture = scene.add.renderTexture(0, 0, mapWidth, mapHeight)
+    this.renderTexture = scene.add.renderTexture(this.boundsX, this.boundsY, this.boundsWidth, this.boundsHeight)
     this.renderTexture.setOrigin(0, 0)
     this.renderTexture.setBlendMode(Phaser.BlendModes.ADD)
     this.renderTexture.setDepth(DEPTH_SPARKLE)
 
     this.sparkles = []
     for (let index = 0; index < config.count; index++) {
-      this.sparkles.push(_createSparkle(mapWidth, mapHeight, config.minCycleMs, config.maxCycleMs))
+      this.sparkles.push(_createSparkle(this.boundsWidth, this.boundsHeight, config.minCycleMs, config.maxCycleMs))
     }
 
     this.update()
@@ -72,8 +79,8 @@ export class SparkleOverlay {
 
       // NOTE: When a sparkle falls off the bottom or drifts off the sides,
       // respawn it at the top at a random X position.
-      if (sparkle.pixelY > this.mapHeight || sparkle.pixelX < 0 || sparkle.pixelX > this.mapWidth) {
-        this.sparkles[index] = _createSparkle(this.mapWidth, this.mapHeight, minCycleMs, maxCycleMs)
+      if (sparkle.pixelY > this.boundsHeight || sparkle.pixelX < 0 || sparkle.pixelX > this.boundsWidth) {
+        this.sparkles[index] = _createSparkle(this.boundsWidth, this.boundsHeight, minCycleMs, maxCycleMs)
         this.sparkles[index].pixelY = 0
         continue
       }
