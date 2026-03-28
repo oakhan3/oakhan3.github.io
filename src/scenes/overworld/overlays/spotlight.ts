@@ -20,6 +20,10 @@ const LAMP_CONE_HEIGHT_PX = 40
 const HEADLIGHT_CONE_LENGTH_PX = 40
 const HEADLIGHT_CONE_SPREAD_PX = 16
 
+// NOTE: Shift all fixed lights by this many tiles when the map content has
+// been offset from the original layout. Update when resizing the map.
+const MAP_TILE_OFFSET = { x: 0, y: 10 }
+
 // NOTE: Tile coords x TILE_SIZE = pixel coords. Spotlights are placed a few
 // tiles below the gem sources so the light pools onto the stage surface.
 const SPOTLIGHT_CONFIG: SpotlightConfig = {
@@ -249,5 +253,15 @@ export function createSpotlightOverlay(
   mapHeight: number,
   player: Phaser.GameObjects.Sprite,
 ): SpotlightOverlay {
-  return new SpotlightOverlay(scene, mapWidth, mapHeight, player, SPOTLIGHT_CONFIG)
+  const offsetX = MAP_TILE_OFFSET.x * TILE_SIZE
+  const offsetY = MAP_TILE_OFFSET.y * TILE_SIZE
+  const config: SpotlightConfig = {
+    ...SPOTLIGHT_CONFIG,
+    fixedLights: SPOTLIGHT_CONFIG.fixedLights.map((light) => ({
+      ...light,
+      pixelX: light.pixelX + offsetX,
+      pixelY: light.pixelY + offsetY,
+    })),
+  }
+  return new SpotlightOverlay(scene, mapWidth, mapHeight, player, config)
 }
