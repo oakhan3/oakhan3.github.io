@@ -4,11 +4,14 @@ import { DEPTH_PLAYER } from '../../config'
 export interface PlayerAnimationConfig {
   spriteKey: string
   frameRate: number
+  // NOTE: No left entries — left animations reuse the right frames with setFlipX(true).
   animations: {
-    down: { key: string; frames: [number, number] }
-    left: { key: string; frames: [number, number] }
-    right: { key: string; frames: [number, number] }
-    up: { key: string; frames: [number, number] }
+    idleDown: { key: string; frames: [number, number] }
+    idleRight: { key: string; frames: [number, number] }
+    idleUp: { key: string; frames: [number, number] }
+    walkDown: { key: string; frames: [number, number] }
+    walkRight: { key: string; frames: [number, number] }
+    walkUp: { key: string; frames: [number, number] }
   }
 }
 

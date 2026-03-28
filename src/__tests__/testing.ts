@@ -97,7 +97,7 @@ export function simulatePointerMove(game: Phaser.Game, gameX: number, gameY: num
 // NOTE: Test scenes that create a PlayerController need stub animations registered,
 // otherwise PlayerController.update() warns on every frame when it calls anims.play().
 export function createStubPlayerAnimations(scene: Phaser.Scene): void {
-  for (const key of ['walk-left', 'walk-right', 'walk-up', 'walk-down']) {
+  for (const key of ['idle-down', 'idle-right', 'idle-up', 'walk-down', 'walk-right', 'walk-up']) {
     scene.anims.create({ key, frames: [{ key: 'player', frame: 0 }], frameRate: 8, repeat: -1 })
   }
 }

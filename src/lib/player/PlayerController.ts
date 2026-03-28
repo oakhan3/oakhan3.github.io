@@ -3,12 +3,12 @@ import { PlayerSprite } from './PlayerSprite'
 import { PLAYER_SPEED, Direction } from '../../config'
 import { TouchControls } from '../mobile/TouchControls'
 
-const IDLE_FRAME: Record<Direction, number> = {
-  down: 1,
-  up: 4,
-  left: 7,
-  right: 10,
-  none: 1,
+const IDLE_ANIM: Record<Direction, string> = {
+  down: 'idle-down',
+  up: 'idle-up',
+  left: 'idle-right',
+  right: 'idle-right',
+  none: 'idle-down',
 }
 
 export class PlayerController {
@@ -36,8 +36,8 @@ export class PlayerController {
     // retain momentum from the previous frame otherwise.
     if (this.frozen) {
       this.player.setVelocity(0, 0)
-      this.player.anims.stop()
-      this.player.setFrame(IDLE_FRAME[this.currentFacing])
+      this.player.anims.play(IDLE_ANIM[this.currentFacing], true)
+      this.player.setFlipX(this.currentFacing === 'left')
       return
     }
 
@@ -61,19 +61,23 @@ export class PlayerController {
 
     if (velocityX < 0) {
       this.currentFacing = 'left'
-      this.player.anims.play('walk-left', true)
+      this.player.setFlipX(true)
+      this.player.anims.play('walk-right', true)
     } else if (velocityX > 0) {
       this.currentFacing = 'right'
+      this.player.setFlipX(false)
       this.player.anims.play('walk-right', true)
     } else if (velocityY < 0) {
       this.currentFacing = 'up'
+      this.player.setFlipX(false)
       this.player.anims.play('walk-up', true)
     } else if (velocityY > 0) {
       this.currentFacing = 'down'
+      this.player.setFlipX(false)
       this.player.anims.play('walk-down', true)
     } else {
-      this.player.anims.stop()
-      this.player.setFrame(IDLE_FRAME[this.currentFacing])
+      this.player.setFlipX(this.currentFacing === 'left')
+      this.player.anims.play(IDLE_ANIM[this.currentFacing], true)
     }
   }
 
