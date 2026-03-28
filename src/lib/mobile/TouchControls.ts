@@ -23,6 +23,7 @@ export class TouchControls {
   private originX = 0
   private originY = 0
   private dpad: Phaser.GameObjects.Image
+  private dpadHighlight: Phaser.GameObjects.Image
   private knob: Phaser.GameObjects.Graphics
 
   constructor(scene: Phaser.Scene) {
@@ -32,6 +33,13 @@ export class TouchControls {
     this.dpad.setDepth(DEPTH_JOYSTICK_BASE)
     this.dpad.setAlpha(DPAD_ALPHA)
     this.dpad.setVisible(false)
+
+    this.dpadHighlight = scene.add.image(0, 0, 'dpad-highlight')
+    this.dpadHighlight.setDisplaySize(DPAD_SIZE, DPAD_SIZE)
+    this.dpadHighlight.setScrollFactor(0)
+    this.dpadHighlight.setDepth(DEPTH_JOYSTICK_BASE)
+    this.dpadHighlight.setAlpha(DPAD_ALPHA)
+    this.dpadHighlight.setVisible(false)
 
     this.knob = scene.add.graphics()
     this.knob.fillStyle(JOYSTICK_KNOB_COLOR, JOYSTICK_KNOB_ALPHA)
@@ -50,7 +58,7 @@ export class TouchControls {
   }
 
   getGameObjects(): Phaser.GameObjects.GameObject[] {
-    return [this.dpad, this.knob]
+    return [this.dpad, this.dpadHighlight, this.knob]
   }
 
   private handlePointerDown(pointer: Phaser.Input.Pointer): void {
@@ -60,6 +68,7 @@ export class TouchControls {
 
     this.dpad.setPosition(pointer.x, pointer.y)
     this.dpad.setVisible(true)
+    this.dpadHighlight.setPosition(pointer.x, pointer.y)
     this.knob.setPosition(pointer.x, pointer.y)
     this.knob.setVisible(true)
   }
@@ -67,6 +76,7 @@ export class TouchControls {
   private handlePointerMove(pointer: Phaser.Input.Pointer): void {
     if (!pointer.isDown) return
     this.activeDirection = _directionFromDelta(pointer.x - this.originX, pointer.y - this.originY)
+    _updateHighlight(this.dpadHighlight, this.activeDirection)
 
     // NOTE: Clamp the knob position to the base radius so it doesn't drift
     // outside the dpad when the finger drags far away.
@@ -84,7 +94,19 @@ export class TouchControls {
   private handlePointerUp(): void {
     this.activeDirection = 'none'
     this.dpad.setVisible(false)
+    this.dpadHighlight.setVisible(false)
     this.knob.setVisible(false)
+  }
+}
+
+function _updateHighlight(highlight: Phaser.GameObjects.Image, direction: Direction): void {
+  const angles: Record<Direction, number | null> = { up: 0, right: 90, down: 180, left: 270, none: null }
+  const angle = angles[direction]
+  if (angle === null) {
+    highlight.setVisible(false)
+  } else {
+    highlight.setAngle(angle)
+    highlight.setVisible(true)
   }
 }
 

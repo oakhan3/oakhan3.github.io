@@ -42,7 +42,7 @@ const MESSAGES: Partial<Record<InteractableName, Message>> = {
     display_link: 'LinkedIn',
   },
   office: {
-    text: "Very business-ey building over here...",
+    text: 'Very business-ey building over here...',
     url: 'https://www.linkedin.com/in/omarkhan01/',
     display_link: 'LinkedIn',
   },
