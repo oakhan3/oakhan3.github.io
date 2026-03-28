@@ -80,7 +80,6 @@ export class OverworldScene extends Phaser.Scene {
     }
 
     this.cameras.main.startFollow(player, true)
-    this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
     this.matter.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
 
     if (!flags.disableOverlays) {
