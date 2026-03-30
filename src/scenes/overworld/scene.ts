@@ -29,10 +29,11 @@ const LAYERS: LayerConfig[] = [
   { name: 'Ground' },
   { name: 'BackBackTree', collision: 'fromGroup' },
   { name: 'BackTree', collision: 'fromGroup' },
+  { name: 'Inaccesible Area' },
   { name: 'Tile Rise', collision: 'fromGroup' },
   { name: 'BeachFun', collision: 'fromGroup' },
   { name: 'MiscOverlays', collision: 'fromGroup' },
-  { name: 'StageLights', collision: 'fromGroup' },
+  { name: 'StageLights' },
   { name: 'AbovePlayer', depth: DEPTH_ABOVE_PLAYER },
 ]
 
