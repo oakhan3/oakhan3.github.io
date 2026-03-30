@@ -18,21 +18,18 @@ import { isMobile, DEPTH_ABOVE_PLAYER } from '../../config'
 
 interface LayerConfig {
   name: string
-  collision?: 'fromGroup' | 'allTiles'
+  collision?: boolean
   depth?: number
 }
 
-// NOTE: 'fromGroup' reads per-tile objectgroup collision shapes from the tileset in Tiled.
-// 'allTiles' blocks every non-empty tile — used for Kiwi because its objectgroup shapes
-// weren't picked up by setCollisionFromCollisionGroup() despite being defined in Tiled.
 const LAYERS: LayerConfig[] = [
   { name: 'Ground' },
-  { name: 'BackBackTree', collision: 'fromGroup' },
-  { name: 'BackTree', collision: 'fromGroup' },
-  { name: 'Inaccesible Area' },
-  { name: 'Tile Rise', collision: 'fromGroup' },
-  { name: 'BeachFun', collision: 'fromGroup' },
-  { name: 'MiscOverlays', collision: 'fromGroup' },
+  { name: 'BackBackTree', collision: true },
+  { name: 'BackTree', collision: true },
+  { name: 'Inaccessible Area' },
+  { name: 'Tile Rise', collision: true },
+  { name: 'BeachFun', collision: true },
+  { name: 'MiscOverlays', collision: true },
   { name: 'StageLights' },
   { name: 'AbovePlayer', depth: DEPTH_ABOVE_PLAYER },
 ]
@@ -213,7 +210,7 @@ function _createLayers(
 
     // NOTE: Collision flags must be set BEFORE convertTilemapLayer() — only
     // tiles marked as colliding get converted to Matter bodies.
-    if (config.collision === 'fromGroup') {
+    if (config.collision) {
       layer.setCollisionFromCollisionGroup()
       // NOTE: Phaser bug — MatterTileBody calls Body.scale(body) where body is a null
       // local variable when the tile has flipX/flipY and the body was created from tile
@@ -221,9 +218,6 @@ function _createLayers(
       layer.forEachTile((tile) => {
         if (tile.collides && (tile.flipX || tile.flipY)) tile.setCollision(false)
       })
-      collisionLayers.push(layer)
-    } else if (config.collision === 'allTiles') {
-      layer.setCollisionByExclusion([-1])
       collisionLayers.push(layer)
     }
 
