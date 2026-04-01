@@ -12,9 +12,9 @@ export class BootScene extends Phaser.Scene {
     const centerY = this.cameras.main.centerY
 
     this.add
-      .text(centerX, centerY - 20, 'OMAR ALI KHAN', {
+      .text(centerX, centerY - 20, "OMAR ALI KHAN'S WORLD", {
         fontFamily: '"Press Start 2P"',
-        fontSize: '8px',
+        fontSize: '20px',
         color: '#e2e8f0',
       })
       .setOrigin(0.5)
@@ -22,7 +22,7 @@ export class BootScene extends Phaser.Scene {
     const prompt = this.add
       .text(centerX, centerY + 20, 'PRESS ANY KEY', {
         fontFamily: '"Press Start 2P"',
-        fontSize: '6px',
+        fontSize: '15px',
         color: '#a0aec0',
       })
       .setOrigin(0.5)

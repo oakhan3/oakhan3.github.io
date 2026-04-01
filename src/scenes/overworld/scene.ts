@@ -135,7 +135,7 @@ export class OverworldScene extends Phaser.Scene {
     )
 
     this.playerController.freeze()
-    dialog.show(`Hi, I'm Omar Ali Khan,\nwelcome to my World!`, undefined, undefined, () => {
+    dialog.show(`Hi, I'm Omar Ali Khan! Welcome! Please take your time to explore!`, undefined, undefined, () => {
       this.playerController.unfreeze()
       this.questOverlay.show(this.questSystem.getAll())
     })

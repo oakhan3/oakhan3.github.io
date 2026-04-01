@@ -21,7 +21,7 @@ export class PreloadScene extends Phaser.Scene {
     this.add
       .text(centerX, centerY - 16, 'LOADING...', {
         fontFamily: '"Press Start 2P"',
-        fontSize: '6px',
+        fontSize: '10px',
         color: '#a0aec0',
       })
       .setOrigin(0.5)
