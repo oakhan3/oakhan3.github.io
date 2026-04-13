@@ -69,7 +69,7 @@ describe('QuestOverlay', () => {
     game = createMinimalGame([OverlayTestScene])
     const scene = (await waitForScene(game, 'OverlayTestScene')) as OverlayTestScene
 
-    scene.overlay.show([{ name: 'kiwi-sign', label: 'Find Kiwi', completed: false }])
+    scene.overlay.show([{ name: ['kiwi-sign'], label: 'Find Kiwi', completed: false }])
 
     const container = findOverlayContainer(scene)
     expect(container.visible).toBe(true)
@@ -79,7 +79,7 @@ describe('QuestOverlay', () => {
     game = createMinimalGame([OverlayTestScene])
     const scene = (await waitForScene(game, 'OverlayTestScene')) as OverlayTestScene
 
-    scene.overlay.show([{ name: 'kiwi-sign', label: 'Find Kiwi', completed: false }])
+    scene.overlay.show([{ name: ['kiwi-sign'], label: 'Find Kiwi', completed: false }])
     simulateKeyPress(game, 'Enter', 13)
     await delay(50)
 
@@ -91,7 +91,7 @@ describe('QuestOverlay', () => {
     game = createMinimalGame([OverlayTestScene])
     const scene = (await waitForScene(game, 'OverlayTestScene')) as OverlayTestScene
 
-    scene.overlay.show([{ name: 'kiwi-sign', label: 'Find Kiwi', completed: false }])
+    scene.overlay.show([{ name: ['kiwi-sign'], label: 'Find Kiwi', completed: false }])
     simulatePointerDown(game, GBA_WIDTH / 2, 100)
     await delay(50)
 
