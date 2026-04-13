@@ -24,8 +24,8 @@ import {
 } from './constants'
 
 export class QuestOverlay extends BaseOverlay {
-  show(quests: Array<Quest & { completed: boolean }>): void {
-    super._show()
+  show(quests: Array<Quest & { completed: boolean }>, onDismiss?: () => void): void {
+    super._show(onDismiss)
 
     const scene = this.scene
     const mobile = isMobile()

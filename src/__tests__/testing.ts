@@ -54,8 +54,11 @@ export async function bootToOverworld(game: Phaser.Game): Promise<Phaser.Scene> 
   return waitForScene(game, 'OverworldScene')
 }
 
-// NOTE: Space twice — first press rushes the typewriter text, second press closes the dialog.
+// NOTE: Space twice closes the dialog (first rushes typewriter, second dismisses), then
+// once more to dismiss the quest overlay that opens immediately after.
 export async function dismissDialog(game: Phaser.Game): Promise<void> {
+  await delay(100)
+  simulateKeyPress(game, ' ', 32)
   await delay(100)
   simulateKeyPress(game, ' ', 32)
   await delay(100)

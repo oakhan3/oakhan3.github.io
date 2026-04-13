@@ -98,7 +98,13 @@ export class OverworldScene extends Phaser.Scene {
     this.questOverlay = new QuestOverlay(this)
     this.congratulatoryOverlay = new CongratulatoryOverlay(this)
 
-    const questButton = new QuestButton(this, this.questOverlay, this.questSystem)
+    const questButton = new QuestButton(
+      this,
+      this.questOverlay,
+      this.questSystem,
+      () => this.playerController.freeze(),
+      () => this.playerController.unfreeze(),
+    )
 
     _setupCameras(
       this,
@@ -136,8 +142,8 @@ export class OverworldScene extends Phaser.Scene {
 
     this.playerController.freeze()
     dialog.show(`Hi, I'm Omar Ali Khan, Welcome!`, undefined, undefined, () => {
-      this.playerController.unfreeze()
-      this.questOverlay.show(this.questSystem.getAll())
+      this.playerController.freeze()
+      this.questOverlay.show(this.questSystem.getAll(), () => this.playerController.unfreeze())
     })
   }
 

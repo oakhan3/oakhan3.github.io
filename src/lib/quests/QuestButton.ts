@@ -27,7 +27,13 @@ export class QuestButton {
   private container: Phaser.GameObjects.Container
   private zone: Phaser.GameObjects.Zone
 
-  constructor(scene: Phaser.Scene, questOverlay: QuestOverlay, questSystem: QuestSystem) {
+  constructor(
+    scene: Phaser.Scene,
+    questOverlay: QuestOverlay,
+    questSystem: QuestSystem,
+    onOpen?: () => void,
+    onClose?: () => void,
+  ) {
     const mobile = isMobile()
     const btnHeight = mobile ? BTN_HEIGHT_MOBILE_PX : BTN_HEIGHT_DESKTOP_PX
     const btnWidth = mobile ? BTN_WIDTH_MOBILE_PX : BTN_WIDTH_DESKTOP_PX
@@ -60,8 +66,10 @@ export class QuestButton {
         event.stopPropagation()
         if (questOverlay.isOpen) {
           questOverlay.dismiss()
+          onClose?.()
         } else {
-          questOverlay.show(questSystem.getAll())
+          onOpen?.()
+          questOverlay.show(questSystem.getAll(), onClose)
         }
       },
     )
@@ -80,8 +88,10 @@ export class QuestButton {
         event.stopPropagation()
         if (questOverlay.isOpen) {
           questOverlay.dismiss()
+          onClose?.()
         } else {
-          questOverlay.show(questSystem.getAll())
+          onOpen?.()
+          questOverlay.show(questSystem.getAll(), onClose)
         }
       },
     )
