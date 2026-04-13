@@ -8,7 +8,7 @@ export const GBA_HEIGHT = 320
 export const TILE_SIZE = 16
 
 // NOTE: Matter.js velocity is in pixels per physics step, not pixels per second like Arcade.
-export const PLAYER_SPEED = 1.8
+export const PLAYER_SPEED = 1.6
 
 export const PLAYER_FRAME_WIDTH = 48
 export const PLAYER_FRAME_HEIGHT = 48
