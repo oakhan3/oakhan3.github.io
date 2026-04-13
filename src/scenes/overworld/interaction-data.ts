@@ -24,7 +24,7 @@ const TIKTOK_URL = 'https://www.tiktok.com/@kingkiwifi'
 const LINKEDIN_URL = 'https://www.linkedin.com/in/omarkhan01/'
 const GITHUB_URL = 'https://github.com/oakhan3/'
 const INSTAGRAM_URL = 'https://www.instagram.com/electricoaksband/'
-const BLOG_URL = 'https://www.breaking-changes.blog/'
+const BLOG_URL = 'https://breaking-changes.blog/'
 
 // NOTE: Dialog messages keyed by the Tiled object name. Each interactable name
 // maps to the text shown in the dialog box when the player interacts with it.
