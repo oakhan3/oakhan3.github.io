@@ -106,7 +106,7 @@ export class OverworldScene extends Phaser.Scene {
       () => this.playerController.unfreeze(),
     )
 
-    _setupCameras(
+    const uiCamera = _setupCameras(
       this,
       touchControls,
       dialog,
@@ -139,6 +139,10 @@ export class OverworldScene extends Phaser.Scene {
         }
       })(),
     )
+
+    // NOTE: The UI camera's ignore list is built before the interaction system
+    // is created, so its world-space objects must be explicitly ignored afterward.
+    uiCamera?.ignore(this.interactionSystem.getGameObjects())
 
     this.playerController.freeze()
     dialog.show(`Hi, I'm Omar Ali Khan, Welcome!`, undefined, undefined, () => {
@@ -182,8 +186,8 @@ function _setupCameras(
   questOverlay: QuestOverlay,
   congratulatoryOverlay: CongratulatoryOverlay,
   questButtonObjects: Phaser.GameObjects.GameObject[],
-): void {
-  if (!isMobile()) return
+): Phaser.Cameras.Scene2D.Camera | null {
+  if (!isMobile()) return null
 
   scene.cameras.main.setZoom(2)
   // NOTE: A second camera at zoom 1 renders UI elements (dialog, quest UI) so they
@@ -201,6 +205,7 @@ function _setupCameras(
   scene.cameras.main.ignore(uiObjects)
   const uiSet = new Set(uiObjects)
   uiCamera.ignore(scene.children.list.filter((obj) => !uiSet.has(obj)))
+  return uiCamera
 }
 
 function _createLayers(

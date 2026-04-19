@@ -86,6 +86,10 @@ export class InteractionSystem {
     })
   }
 
+  getGameObjects(): Phaser.GameObjects.GameObject[] {
+    return [this.proximityLabel]
+  }
+
   triggerByName(name: string): void {
     const message = this.config.messages[name]
     if (!message) return
