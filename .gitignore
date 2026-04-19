@@ -7,3 +7,4 @@ dist/
 coverage/
 .last-run.json
 test-results/
+CLAUDE.md
