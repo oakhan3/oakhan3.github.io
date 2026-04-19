@@ -41,7 +41,7 @@ export class InteractionSystem {
   private touchStartX = 0
   private touchStartY = 0
   private dialogOpenOnTouchStart = false
-  private proximityLabel: Phaser.GameObjects.Text
+  private proximityLabel: Phaser.GameObjects.Container
 
   constructor(
     scene: Phaser.Scene,
@@ -59,12 +59,21 @@ export class InteractionSystem {
     this.interactables = _parseInteractables(map)
     this.spaceKey = scene.input.keyboard!.addKey('SPACE')
     this.enterKey = scene.input.keyboard!.addKey('ENTER')
-    this.proximityLabel = scene.add.text(0, 0, 'TAP!', {
+    const labelText = scene.add.text(0, 0, 'TAP!', {
       fontFamily: UI_FONT_FAMILY,
       fontSize: '6px',
       color: '#ff1493',
     })
-    this.proximityLabel.setOrigin(0.5, 1)
+    // NOTE: Measure text first so the background can be sized to fit.
+    const pad = 3
+    const w = labelText.width + pad * 2
+    const h = labelText.height + pad * 2
+    const bg = scene.add.graphics()
+    bg.fillStyle(0x000000, 0.75)
+    bg.fillRoundedRect(-w / 2, -h, w, h, 2)
+    labelText.setOrigin(0.5, 1)
+    labelText.setPosition(0, -pad)
+    this.proximityLabel = scene.add.container(0, 0, [bg, labelText])
     this.proximityLabel.setDepth(DEPTH_ABOVE_PLAYER)
     this.proximityLabel.setVisible(false)
     // NOTE: Snapshot dialog state on pointerdown. The dialog closes synchronously
