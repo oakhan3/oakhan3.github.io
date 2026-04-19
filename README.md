@@ -63,7 +63,7 @@ Optimizations applied:
 - **Custom lighting** — nighttime overlay. Supports three cone types (stage, lamp, headlight) and three animation modes: flicker (lamps), pulse (building windows), and color-cycle (stage spotlights). Each light has a random phase offset for organic variation.
 - **Procedural lightning** — a bolt strikes at a fixed location at random intervals, built with midpoint displacement.
 - **Quest system** — tracks completion of named objectives. A banner slides in on each completion. Overall completion is tracked.
-- **Proximity interactables** — objects defined in Tiled trigger typewriter-style dialog when the player walks nearby. Dialogs support inline hyperlinks that open in a new tab (Safari-safe via anchor click).
+- **Proximity interactables** — objects defined in Tiled trigger typewriter-style dialog when the player walks nearby. A neon pink TAP! indicator appears above interactables when the player is in range. Dialogs support inline hyperlinks that open in a new tab (Safari-safe via anchor click).
 - **Custom map and collisions** — tilemap built in Tiled with per-tile convex polygon collision shapes, an above-player render layer, and separate object layers for interactables.
 - **Dialog system** — typewriter effect with configurable speed, optional URL link button with expanded mobile hit area, and open/close callbacks for chaining actions.
 - **Touch controls** — drag-from-origin virtual d-pad with a visual indicator.

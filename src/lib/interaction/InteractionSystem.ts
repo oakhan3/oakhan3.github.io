@@ -1,5 +1,5 @@
 import Phaser from 'phaser'
-import { TOUCH_DEADZONE_PX } from '../../config'
+import { DEPTH_ABOVE_PLAYER, TOUCH_DEADZONE_PX, UI_FONT_FAMILY } from '../../config'
 import { computeCentroid } from '../math'
 import { PlayerController } from '../player/PlayerController'
 import { DialogBox } from '../dialog/DialogBox'
@@ -41,6 +41,7 @@ export class InteractionSystem {
   private touchStartX = 0
   private touchStartY = 0
   private dialogOpenOnTouchStart = false
+  private proximityLabel: Phaser.GameObjects.Text
 
   constructor(
     scene: Phaser.Scene,
@@ -58,6 +59,14 @@ export class InteractionSystem {
     this.interactables = _parseInteractables(map)
     this.spaceKey = scene.input.keyboard!.addKey('SPACE')
     this.enterKey = scene.input.keyboard!.addKey('ENTER')
+    this.proximityLabel = scene.add.text(0, 0, 'TAP!', {
+      fontFamily: UI_FONT_FAMILY,
+      fontSize: '6px',
+      color: '#ff1493',
+    })
+    this.proximityLabel.setOrigin(0.5, 1)
+    this.proximityLabel.setDepth(DEPTH_ABOVE_PLAYER)
+    this.proximityLabel.setVisible(false)
     // NOTE: Snapshot dialog state on pointerdown. The dialog closes synchronously
     // during pointerdown (via handleAdvance), so by the time pointerup fires
     // isOpen() is already false — using the snapshot prevents the closing tap
@@ -95,7 +104,16 @@ export class InteractionSystem {
     // the dialog closes.
     if (this.playerController.isFrozen() || this.dialog.isOpen()) {
       this.tapPending = false
+      this.proximityLabel.setVisible(false)
       return
+    }
+
+    const nearby = this._findNearbyInteractable()
+    if (nearby) {
+      this.proximityLabel.setPosition(nearby.x, nearby.y - 8)
+      this.proximityLabel.setVisible(true)
+    } else {
+      this.proximityLabel.setVisible(false)
     }
 
     // NOTE: Use JustDown for triggering. The onClose callback calls resetKeys(),
@@ -108,7 +126,6 @@ export class InteractionSystem {
 
     if (!triggered) return
 
-    const nearby = this._findNearbyInteractable()
     if (!nearby) return
 
     const message = this.config.messages[nearby.name]
